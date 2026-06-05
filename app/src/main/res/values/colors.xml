@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand -->
+    <color name="primary">#5C6BC0</color>          <!-- Indigo 400 -->
+    <color name="primaryDark">#3949AB</color>       <!-- Indigo 600 -->
+    <color name="primaryLight">#E8EAF6</color>      <!-- Indigo 50 -->
+    <color name="accent">#7E57C2</color>            <!-- Deep Purple 400 -->
+
+    <!-- Backgrounds -->
+    <color name="bgPage">#F5F5F7</color>
+    <color name="cardBg">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="textPrimary">#1A1A2E</color>
+    <color name="textSecondary">#6B6B8A</color>
+
+    <!-- Status bar / nav -->
+    <color name="statusBar">#3949AB</color>
+
+    <!-- Chip colors per type (used programmatically if needed) -->
+    <color name="chipMeal">#EF9A9A</color>
+    <color name="chipExercise">#A5D6A7</color>
+    <color name="chipStandUp">#FFCC80</color>
+    <color name="chipWater">#81D4FA</color>
+    <color name="chipSleep">#CE93D8</color>
+    <color name="chipMeditation">#80CBC4</color>
+    <color name="chipCustom">#BDBDBD</color>
+</resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#8B97EA</color>
+    <color name="primaryDark">#6672D6</color>
+    <color name="primaryLight">#1E2447</color>
+    <color name="accent">#A78BFA</color>
+
+    <color name="bgPage">#0F1220</color>
+    <color name="cardBg">#171B2F</color>
+
+    <color name="textPrimary">#F3F5FF</color>
+    <color name="textSecondary">#B7BCE0</color>
+
+    <color name="statusBar">#0B0E19</color>
+
+    <color name="chipMeal">#EF9A9A</color>
+    <color name="chipExercise">#A5D6A7</color>
+    <color name="chipStandUp">#FFCC80</color>
+    <color name="chipWater">#81D4FA</color>
+    <color name="chipSleep">#CE93D8</color>
+    <color name="chipMeditation">#80CBC4</color>
+    <color name="chipCustom">#BDBDBD</color>
+</resources>
