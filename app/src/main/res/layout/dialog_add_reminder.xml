@@ -39,6 +39,46 @@
             android:background="@drawable/bg_field"
             android:paddingHorizontal="12dp"/>
 
+        <!-- ── Meal Specific Fields ── -->
+        <LinearLayout
+            android:id="@+id/llMealDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/LabelText"
+                android:layout_marginTop="18dp"
+                android:text="Dish Type"/>
+
+            <EditText
+                android:id="@+id/etDishType"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:hint="e.g. Pasta, Salad, etc."
+                android:inputType="textCapSentences"
+                android:background="@drawable/bg_field"
+                android:paddingHorizontal="12dp"/>
+
+            <TextView
+                style="@style/LabelText"
+                android:layout_marginTop="18dp"
+                android:text="Ingredients"/>
+
+            <EditText
+                android:id="@+id/etIngredients"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginTop="6dp"
+                android:hint="e.g. Spinach, Tomato, Tofu"
+                android:inputType="textMultiLine|textCapSentences"
+                android:gravity="top"
+                android:background="@drawable/bg_field"
+                android:padding="12dp"/>
+        </LinearLayout>
+
         <!-- ── Mode ── -->
         <TextView
             style="@style/LabelText"

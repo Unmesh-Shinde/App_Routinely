@@ -58,8 +58,27 @@ class DietPlanActivity : AppCompatActivity() {
 
         fabAdd.setOnClickListener { showMealDialog(null) }
 
+        findViewById<Button>(R.id.btnQuickRoutine).setOnClickListener {
+            addQuickRoutine()
+        }
+
         loadPlan(PlanDuration.WEEKLY)
         setupDaySelector(horizontalDayScroll)
+    }
+
+    private fun addQuickRoutine() {
+        val list = currentPlan.dailyMeals.getOrPut(selectedDay) { mutableListOf() }
+        list.add(Meal(name = "Healthy Breakfast", hour = 8, minute = 0, mealType = "Breakfast", description = "Eggs, toast, fruit"))
+        list.add(Meal(name = "Power Lunch", hour = 13, minute = 0, mealType = "Lunch", description = "Chicken salad, quinoa"))
+        list.add(Meal(name = "Light Dinner", hour = 19, minute = 30, mealType = "Dinner", description = "Grilled fish, vegetables"))
+        
+        planManager.saveDietPlan(currentPlan)
+        // Sync reminders for all added meals
+        list.takeLast(3).forEach { 
+            planManager.syncMealReminder(this, it, selectedDay, currentPlan.duration)
+        }
+        refreshMeals()
+        Toast.makeText(this, "Standard daily routine added! 🥗", Toast.LENGTH_SHORT).show()
     }
 
     private fun loadPlan(duration: PlanDuration) {
@@ -103,17 +122,28 @@ class DietPlanActivity : AppCompatActivity() {
         val tvTime = v.findViewById<TextView>(R.id.tvMealTime)
         val btnTime = v.findViewById<Button>(R.id.btnPickMealTime)
         val swReminder = v.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.swMealReminder)
+        val spinnerType = v.findViewById<Spinner>(R.id.spinnerMealType)
+
+        val mealTypes = arrayOf("Breakfast", "Lunch", "Dinner", "Snack")
+        val spinnerAdapter = ArrayAdapter(this, R.layout.spinner_item, mealTypes)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerType.adapter = spinnerAdapter
 
         var selHour = existing?.hour ?: 8
         var selMin = existing?.minute ?: 0
         
-        fun updateTimeLabel() { tvTime.text = "%02d:%02d".format(selHour, selMin) }
+        fun updateTimeLabel() {
+            val h = if (selHour == 0 || selHour == 12) 12 else selHour % 12
+            val amPm = if (selHour < 12) "AM" else "PM"
+            tvTime.text = "%02d:%02d %s".format(h, selMin, amPm)
+        }
         updateTimeLabel()
 
         existing?.let {
             etName.setText(it.name)
             etNotes.setText(it.description)
             swReminder.isChecked = it.isReminderEnabled
+            spinnerType.setSelection(mealTypes.indexOf(it.mealType).coerceAtLeast(0))
         }
 
         btnTime.setOnClickListener {
@@ -121,35 +151,44 @@ class DietPlanActivity : AppCompatActivity() {
                 selHour = h
                 selMin = m
                 updateTimeLabel()
-            }, selHour, selMin, true).show()
+            }, selHour, selMin, false).show()
         }
 
-        AlertDialog.Builder(this)
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle(if (existing == null) "Add Meal" else "Edit Meal")
             .setView(v)
-            .setPositiveButton("Save") { _, _ ->
-                val name = etName.text.toString().trim()
-                if (name.isEmpty()) return@setPositiveButton
-                
-                val newMeal = Meal(
-                    id = existing?.id ?: System.currentTimeMillis().toInt(),
-                    name = name,
-                    description = etNotes.text.toString().trim(),
-                    hour = selHour,
-                    minute = selMin,
-                    isReminderEnabled = swReminder.isChecked
-                )
-                
-                val list = currentPlan.dailyMeals.getOrPut(selectedDay) { mutableListOf() }
-                val idx = list.indexOfFirst { it.id == newMeal.id }
-                if (idx >= 0) list[idx] = newMeal else list.add(newMeal)
-                
-                planManager.saveDietPlan(currentPlan)
-                planManager.syncMealReminder(this@DietPlanActivity, newMeal, selectedDay, currentPlan.duration)
-                refreshMeals()
-            }
+            .setPositiveButton("Save", null)
             .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+
+        dialog.show()
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val name = etName.text.toString().trim()
+            if (name.isEmpty()) {
+                etName.error = "Required"
+                return@setOnClickListener
+            }
+            
+            val newMeal = Meal(
+                id = existing?.id ?: System.currentTimeMillis().toInt(),
+                name = name,
+                description = etNotes.text.toString().trim(),
+                hour = selHour,
+                minute = selMin,
+                isReminderEnabled = swReminder.isChecked,
+                mealType = spinnerType.selectedItem.toString()
+            )
+            
+            val list = currentPlan.dailyMeals.getOrPut(selectedDay) { mutableListOf() }
+            val idx = list.indexOfFirst { it.id == newMeal.id }
+            if (idx >= 0) list[idx] = newMeal else list.add(newMeal)
+            
+            planManager.saveDietPlan(currentPlan)
+            planManager.syncMealReminder(this@DietPlanActivity, newMeal, selectedDay, currentPlan.duration)
+            refreshMeals()
+            dialog.dismiss()
+        }
     }
 
     private fun editMeal(meal: Meal) {
@@ -171,11 +210,19 @@ class DietPlanActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val m = items[position]
-            holder.tvEmoji.text = "🍳"
+            holder.tvEmoji.text = when (m.mealType) {
+                "Breakfast" -> "🍳"
+                "Lunch" -> "🥗"
+                "Dinner" -> "🍲"
+                "Snack" -> "🍎"
+                else -> "🍴"
+            }
             holder.tvTitle.text = m.name
-            holder.tvSubtitle.text = m.description
-            holder.tvTime.text = "%02d:%02d".format(m.hour, m.minute)
+            holder.tvSubtitle.text = "${m.mealType} • ${m.description}"
+            holder.tvTime.text = m.formatTime()
+            
             holder.itemView.setOnClickListener { onEdit(m) }
+            holder.itemView.findViewById<View>(R.id.btnEdit).setOnClickListener { onEdit(m) }
             
             // Hide reminder toggle for now in plan list to keep simple
             holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE

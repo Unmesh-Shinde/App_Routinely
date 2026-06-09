@@ -55,7 +55,7 @@ class ReminderAdapter(
                 "Every ${r.intervalMinutes} min"
             } else {
                 val days = buildDaysLabel(r.repeatDays)
-                "%02d:%02d  %s".format(r.hour, r.minute, days)
+                "${r.formatTime()}  $days"
             }
 
             itemView.alpha = if (r.isEnabled) 1f else 0.45f

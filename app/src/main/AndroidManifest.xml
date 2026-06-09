@@ -28,7 +28,7 @@
         <activity
             android:name=".RemindersActivity"
             android:exported="false"
-            android:label="Set Reminders"/>
+            android:label="View Reminders"/>
 
         <activity
             android:name=".DietPlanActivity"

@@ -31,6 +31,10 @@ object ReminderDialogHelper {
         val btnPickTime   = v.findViewById<Button>(R.id.btnPickTime)
         val etIntervalMin = v.findViewById<EditText>(R.id.etIntervalMin)
 
+        val llMealDetails = v.findViewById<View>(R.id.llMealDetails)
+        val etDishType    = v.findViewById<EditText>(R.id.etDishType)
+        val etIngredients = v.findViewById<EditText>(R.id.etIngredients)
+
         val cbDays = listOf(
             v.findViewById<SwitchCompat>(R.id.swMon),
             v.findViewById<SwitchCompat>(R.id.swTue),
@@ -42,15 +46,21 @@ object ReminderDialogHelper {
         )
 
         val types = ReminderType.values()
-        spinnerType.adapter = ArrayAdapter(
-            context, android.R.layout.simple_spinner_dropdown_item,
+        val adapter = ArrayAdapter(
+            context, R.layout.spinner_item,
             types.map { "${it.emoji}  ${it.label}" }.toTypedArray()
         )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerType.adapter = adapter
 
         var selHour = existing?.hour ?: 8
         var selMin  = existing?.minute ?: 0
 
-        fun refreshTimeLabel() { tvTime.text = "%02d:%02d".format(selHour, selMin) }
+        fun refreshTimeLabel() {
+            val h = if (selHour == 0 || selHour == 12) 12 else selHour % 12
+            val amPm = if (selHour < 12) "AM" else "PM"
+            tvTime.text = "%02d:%02d %s".format(h, selMin, amPm)
+        }
         refreshTimeLabel()
 
         existing?.let { r ->
@@ -60,7 +70,10 @@ object ReminderDialogHelper {
                 rbInterval.isChecked = true
                 etIntervalMin.setText(r.intervalMinutes.toString())
             }
+            etDishType.setText(r.dishType)
+            etIngredients.setText(r.ingredients)
             cbDays.forEachIndexed { i, sw -> sw.isChecked = (i + 1) in r.repeatDays }
+            llMealDetails.visibility = if (r.type == ReminderType.MEAL) View.VISIBLE else View.GONE
         } ?: cbDays.forEach { it.isChecked = true }
 
         spinnerType.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -69,6 +82,7 @@ object ReminderDialogHelper {
                 if (existing == null && etTitle.text.isNullOrBlank()) {
                     etTitle.setText(type.defaultTitle)
                 }
+                llMealDetails.visibility = if (type == ReminderType.MEAL) View.VISIBLE else View.GONE
             }
             override fun onNothingSelected(p: AdapterView<*>?) {}
         }
@@ -78,7 +92,7 @@ object ReminderDialogHelper {
                 selHour = h
                 selMin = m
                 refreshTimeLabel()
-            }, selHour, selMin, true).show()
+            }, selHour, selMin, false).show()
         }
 
         fun syncVisibility() {
@@ -89,7 +103,7 @@ object ReminderDialogHelper {
         syncVisibility()
         rgMode.setOnCheckedChangeListener { _, _ -> syncVisibility() }
 
-        val dialog = AlertDialog.Builder(context)
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(context)
             .setTitle(if (existing == null) "Add Reminder" else "Edit Reminder")
             .setView(v)
             .setPositiveButton("Save", null)
@@ -109,6 +123,8 @@ object ReminderDialogHelper {
             val isInterval = rbInterval.isChecked
             val intervalMin = etIntervalMin.text.toString().toIntOrNull()?.coerceAtLeast(1) ?: 60
             val days = cbDays.mapIndexedNotNull { i, sw -> if (sw.isChecked) i + 1 else null }
+            val dishType = etDishType.text.toString().trim()
+            val ingredients = etIngredients.text.toString().trim()
 
             if (!isInterval && days.isEmpty()) {
                 Toast.makeText(context, "Select at least one day", Toast.LENGTH_SHORT).show()
@@ -125,7 +141,9 @@ object ReminderDialogHelper {
                     isIntervalBased = isInterval,
                     intervalMinutes = intervalMin,
                     repeatDays = days,
-                    isEnabled = existing?.isEnabled ?: true
+                    isEnabled = existing?.isEnabled ?: true,
+                    dishType = if (selectedType == ReminderType.MEAL) dishType else "",
+                    ingredients = if (selectedType == ReminderType.MEAL) ingredients else ""
                 )
             )
 

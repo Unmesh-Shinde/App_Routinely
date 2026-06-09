@@ -8,9 +8,21 @@ enum class ReminderType(
     val emoji: String,
     val defaultMessage: String
 ) {
+    MEAL(
+        "Meal Time", "Meal Reminder", "🍽️",
+        "Time for your meal. Eat healthy and mindfully!"
+    ),
+    EXERCISE(
+        "Exercise", "Workout Time", "💪",
+        "Time to get moving! Your body will thank you."
+    ),
     HYDRATION(
         "Hydration", "Drink Water", "💧",
-        "Stay hydrated! Time to drink a glass of water."
+        "Stay hydrated! Time to drink a glass of water now."
+    ),
+    SLEEP(
+        "Sleep", "Bedtime", "😴",
+        "Time to wind down. Get some restful sleep tonight!"
     ),
     MEDITATION(
         "Meditation", "Meditation Time", "🧘",
@@ -47,4 +59,10 @@ data class Reminder(
     val dishType: String = "",
     val ingredients: String = "",
     val isHidden: Boolean = false
-) : Serializable
+) : Serializable {
+    fun formatTime(): String {
+        val h = if (hour == 0 || hour == 12) 12 else hour % 12
+        val amPm = if (hour < 12) "AM" else "PM"
+        return "%02d:%02d %s".format(h, minute, amPm)
+    }
+}

@@ -32,7 +32,10 @@ class WorkoutPlanActivity : AppCompatActivity() {
 
         planManager = PlanManager(this)
 
-        val llChallenges = findViewById<LinearLayout>(R.id.llChallenges)
+        val cardWeekly = findViewById<View>(R.id.cardWeekly)
+        val card10 = findViewById<View>(R.id.card10Days)
+        val card15 = findViewById<View>(R.id.card15Days)
+        val card30 = findViewById<View>(R.id.card30Days)
         val llDays = findViewById<LinearLayout>(R.id.llWorkoutDays)
         val rvExercises = findViewById<RecyclerView>(R.id.rvExercises)
         val fabAdd = findViewById<FloatingActionButton>(R.id.fabAddExercise)
@@ -41,38 +44,37 @@ class WorkoutPlanActivity : AppCompatActivity() {
         rvExercises.layoutManager = LinearLayoutManager(this)
         rvExercises.adapter = adapter
 
-        // Setup Challenge Selectors
-        setupChallengeSelectors(llChallenges, llDays)
+        val cards = listOf(cardWeekly, card10, card15, card30)
+        cards.forEachIndexed { i, card ->
+            card.setOnClickListener {
+                currentDuration = when (i) {
+                    0 -> ChallengeDuration.WEEKLY
+                    1 -> ChallengeDuration.TEN_DAYS
+                    2 -> ChallengeDuration.FIFTEEN_DAYS
+                    else -> ChallengeDuration.THIRTY_DAYS
+                }
+                loadPlan(currentDuration)
+                setupDaySelector(llDays)
+                updateChallengeUI(cards)
+            }
+        }
 
         fabAdd.setOnClickListener { showExerciseDialog(null) }
 
         loadPlan(ChallengeDuration.TEN_DAYS)
         setupDaySelector(llDays)
+        updateChallengeUI(cards)
     }
 
-    private fun setupChallengeSelectors(container: LinearLayout, dayContainer: LinearLayout) {
-        for (i in 0 until container.childCount) {
-            val card = container.getChildAt(i)
-            card.setOnClickListener {
-                currentDuration = when (i) {
-                    0 -> ChallengeDuration.TEN_DAYS
-                    1 -> ChallengeDuration.FIFTEEN_DAYS
-                    else -> ChallengeDuration.THIRTY_DAYS
-                }
-                loadPlan(currentDuration)
-                setupDaySelector(dayContainer)
-                updateChallengeUI(container)
+    private fun updateChallengeUI(cards: List<View>) {
+        cards.forEachIndexed { i, card ->
+            val isSelected = when (i) {
+                0 -> currentDuration == ChallengeDuration.WEEKLY
+                1 -> currentDuration == ChallengeDuration.TEN_DAYS
+                2 -> currentDuration == ChallengeDuration.FIFTEEN_DAYS
+                else -> currentDuration == ChallengeDuration.THIRTY_DAYS
             }
-        }
-    }
-
-    private fun updateChallengeUI(container: LinearLayout) {
-        for (i in 0 until container.childCount) {
-            container.getChildAt(i).alpha = if (
-                (i == 0 && currentDuration == ChallengeDuration.TEN_DAYS) ||
-                (i == 1 && currentDuration == ChallengeDuration.FIFTEEN_DAYS) ||
-                (i == 2 && currentDuration == ChallengeDuration.THIRTY_DAYS)
-            ) 1f else 0.6f
+            card.alpha = if (isSelected) 1f else 0.6f
         }
     }
 
@@ -117,10 +119,16 @@ class WorkoutPlanActivity : AppCompatActivity() {
         val tvTime = v.findViewById<TextView>(R.id.tvExTime)
         val btnTime = v.findViewById<Button>(R.id.btnPickExTime)
         val swReminder = v.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.swExReminder)
+        val etTarget = v.findViewById<EditText>(R.id.etExTarget)
+        val sliderIntensity = v.findViewById<com.google.android.material.slider.Slider>(R.id.sliderExIntensity)
 
         var selHour = existing?.hour ?: 7
         var selMin = existing?.minute ?: 0
-        fun updateTimeLabel() { tvTime.text = "%02d:%02d".format(selHour, selMin) }
+        fun updateTimeLabel() {
+            val h = if (selHour == 0 || selHour == 12) 12 else selHour % 12
+            val amPm = if (selHour < 12) "AM" else "PM"
+            tvTime.text = "%02d:%02d %s".format(h, selMin, amPm)
+        }
         updateTimeLabel()
 
         existing?.let {
@@ -128,6 +136,8 @@ class WorkoutPlanActivity : AppCompatActivity() {
             etSets.setText(it.sets.toString())
             etReps.setText(it.reps)
             swReminder.isChecked = it.isReminderEnabled
+            etTarget.setText(it.targetArea)
+            sliderIntensity.value = it.intensity.toFloat()
         }
 
         btnTime.setOnClickListener {
@@ -135,36 +145,46 @@ class WorkoutPlanActivity : AppCompatActivity() {
                 selHour = h
                 selMin = m
                 updateTimeLabel()
-            }, selHour, selMin, true).show()
+            }, selHour, selMin, false).show()
         }
 
-        AlertDialog.Builder(this)
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle(if (existing == null) "Add Exercise" else "Edit Exercise")
             .setView(v)
-            .setPositiveButton("Save") { _, _ ->
-                val name = etName.text.toString().trim()
-                if (name.isEmpty()) return@setPositiveButton
-                
-                val newEx = Exercise(
-                    id = existing?.id ?: System.currentTimeMillis().toInt(),
-                    name = name,
-                    sets = etSets.text.toString().toIntOrNull() ?: 3,
-                    reps = etReps.text.toString(),
-                    hour = selHour,
-                    minute = selMin,
-                    isReminderEnabled = swReminder.isChecked
-                )
-                
-                val list = currentPlan.dailyExercises.getOrPut(selectedDay) { mutableListOf() }
-                val idx = list.indexOfFirst { it.id == newEx.id }
-                if (idx >= 0) list[idx] = newEx else list.add(newEx)
-                
-                planManager.saveWorkoutPlan(currentPlan)
-                planManager.syncExerciseReminder(this@WorkoutPlanActivity, newEx, selectedDay, currentPlan.duration)
-                refreshExercises()
-            }
+            .setPositiveButton("Save", null)
             .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+
+        dialog.show()
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val name = etName.text.toString().trim()
+            if (name.isEmpty()) {
+                etName.error = "Required"
+                return@setOnClickListener
+            }
+            
+            val newEx = Exercise(
+                id = existing?.id ?: System.currentTimeMillis().toInt(),
+                name = name,
+                sets = etSets.text.toString().toIntOrNull() ?: 3,
+                reps = etReps.text.toString(),
+                hour = selHour,
+                minute = selMin,
+                isReminderEnabled = swReminder.isChecked,
+                targetArea = etTarget.text.toString().trim(),
+                intensity = sliderIntensity.value.toInt()
+            )
+            
+            val list = currentPlan.dailyExercises.getOrPut(selectedDay) { mutableListOf() }
+            val idx = list.indexOfFirst { it.id == newEx.id }
+            if (idx >= 0) list[idx] = newEx else list.add(newEx)
+            
+            planManager.saveWorkoutPlan(currentPlan)
+            planManager.syncExerciseReminder(this@WorkoutPlanActivity, newEx, selectedDay, currentPlan.duration)
+            refreshExercises()
+            dialog.dismiss()
+        }
     }
 
     private fun editExercise(ex: Exercise) {
@@ -188,9 +208,11 @@ class WorkoutPlanActivity : AppCompatActivity() {
             val ex = items[position]
             holder.tvEmoji.text = "💪"
             holder.tvTitle.text = ex.name
-            holder.tvSubtitle.text = "${ex.sets} sets x ${ex.reps}"
-            holder.tvTime.text = "%02d:%02d".format(ex.hour, ex.minute)
+            holder.tvSubtitle.text = "${ex.sets}x${ex.reps} • ${ex.targetArea} (${ex.intensity}%)"
+            holder.tvTime.text = ex.formatTime()
+
             holder.itemView.setOnClickListener { onEdit(ex) }
+            holder.itemView.findViewById<View>(R.id.btnEdit).setOnClickListener { onEdit(ex) }
             
             holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
             holder.itemView.findViewById<View>(R.id.btnDelete).setOnClickListener {

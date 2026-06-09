@@ -51,7 +51,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="160dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnQuickRoutine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="16dp"
+        android:text="Quick Daily Routine"
+        android:textAllCaps="false"
+        app:cornerRadius="24dp"
+        android:backgroundTint="#EF9A9A"
+        android:textColor="@color/textPrimary"
+        app:icon="@android:drawable/ic_menu_today"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddMeal"

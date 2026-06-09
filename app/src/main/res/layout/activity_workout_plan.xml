@@ -59,17 +59,32 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardWeekly"
+                    android:layout_width="0dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#E8EAF6">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📅" android:textSize="20sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weekly" android:textStyle="bold" android:textSize="10sp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card10Days"
                     android:layout_width="0dp"
                     android:layout_height="100dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
+                    android:layout_marginHorizontal="4dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:cardBackgroundColor="#E8F5E9">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🔥" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10 Days" android:textStyle="bold" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🔥" android:textSize="20sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10 Days" android:textStyle="bold" android:textSize="10sp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -83,8 +98,8 @@
                     app:cardElevation="2dp"
                     app:cardBackgroundColor="#E1F5FE">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⚡" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="15 Days" android:textStyle="bold" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⚡" android:textSize="20sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="15 Days" android:textStyle="bold" android:textSize="10sp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -93,13 +108,13 @@
                     android:layout_width="0dp"
                     android:layout_height="100dp"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="4dp"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
                     app:cardBackgroundColor="#F3E5F5">
                     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏆" android:textSize="24sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="30 Days" android:textStyle="bold" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏆" android:textSize="20sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="30 Days" android:textStyle="bold" android:textSize="10sp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>

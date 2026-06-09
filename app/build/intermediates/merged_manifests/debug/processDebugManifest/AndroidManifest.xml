@@ -44,7 +44,7 @@
         <activity
             android:name="com.dailyroutine.app.RemindersActivity"
             android:exported="false"
-            android:label="Set Reminders" />
+            android:label="View Reminders" />
         <activity
             android:name="com.dailyroutine.app.DietPlanActivity"
             android:exported="false"

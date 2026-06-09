@@ -23,13 +23,15 @@ class ReminderManager(context: Context) {
         val json = prefs.getString(KEY_LIST, null) ?: return mutableListOf()
         return try {
             val type = object : TypeToken<MutableList<Reminder>>() {}.type
-            gson.fromJson<MutableList<Reminder>>(json, type) ?: mutableListOf<Reminder>()
+            val rawList: MutableList<Reminder>? = gson.fromJson(json, type)
+            // Filter out any entries where type might have become null due to enum mismatch
+            rawList?.filter { it.type != null }?.toMutableList() ?: mutableListOf()
         } catch (_: Exception) {
-            mutableListOf<Reminder>()
+            mutableListOf()
         }.sortedWith(
             compareBy<Reminder> { !it.isEnabled }
                 .thenBy { if (it.isIntervalBased) 1 else 0 }
-                .thenBy { it.type.ordinal }
+                .thenBy { it.type?.ordinal ?: ReminderType.CUSTOM.ordinal }
                 .thenBy { if (it.isIntervalBased) it.intervalMinutes else it.hour * 60 + it.minute }
                 .thenBy { it.title.lowercase() }
         ).toMutableList()

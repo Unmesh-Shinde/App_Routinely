@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Brand -->
-    <color name="primary">#5C6BC0</color>          <!-- Indigo 400 -->
-    <color name="primaryDark">#3949AB</color>       <!-- Indigo 600 -->
-    <color name="primaryLight">#E8EAF6</color>      <!-- Indigo 50 -->
-    <color name="accent">#7E57C2</color>            <!-- Deep Purple 400 -->
+    <color name="primary">#5B5FEF</color>          <!-- Indigo/Purple -->
+    <color name="primaryDark">#3F41C2</color>
+    <color name="primaryLight">#EEF0FF</color>
+    <color name="accent">#7E57C2</color>
+
+    <!-- Health Palette -->
+    <color name="healthNutrition">#4CAF50</color>  <!-- Soft Green -->
+    <color name="healthWorkout">#FF9800</color>    <!-- Orange -->
+    <color name="healthSleep">#42A5F5</color>      <!-- Blue -->
+    <color name="healthWalking">#26A69A</color>    <!-- Teal -->
+    <color name="healthWeight">#78909C</color>
+    <color name="healthCalories">#EC407A</color>
 
     <!-- Backgrounds -->
     <color name="bgPage">#F5F5F7</color>
     <color name="cardBg">#FFFFFF</color>
+    <color name="fieldBg">#F0F0F6</color>
+    <color name="fieldStroke">#D0D0E0</color>
 
     <!-- Text -->
     <color name="textPrimary">#1A1A2E</color>
     <color name="textSecondary">#6B6B8A</color>
 
     <!-- Status bar / nav -->
-    <color name="statusBar">#3949AB</color>
+    <color name="statusBar">#5B5FEF</color>
 
-    <!-- Chip colors per type (used programmatically if needed) -->
-    <color name="chipMeal">#EF9A9A</color>
-    <color name="chipExercise">#A5D6A7</color>
+    <!-- Chip colors per type -->
+    <color name="chipMeal">#4CAF50</color>
+    <color name="chipExercise">#FF9800</color>
     <color name="chipStandUp">#FFCC80</color>
-    <color name="chipWater">#81D4FA</color>
-    <color name="chipSleep">#CE93D8</color>
+    <color name="chipWater">#42A5F5</color>
+    <color name="chipSleep">#9575CD</color>
     <color name="chipMeditation">#80CBC4</color>
     <color name="chipCustom">#BDBDBD</color>
 </resources>
