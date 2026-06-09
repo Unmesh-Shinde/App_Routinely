@@ -8,29 +8,25 @@ enum class ReminderType(
     val emoji: String,
     val defaultMessage: String
 ) {
-    MEAL(
-        "Meal Time", "Meal Reminder", "🍽️",
-        "Time for your meal. Eat healthy and mindfully!"
-    ),
-    EXERCISE(
-        "Exercise", "Workout Time", "💪",
-        "Time to get moving! Your body will thank you."
-    ),
-    STAND_UP(
-        "Stand Up", "Time to Stretch!", "🪑",
-        "You've been sitting too long. Stand up and stretch for a few minutes!"
-    ),
-    WATER(
+    HYDRATION(
         "Hydration", "Drink Water", "💧",
-        "Stay hydrated! Drink a glass of water now."
-    ),
-    SLEEP(
-        "Sleep", "Bedtime", "😴",
-        "Time to wind down. Get some restful sleep tonight!"
+        "Stay hydrated! Time to drink a glass of water."
     ),
     MEDITATION(
         "Meditation", "Meditation Time", "🧘",
         "Take a mindful break. A few minutes of meditation will help you focus."
+    ),
+    DAILY_TODOS(
+        "Daily To Do's", "To-Do List", "📝",
+        "Check your tasks for today. Stay productive!"
+    ),
+    WEEKEND_TASKS(
+        "Weekend Tasks", "Weekend Focus", "🏡",
+        "Don't forget your weekend goals and chores."
+    ),
+    MONTHLY_TASKS(
+        "Monthly Tasks", "Monthly Review", "📅",
+        "Time to look at your monthly goals and progress."
     ),
     CUSTOM(
         "Custom", "My Reminder", "⏰",

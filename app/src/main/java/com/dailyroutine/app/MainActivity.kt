@@ -1,23 +1,28 @@
 package com.dailyroutine.app
 
 import android.content.Intent
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.card.MaterialCardView
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var mgr: ReminderManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        updateGreeting()
+        mgr = ReminderManager(this)
 
-        findViewById<MaterialCardView>(R.id.cardReminders).setOnClickListener {
-            startActivity(Intent(this, RemindersActivity::class.java))
-        }
+        updateGreeting()
 
         findViewById<MaterialCardView>(R.id.cardDiet).setOnClickListener {
             startActivity(Intent(this, DietPlanActivity::class.java))
@@ -25,6 +30,43 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<MaterialCardView>(R.id.cardWorkout).setOnClickListener {
             startActivity(Intent(this, WorkoutPlanActivity::class.java))
+        }
+
+        findViewById<MaterialCardView>(R.id.cardWalking).setOnClickListener {
+            startActivity(Intent(this, WalkingDataActivity::class.java))
+        }
+
+        findViewById<MaterialCardView>(R.id.cardSleep).setOnClickListener {
+            startActivity(Intent(this, SleepTrackingActivity::class.java))
+        }
+
+        findViewById<Button>(R.id.btnConnectFitness).setOnClickListener {
+            Toast.makeText(this, "Connecting to Fitness App...", Toast.LENGTH_SHORT).show()
+        }
+
+        findViewById<Button>(R.id.btnSetReminders).setOnClickListener {
+            ReminderDialogHelper.showDialog(this, mgr, null)
+        }
+
+        requestNotificationPermission()
+        requestExactAlarmPermission()
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
+            }
+        }
+    }
+
+    private fun requestExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(android.app.AlarmManager::class.java)
+            if (!alarmManager.canScheduleExactAlarms()) {
+                val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                startActivity(intent)
+            }
         }
     }
 

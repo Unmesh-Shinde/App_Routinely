@@ -63,13 +63,11 @@ class PlanManager(context: Context) {
         mgr.saveReminder(Reminder(
             id = meal.id,
             title = "Meal: ${meal.name}",
-            type = ReminderType.MEAL,
+            type = ReminderType.CUSTOM,
             hour = meal.hour,
             minute = meal.minute,
             repeatDays = days,
-            isHidden = true,
-            dishType = meal.name,
-            ingredients = meal.description
+            isHidden = true
         ))
     }
 
@@ -83,7 +81,7 @@ class PlanManager(context: Context) {
         mgr.saveReminder(Reminder(
             id = ex.id,
             title = "Exercise: ${ex.name}",
-            type = ReminderType.EXERCISE,
+            type = ReminderType.CUSTOM,
             hour = ex.hour,
             minute = ex.minute,
             repeatDays = listOf(1, 2, 3, 4, 5, 6, 7), // Every day for challenges

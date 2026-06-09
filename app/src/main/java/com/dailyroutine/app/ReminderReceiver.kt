@@ -71,15 +71,7 @@ class ReminderReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        var message = reminder.type.defaultMessage
-        if (reminder.type == ReminderType.MEAL) {
-            val details = mutableListOf<String>()
-            if (reminder.dishType.isNotBlank()) details.add("Dish: ${reminder.dishType}")
-            if (reminder.ingredients.isNotBlank()) details.add("Ingredients: ${reminder.ingredients}")
-            if (details.isNotEmpty()) {
-                message = details.joinToString("\n")
-            }
-        }
+        val message = reminder.type.defaultMessage
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)

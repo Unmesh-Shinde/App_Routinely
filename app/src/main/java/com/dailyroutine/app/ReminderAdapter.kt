@@ -48,10 +48,7 @@ class ReminderAdapter(
             tvEmoji.text = r.type.emoji
             tvTitle.text = r.title
             
-            var sub = r.type.label
-            if (r.type == ReminderType.MEAL && r.dishType.isNotBlank()) {
-                sub += " • ${r.dishType}"
-            }
+            val sub = r.type.label
             tvSubtitle.text = sub
 
             tvTime.text = if (r.isIntervalBased) {

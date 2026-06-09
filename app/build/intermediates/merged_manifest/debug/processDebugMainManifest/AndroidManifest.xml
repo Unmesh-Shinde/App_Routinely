@@ -53,6 +53,14 @@
             android:name="com.dailyroutine.app.WorkoutPlanActivity"
             android:exported="false"
             android:label="Workout Plan" />
+        <activity
+            android:name="com.dailyroutine.app.WalkingDataActivity"
+            android:exported="false"
+            android:label="Walking Data" />
+        <activity
+            android:name="com.dailyroutine.app.SleepTrackingActivity"
+            android:exported="false"
+            android:label="Sleep Tracking" />
 
         <receiver
             android:name="com.dailyroutine.app.ReminderReceiver"

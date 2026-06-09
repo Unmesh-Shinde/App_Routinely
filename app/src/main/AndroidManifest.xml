@@ -40,6 +40,16 @@
             android:exported="false"
             android:label="Workout Plan"/>
 
+        <activity
+            android:name=".WalkingDataActivity"
+            android:exported="false"
+            android:label="Walking Data"/>
+
+        <activity
+            android:name=".SleepTrackingActivity"
+            android:exported="false"
+            android:label="Sleep Tracking"/>
+
         <receiver
             android:name=".ReminderReceiver"
             android:exported="false"/>

@@ -1,90 +1,102 @@
 [
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_reminders.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_reminders.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_workout.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_workout.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\mipmap-anydpi-v26\\ic_launcher.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_main.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_main.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\ic_launcher_foreground.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_ic_notification.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\ic_notification.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_dialog_add_reminder.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\dialog_add_reminder.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_ic_launcher_background.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\ic_launcher_background.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_diet.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_diet.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_emoji_badge.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_emoji_badge.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_chip.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_chip.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_home_header.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_home_header.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_dialog_edit_meal.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\dialog_edit_meal.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/layout_dialog_edit_exercise.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/layout/dialog_edit_exercise.xml"
+        "merged": "com.dailyroutine.app-debug-32:/layout_activity_main.xml.flat",
+        "source": "com.dailyroutine.app-main-34:/layout/activity_main.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_workout.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_workout.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_home_header.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_home_header.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_ic_launcher_foreground.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\ic_launcher_foreground.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_walking_data.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_walking_data.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_diet_plan.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_diet_plan.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_reminders.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_reminders.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\ic_launcher_background.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_dialog_add_reminder.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\dialog_add_reminder.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_sleep_tracking.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_sleep_tracking.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_field.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_field.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_workout_plan.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_workout_plan.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_diet.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_diet.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_dialog_edit_exercise.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\dialog_edit_exercise.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_workout_plan.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_workout_plan.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_emoji_badge.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_emoji_badge.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/layout_dialog_edit_meal.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/layout/dialog_edit_meal.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_reminders.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_reminders.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_chip.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_chip.xml"
+        "merged": "com.dailyroutine.app-debug-32:/drawable_ic_fitness_center.xml.flat",
+        "source": "com.dailyroutine.app-main-34:/drawable/ic_fitness_center.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_item_reminder.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\item_reminder.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_item_reminder.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\item_reminder.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/layout_activity_diet_plan.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/layout/activity_diet_plan.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_ic_notification.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\ic_notification.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/layout_activity_workout_plan.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/layout/activity_workout_plan.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_reminders.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_reminders.xml"
     },
     {
-        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_diet_plan.xml.flat",
-        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_diet_plan.xml"
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_field.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_field.xml"
+    },
+    {
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_water.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_water.xml"
+    },
+    {
+        "merged": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-debug-32:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\Unmesh\\.gradle\\daemon\\9.3.0\\com.dailyroutine.app-main-34:\\mipmap-anydpi-v26\\ic_launcher.xml"
     }
 ]
