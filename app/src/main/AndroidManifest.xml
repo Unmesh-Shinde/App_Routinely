@@ -26,6 +26,11 @@
         </activity>
 
         <activity
+            android:name=".SignupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DailyRoutine"/>
+
+        <activity
             android:name=".RemindersActivity"
             android:exported="false"
             android:label="View Reminders"/>
@@ -43,12 +48,27 @@
         <activity
             android:name=".WalkingDataActivity"
             android:exported="false"
-            android:label="Walking Data"/>
+            android:label="Step Tracker"/>
 
         <activity
             android:name=".SleepTrackingActivity"
             android:exported="false"
             android:label="Sleep Tracking"/>
+
+        <activity
+            android:name=".WeightActivity"
+            android:exported="false"
+            android:label="Weight Tracking"/>
+
+        <activity
+            android:name=".CaloriesActivity"
+            android:exported="false"
+            android:label="Calories Tracking"/>
+
+        <activity
+            android:name=".HabitProgressActivity"
+            android:exported="false"
+            android:label="Daily Progress"/>
 
         <receiver
             android:name=".ReminderReceiver"

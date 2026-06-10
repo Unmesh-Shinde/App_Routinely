@@ -14,22 +14,38 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#E57373"
-            app:title="Diet Plan"
+            app:title="Nutrition Calendar"
             app:titleTextColor="@android:color/white"/>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#E57373"
-            app:tabTextColor="#FFCDD2"
-            app:tabSelectedTextColor="@android:color/white"
-            app:tabIndicatorColor="@android:color/white"
-            app:tabMode="fixed">
-            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weekly"/>
-            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Bi-Weekly"/>
-            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Monthly"/>
-        </com.google.android.material.tabs.TabLayout>
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="12dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvSelectedDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="October 10, 2024"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPickDate"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Change"
+                android:textColor="@android:color/white"
+                app:icon="@android:drawable/ic_menu_today"
+                app:iconTint="@android:color/white"/>
+        </LinearLayout>
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -43,6 +59,35 @@
                 android:orientation="horizontal"
                 android:padding="8dp"/>
         </HorizontalScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFEBEE"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvMealCount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="3 meals planned for today"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvTotalCaloriesToday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="~0 kcal"
+                android:textColor="@color/healthCalories"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -61,7 +106,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
         android:layout_margin="16dp"
-        android:text="Quick Daily Routine"
+        android:text="Quick Routine"
         android:textAllCaps="false"
         app:cornerRadius="24dp"
         android:backgroundTint="#EF9A9A"
@@ -76,6 +121,7 @@
         android:layout_margin="16dp"
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="#E57373"
-        app:tint="@android:color/white"/>
+        app:tint="@android:color/white"
+        android:contentDescription="Add Meal"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

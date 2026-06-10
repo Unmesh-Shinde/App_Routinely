@@ -20,16 +20,29 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mgr: ReminderManager
     private lateinit var planManager: PlanManager
+    private lateinit var healthDataManager: HealthDataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        if (!UserPreferencesStore.isSignedUp(this)) {
+            startActivity(Intent(this, SignupActivity::class.java))
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_main)
 
         mgr = ReminderManager(this)
         planManager = PlanManager(this)
+        healthDataManager = HealthDataManager(this)
 
         updateGreeting()
         updateDashboard()
+
+        findViewById<View>(R.id.cardProgress).setOnClickListener {
+            startActivity(Intent(this, HabitProgressActivity::class.java))
+        }
 
         findViewById<MaterialCardView>(R.id.cardDiet).setOnClickListener {
             startActivity(Intent(this, DietPlanActivity::class.java))
@@ -47,8 +60,27 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SleepTrackingActivity::class.java))
         }
 
+        findViewById<MaterialCardView>(R.id.cardWeight).setOnClickListener {
+            startActivity(Intent(this, WeightActivity::class.java))
+        }
+
+        findViewById<MaterialCardView>(R.id.cardCalories).setOnClickListener {
+            startActivity(Intent(this, CaloriesActivity::class.java))
+        }
+
         findViewById<MaterialButton>(R.id.btnHealthSync).setOnClickListener {
-            Toast.makeText(this, "Health Syncing...", Toast.LENGTH_SHORT).show()
+            // Simulate fetching data from a fitness band
+            val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
+            prefs.edit()
+                .putBoolean("is_fitness_connected", true)
+                .putString("steps_count", "7,250")
+                .putString("sleep_hours", "7h 15m")
+                .putString("calories_burnt", "1,420")
+                .putString("current_weight", "74.2 kg")
+                .apply()
+            
+            updateDashboard()
+            Toast.makeText(this, "Health Data Synced from Band! ⌚", Toast.LENGTH_SHORT).show()
         }
 
         findViewById<MaterialButton>(R.id.btnReminders).setOnClickListener { view ->
@@ -78,18 +110,30 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateGreeting() {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val name = UserPreferencesStore.getUserName(this)
         val greeting = when (hour) {
-            in 0..11 -> "Good Morning, John 👋"
-            in 12..16 -> "Good Afternoon, John 👋"
-            in 17..20 -> "Good Evening, John 👋"
-            else -> "Good Night, John 👋"
+            in 0..11 -> "Good Morning, $name 👋"
+            in 12..16 -> "Good Afternoon, $name 👋"
+            in 17..20 -> "Good Evening, $name 👋"
+            else -> "Good Night, $name 👋"
         }
         findViewById<TextView>(R.id.tvGreeting).text = greeting
     }
 
     private fun updateDashboard() {
-        val allReminders = mgr.getAllReminders()
-        val totalHabits = allReminders.size
+        val allReminders = mgr.getAllReminders().filter { it.isEnabled }
+        val activeRemindersCount = allReminders.filter { !it.isHidden }.size
+        
+        // Count today's plan items
+        val calendar = Calendar.getInstance()
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(calendar.time)
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        val planDay = if (dayOfWeek == 1) 7 else dayOfWeek - 1
+        
+        val todayMeals = planManager.getMealsForDate(todayStr).size
+        val todayWorkout = planManager.getWorkoutPlan(ChallengeDuration.WEEKLY).dailyExercises[planDay]?.size ?: 0
+        
+        val totalHabits = activeRemindersCount + todayMeals + todayWorkout
         val doneHabits = RoutineProgressStore.getDoneCount(this)
         
         // Progress Card
@@ -98,24 +142,21 @@ class MainActivity : AppCompatActivity() {
         val progress = if (totalHabits > 0) (doneHabits * 100 / totalHabits) else 0
         findViewById<LinearProgressIndicator>(R.id.progressHabits).progress = progress
 
-        // Today's Score
-        val dietPlan = planManager.getDietPlan(PlanDuration.WEEKLY)
-        val totalMeals = dietPlan.dailyMeals.values.sumOf { it.size }
-        // Simple mock for summary logic as full tracking isn't in place for all yet
-        findViewById<TextView>(R.id.tvScoreMeals).text = "3/5"
-        findViewById<TextView>(R.id.tvScoreWorkout).text = "Done ✅"
-        findViewById<TextView>(R.id.tvScoreWater).text = "2.1L"
-        findViewById<TextView>(R.id.tvScoreSleep).text = "7h 20m"
-        findViewById<TextView>(R.id.tvScoreOverall).text = "Overall Score: 78%"
+        // Wellness Tracking (Dynamic)
+        val steps = healthDataManager.getSteps()
+        val sleep = healthDataManager.getSleep()
+        val calories = healthDataManager.getCalories()
+        val weight = healthDataManager.getWeight()
 
-        // Module Status
-        findViewById<TextView>(R.id.tvStatusDiet).text = "Meal schedule tracking active"
-        findViewById<TextView>(R.id.tvStatusWorkout).text = "15-day challenge in progress"
+        findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected()) steps else "0"
+        findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected()) sleep else "0h"
+        findViewById<TextView>(R.id.tvValCalories).text = if (healthDataManager.isConnected()) calories else "0"
+        findViewById<TextView>(R.id.tvValWeight).text = if (healthDataManager.isConnected()) weight else "0 kg"
 
         // Upcoming Reminder
         val now = Calendar.getInstance()
         val upcoming = allReminders
-            .filter { it.isEnabled && !it.isIntervalBased }
+            .filter { it.isEnabled && !it.isIntervalBased && !it.isHidden }
             .filter { (it.hour * 60 + it.minute) > (now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)) }
             .minByOrNull { it.hour * 60 + it.minute }
 

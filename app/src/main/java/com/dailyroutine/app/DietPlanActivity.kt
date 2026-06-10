@@ -1,6 +1,7 @@
 package com.dailyroutine.app
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,16 +12,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.tabs.TabLayout
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DietPlanActivity : AppCompatActivity() {
 
     private lateinit var planManager: PlanManager
-    private lateinit var currentPlan: DietPlan
-    private var selectedDay = 1
     private lateinit var adapter: MealAdapter
-    private lateinit var tabLayout: TabLayout
+    private var selectedCalendar = Calendar.getInstance()
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    private val displayFormatter = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,106 +35,102 @@ class DietPlanActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
 
         planManager = PlanManager(this)
-        
-        tabLayout = findViewById(R.id.tabLayout)
-        val rvMeals = findViewById<RecyclerView>(R.id.rvMeals)
-        val fabAdd = findViewById<FloatingActionButton>(R.id.fabAddMeal)
-        val horizontalDayScroll = findViewById<LinearLayout>(R.id.llDays)
 
+        val rvMeals = findViewById<RecyclerView>(R.id.rvMeals)
         adapter = MealAdapter { editMeal(it) }
         rvMeals.layoutManager = LinearLayoutManager(this)
         rvMeals.adapter = adapter
 
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                val duration = when (tab?.position) {
-                    0 -> PlanDuration.WEEKLY
-                    1 -> PlanDuration.BI_WEEKLY
-                    else -> PlanDuration.MONTHLY
-                }
-                loadPlan(duration)
-                setupDaySelector(horizontalDayScroll)
-            }
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
+        findViewById<MaterialButton>(R.id.btnPickDate).setOnClickListener {
+            showDatePicker()
+        }
 
-        fabAdd.setOnClickListener { showMealDialog(null) }
+        findViewById<FloatingActionButton>(R.id.fabAddMeal).setOnClickListener {
+            showMealDialog(null)
+        }
 
-        findViewById<Button>(R.id.btnQuickRoutine).setOnClickListener {
+        findViewById<MaterialButton>(R.id.btnQuickRoutine).setOnClickListener {
             addQuickRoutine()
         }
 
-        loadPlan(PlanDuration.WEEKLY)
-        setupDaySelector(horizontalDayScroll)
+        setupDateStrip()
+        updateDateUI()
     }
 
-    private fun addQuickRoutine() {
-        val list = currentPlan.dailyMeals.getOrPut(selectedDay) { mutableListOf() }
-        list.add(Meal(name = "Healthy Breakfast", hour = 8, minute = 0, mealType = "Breakfast", description = "Eggs, toast, fruit"))
-        list.add(Meal(name = "Power Lunch", hour = 13, minute = 0, mealType = "Lunch", description = "Chicken salad, quinoa"))
-        list.add(Meal(name = "Light Dinner", hour = 19, minute = 30, mealType = "Dinner", description = "Grilled fish, vegetables"))
-        
-        planManager.saveDietPlan(currentPlan)
-        // Sync reminders for all added meals
-        list.takeLast(3).forEach { 
-            planManager.syncMealReminder(this, it, selectedDay, currentPlan.duration)
-        }
-        refreshMeals()
-        Toast.makeText(this, "Standard daily routine added! 🥗", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun loadPlan(duration: PlanDuration) {
-        currentPlan = planManager.getDietPlan(duration)
-        selectedDay = 1
-        refreshMeals()
-    }
-
-    private fun setupDaySelector(container: LinearLayout) {
+    private fun setupDateStrip() {
+        val container = findViewById<LinearLayout>(R.id.llDays)
         container.removeAllViews()
-        val totalDays = currentPlan.duration.totalDays
-        for (i in 1..totalDays) {
+        
+        // Show 7 days around selected date
+        val tempCal = selectedCalendar.clone() as Calendar
+        tempCal.add(Calendar.DAY_OF_YEAR, -3)
+
+        val stripDateFormatter = SimpleDateFormat("EEE\ndd", Locale.US)
+
+        for (i in 0 until 7) {
+            val dateStr = dateFormatter.format(tempCal.time)
+            val isSelected = dateStr == dateFormatter.format(selectedCalendar.time)
+            
             val btn = Button(this, null, android.R.attr.buttonStyleSmall).apply {
-                text = "Day $i"
+                text = stripDateFormatter.format(tempCal.time)
                 setOnClickListener {
-                    selectedDay = i
-                    updateDayButtons(container)
-                    refreshMeals()
+                    val clickedCal = Calendar.getInstance()
+                    clickedCal.time = dateFormatter.parse(dateStr) ?: Date()
+                    selectedCalendar = clickedCal
+                    updateDateUI()
+                    setupDateStrip()
                 }
-                alpha = if (i == selectedDay) 1f else 0.5f
+                alpha = if (isSelected) 1f else 0.5f
+                if (isSelected) setBackgroundColor(0x33FFFFFF)
             }
             container.addView(btn)
+            tempCal.add(Calendar.DAY_OF_YEAR, 1)
         }
     }
 
-    private fun updateDayButtons(container: LinearLayout) {
-        for (i in 0 until container.childCount) {
-            container.getChildAt(i).alpha = if (i + 1 == selectedDay) 1f else 0.5f
-        }
+    private fun showDatePicker() {
+        DatePickerDialog(this, { _, y, m, d ->
+            selectedCalendar.set(y, m, d)
+            updateDateUI()
+            setupDateStrip()
+        }, selectedCalendar.get(Calendar.YEAR), selectedCalendar.get(Calendar.MONTH), selectedCalendar.get(Calendar.DAY_OF_MONTH)).show()
+    }
+
+    private fun updateDateUI() {
+        findViewById<TextView>(R.id.tvSelectedDate).text = displayFormatter.format(selectedCalendar.time)
+        refreshMeals()
     }
 
     private fun refreshMeals() {
-        val meals = currentPlan.dailyMeals[selectedDay] ?: mutableListOf()
-        adapter.submitList(meals.sortedBy { it.hour * 60 + it.minute })
+        val dateStr = dateFormatter.format(selectedCalendar.time)
+        val list = planManager.getMealsForDate(dateStr)
+        adapter.submitList(list.sortedBy { it.hour * 60 + it.minute })
+
+        // Update summary strip
+        val count = list.size
+        val dateLabel = if (dateStr == dateFormatter.format(Date())) "today" else "this day"
+        findViewById<TextView>(R.id.tvMealCount).text = "$count meals planned for $dateLabel"
+        
+        val totalCals = list.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
+        findViewById<TextView>(R.id.tvTotalCaloriesToday).text = "~$totalCals kcal"
     }
 
     private fun showMealDialog(existing: Meal?) {
         val v = LayoutInflater.from(this).inflate(R.layout.dialog_edit_meal, null)
         val etName = v.findViewById<EditText>(R.id.etMealName)
-        val etNotes = v.findViewById<EditText>(R.id.etMealNotes)
+        val etDesc = v.findViewById<EditText>(R.id.etMealNotes)
+        val spinnerType = v.findViewById<Spinner>(R.id.spinnerMealType)
         val tvTime = v.findViewById<TextView>(R.id.tvMealTime)
         val btnTime = v.findViewById<Button>(R.id.btnPickMealTime)
         val swReminder = v.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.swMealReminder)
-        val spinnerType = v.findViewById<Spinner>(R.id.spinnerMealType)
 
-        val mealTypes = arrayOf("Breakfast", "Lunch", "Dinner", "Snack")
-        val spinnerAdapter = ArrayAdapter(this, R.layout.spinner_item, mealTypes)
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val types = arrayOf("Breakfast", "Lunch", "Dinner", "Snack")
+        val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, types)
         spinnerType.adapter = spinnerAdapter
 
-        var selHour = existing?.hour ?: 8
+        var selHour = existing?.hour ?: 12
         var selMin = existing?.minute ?: 0
-        
+
         fun updateTimeLabel() {
             val h = if (selHour == 0 || selHour == 12) 12 else selHour % 12
             val amPm = if (selHour < 12) "AM" else "PM"
@@ -141,9 +140,9 @@ class DietPlanActivity : AppCompatActivity() {
 
         existing?.let {
             etName.setText(it.name)
-            etNotes.setText(it.description)
+            etDesc.setText(it.description)
+            spinnerType.setSelection(types.indexOf(it.mealType).coerceAtLeast(0))
             swReminder.isChecked = it.isReminderEnabled
-            spinnerType.setSelection(mealTypes.indexOf(it.mealType).coerceAtLeast(0))
         }
 
         btnTime.setOnClickListener {
@@ -169,23 +168,20 @@ class DietPlanActivity : AppCompatActivity() {
                 etName.error = "Required"
                 return@setOnClickListener
             }
-            
+
             val newMeal = Meal(
-                id = existing?.id ?: System.currentTimeMillis().toInt(),
+                id = existing?.id ?: Meal().id,
                 name = name,
-                description = etNotes.text.toString().trim(),
+                description = etDesc.text.toString().trim(),
                 hour = selHour,
                 minute = selMin,
-                isReminderEnabled = swReminder.isChecked,
-                mealType = spinnerType.selectedItem.toString()
+                mealType = spinnerType.selectedItem.toString(),
+                isReminderEnabled = swReminder.isChecked
             )
-            
-            val list = currentPlan.dailyMeals.getOrPut(selectedDay) { mutableListOf() }
-            val idx = list.indexOfFirst { it.id == newMeal.id }
-            if (idx >= 0) list[idx] = newMeal else list.add(newMeal)
-            
-            planManager.saveDietPlan(currentPlan)
-            planManager.syncMealReminder(this@DietPlanActivity, newMeal, selectedDay, currentPlan.duration)
+
+            val dateStr = dateFormatter.format(selectedCalendar.time)
+            planManager.saveMealForDate(dateStr, newMeal)
+            planManager.syncMealReminder(this@DietPlanActivity, newMeal, dateStr)
             refreshMeals()
             dialog.dismiss()
         }
@@ -193,6 +189,21 @@ class DietPlanActivity : AppCompatActivity() {
 
     private fun editMeal(meal: Meal) {
         showMealDialog(meal)
+    }
+
+    private fun addQuickRoutine() {
+        val dateStr = dateFormatter.format(selectedCalendar.time)
+        val routine = listOf(
+            Meal(name = "Oats with Milk", hour = 8, minute = 0, mealType = "Breakfast"),
+            Meal(name = "Brown Rice & Dal", hour = 13, minute = 0, mealType = "Lunch"),
+            Meal(name = "Roti & Sabzi", hour = 20, minute = 0, mealType = "Dinner")
+        )
+        routine.forEach { 
+            planManager.saveMealForDate(dateStr, it)
+            planManager.syncMealReminder(this, it, dateStr)
+        }
+        refreshMeals()
+        Toast.makeText(this, "Quick Routine Added for Today!", Toast.LENGTH_SHORT).show()
     }
 
     inner class MealAdapter(private val onEdit: (Meal) -> Unit) : RecyclerView.Adapter<MealAdapter.VH>() {
@@ -204,12 +215,14 @@ class DietPlanActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_reminder, parent, false)
+            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_meal, parent, false)
             return VH(v)
         }
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val m = items[position]
+            val isDone = RoutineProgressStore.getDoneIds(this@DietPlanActivity).contains(m.id.toString())
+
             holder.tvEmoji.text = when (m.mealType) {
                 "Breakfast" -> "🍳"
                 "Lunch" -> "🥗"
@@ -224,11 +237,18 @@ class DietPlanActivity : AppCompatActivity() {
             holder.itemView.setOnClickListener { onEdit(m) }
             holder.itemView.findViewById<View>(R.id.btnEdit).setOnClickListener { onEdit(m) }
             
-            // Hide reminder toggle for now in plan list to keep simple
-            holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
+            val switch = holder.itemView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchEnabled)
+            switch.visibility = View.VISIBLE
+            switch.setOnCheckedChangeListener(null)
+            switch.isChecked = isDone
+            switch.setOnCheckedChangeListener { _, checked ->
+                RoutineProgressStore.setDoneStatus(this@DietPlanActivity, m.id, checked)
+                refreshMeals()
+            }
+
             holder.itemView.findViewById<View>(R.id.btnDelete).setOnClickListener {
-                currentPlan.dailyMeals[selectedDay]?.remove(m)
-                planManager.saveDietPlan(currentPlan)
+                val dateStr = dateFormatter.format(selectedCalendar.time)
+                planManager.deleteMealForDate(dateStr, m)
                 refreshMeals()
             }
         }

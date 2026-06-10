@@ -10,17 +10,26 @@ object RoutineProgressStore {
     private const val PREFS = "routine_progress_pref"
     private const val PREFIX = "done_"
 
-    fun markDone(context: Context, reminderId: Int) {
+    fun setDoneStatus(context: Context, id: Int, isDone: Boolean) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val key = todayKey()
         val current = prefs.getStringSet(key, emptySet())?.toMutableSet() ?: mutableSetOf()
-        current.add(reminderId.toString())
+        if (isDone) current.add(id.toString()) else current.remove(id.toString())
         prefs.edit().putStringSet(key, current).apply()
+    }
+
+    fun markDone(context: Context, reminderId: Int) {
+        setDoneStatus(context, reminderId, true)
     }
 
     fun getDoneCount(context: Context): Int {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         return prefs.getStringSet(todayKey(), emptySet())?.size ?: 0
+    }
+
+    fun getDoneIds(context: Context): Set<String> {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        return prefs.getStringSet(todayKey(), emptySet()) ?: emptySet()
     }
 
     fun clearToday(context: Context) {

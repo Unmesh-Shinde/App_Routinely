@@ -15,6 +15,7 @@
     <color name="healthCalories">#EC407A</color>
     <color name="healthNutrition">#4CAF50</color>
     <color name="healthSleep">#42A5F5</color>
+    <color name="healthSync">#009688</color>
     <color name="healthWalking">#26A69A</color>
     <color name="healthWeight">#78909C</color>
     <color name="healthWorkout">#FF9800</color>

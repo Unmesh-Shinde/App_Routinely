@@ -11,11 +11,11 @@ enum class PlanDuration(val label: String, val totalDays: Int) {
 }
 
 data class Meal(
-    val id: Int = System.currentTimeMillis().toInt(),
-    val name: String,
+    val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),
+    val name: String = "",
     val description: String = "",
-    val hour: Int,
-    val minute: Int,
+    val hour: Int = 12,
+    val minute: Int = 0,
     val isReminderEnabled: Boolean = true,
     val mealType: String = "Lunch" // Breakfast, Lunch, Dinner, Snack
 ) : Serializable {
@@ -27,8 +27,7 @@ data class Meal(
 }
 
 data class DietPlan(
-    val duration: PlanDuration,
-    val dailyMeals: MutableMap<Int, MutableList<Meal>> = mutableMapOf() // Day (1..totalDays) -> List of meals
+    val dailyMeals: MutableMap<String, MutableList<Meal>> = mutableMapOf() // Date (yyyy-MM-dd) -> List of meals
 ) : Serializable
 
 // --- Workout Plan Models ---
@@ -41,12 +40,12 @@ enum class ChallengeDuration(val label: String, val days: Int) {
 }
 
 data class Exercise(
-    val id: Int = System.currentTimeMillis().toInt(),
-    val name: String,
+    val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),
+    val name: String = "",
     val sets: Int = 3,
     val reps: String = "10",
-    val hour: Int,
-    val minute: Int,
+    val hour: Int = 8,
+    val minute: Int = 0,
     val isReminderEnabled: Boolean = true,
     val targetArea: String = "Full Body",
     val intensity: Int = 50 // 0..100

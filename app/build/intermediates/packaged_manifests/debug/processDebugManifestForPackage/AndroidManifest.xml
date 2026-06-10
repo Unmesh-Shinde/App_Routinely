@@ -29,7 +29,6 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:testOnly="true"
         android:theme="@style/Theme.DailyRoutine" >
         <activity
             android:name="com.dailyroutine.app.MainActivity"
@@ -41,6 +40,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.dailyroutine.app.SignupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DailyRoutine" />
         <activity
             android:name="com.dailyroutine.app.RemindersActivity"
             android:exported="false"
@@ -56,11 +59,23 @@
         <activity
             android:name="com.dailyroutine.app.WalkingDataActivity"
             android:exported="false"
-            android:label="Walking Data" />
+            android:label="Step Tracker" />
         <activity
             android:name="com.dailyroutine.app.SleepTrackingActivity"
             android:exported="false"
             android:label="Sleep Tracking" />
+        <activity
+            android:name="com.dailyroutine.app.WeightActivity"
+            android:exported="false"
+            android:label="Weight Tracking" />
+        <activity
+            android:name="com.dailyroutine.app.CaloriesActivity"
+            android:exported="false"
+            android:label="Calories Tracking" />
+        <activity
+            android:name="com.dailyroutine.app.HabitProgressActivity"
+            android:exported="false"
+            android:label="Daily Progress" />
 
         <receiver
             android:name="com.dailyroutine.app.ReminderReceiver"

@@ -45,7 +45,7 @@ object ReminderDialogHelper {
             v.findViewById<SwitchCompat>(R.id.swSun)
         )
 
-        val types = ReminderType.values()
+        val types = ReminderType.values().filter { it != ReminderType.MEAL && it != ReminderType.EXERCISE }
         val adapter = ArrayAdapter(
             context, R.layout.spinner_item,
             types.map { "${it.emoji}  ${it.label}" }.toTypedArray()

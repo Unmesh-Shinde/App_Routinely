@@ -165,7 +165,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
             }
             
             val newEx = Exercise(
-                id = existing?.id ?: System.currentTimeMillis().toInt(),
+                id = existing?.id ?: Exercise().id,
                 name = name,
                 sets = etSets.text.toString().toIntOrNull() ?: 3,
                 reps = etReps.text.toString(),
@@ -206,6 +206,8 @@ class WorkoutPlanActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val ex = items[position]
+            val isDone = RoutineProgressStore.getDoneIds(this@WorkoutPlanActivity).contains(ex.id.toString())
+
             holder.tvEmoji.text = "💪"
             holder.tvTitle.text = ex.name
             holder.tvSubtitle.text = "${ex.sets}x${ex.reps} • ${ex.targetArea} (${ex.intensity}%)"
@@ -214,7 +216,15 @@ class WorkoutPlanActivity : AppCompatActivity() {
             holder.itemView.setOnClickListener { onEdit(ex) }
             holder.itemView.findViewById<View>(R.id.btnEdit).setOnClickListener { onEdit(ex) }
             
-            holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
+            val switch = holder.itemView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchEnabled)
+            switch.visibility = View.VISIBLE
+            switch.setOnCheckedChangeListener(null)
+            switch.isChecked = isDone
+            switch.setOnCheckedChangeListener { _, checked ->
+                RoutineProgressStore.setDoneStatus(this@WorkoutPlanActivity, ex.id, checked)
+                refreshExercises()
+            }
+
             holder.itemView.findViewById<View>(R.id.btnDelete).setOnClickListener {
                 currentPlan.dailyExercises[selectedDay]?.remove(ex)
                 planManager.saveWorkoutPlan(currentPlan)

@@ -1,33 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:background="@color/bgPage">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="🚶"
-        android:textSize="64sp"/>
+        android:background="@color/healthWalking">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Walking Data"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/textPrimary"/>
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Step Tracker"
+            app:titleTextColor="@android:color/white"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="This feature is coming soon! Keep moving."
-        android:textSize="16sp"
-        android:textColor="@color/textSecondary"
-        android:gravity="center"/>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/healthWalking"
+            app:tabTextColor="#B2DFDB"
+            app:tabSelectedTextColor="@android:color/white"
+            app:tabIndicatorColor="@android:color/white"
+            app:tabMode="fixed">
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Today"/>
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weekly"/>
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Monthly"/>
+        </com.google.android.material.tabs.TabLayout>
 
-</LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Goal Header -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏆" android:textSize="24sp"/>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Daily Step Goal" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/textSecondary" android:textAllCaps="true"/>
+                    <TextView android:id="@+id/tvStepGoal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10,000 steps" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/healthWalking"/>
+                </LinearLayout>
+                <Button android:id="@+id/btnEditStepGoal" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Edit" android:textColor="@color/healthWalking"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- Today View -->
+            <LinearLayout
+                android:id="@+id/viewToday"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center_horizontal"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tvCurrentSteps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="64sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/healthWalking"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Steps today"
+                    android:textSize="16sp"
+                    android:textColor="@color/textSecondary"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="32dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#1A000000">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:gravity="center">
+                            <TextView android:id="@+id/tvDistance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0.0 km" android:textStyle="bold" android:textSize="18sp" android:textColor="@color/textPrimary"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Distance" android:textSize="12sp" android:textColor="@color/textSecondary"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#1A000000">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:gravity="center">
+                            <TextView android:id="@+id/tvDuration" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 min" android:textStyle="bold" android:textSize="18sp" android:textColor="@color/textPrimary"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Active time" android:textSize="12sp" android:textColor="@color/textSecondary"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Weekly View -->
+            <LinearLayout
+                android:id="@+id/viewWeekly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:id="@+id/llWeeklyStepsGraph"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="bottom"/>
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+            <!-- Monthly View -->
+            <LinearLayout
+                android:id="@+id/viewMonthly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:id="@+id/llMonthlyStepsGraph"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="bottom"/>
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

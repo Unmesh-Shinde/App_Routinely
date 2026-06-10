@@ -8,6 +8,10 @@
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\mipmap-anydpi-v26\\ic_launcher.xml"
     },
     {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_walking.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_walking.xml"
+    },
+    {
         "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_workout.xml.flat",
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_workout.xml"
     },
@@ -36,10 +40,6 @@
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\ic_fitness_center.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/drawable_bg_circle_weight.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/drawable/bg_circle_weight.xml"
-    },
-    {
         "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_diet.xml.flat",
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_diet.xml"
     },
@@ -52,12 +52,20 @@
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_chip.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/layout_activity_main.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/layout/activity_main.xml"
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_signup_gradient.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_signup_gradient.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/drawable_bg_circle_walking.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/drawable/bg_circle_walking.xml"
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_calories.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_calories.xml"
+    },
+    {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_step_bar.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_step_bar.xml"
+    },
+    {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_sleep.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_sleep.xml"
     },
     {
         "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_home_header.xml.flat",
@@ -80,12 +88,24 @@
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_emoji_badge.xml"
     },
     {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\layout_activity_calories.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\activity_calories.xml"
+    },
+    {
         "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_water.xml.flat",
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_water.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/drawable_bg_circle_calories.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/drawable/bg_circle_calories.xml"
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\layout_activity_signup.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\activity_signup.xml"
+    },
+    {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_calorie_bar.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_calorie_bar.xml"
+    },
+    {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\layout_activity_habit_progress.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\activity_habit_progress.xml"
     },
     {
         "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\layout_activity_diet_plan.xml.flat",
@@ -100,6 +120,10 @@
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\item_reminder.xml"
     },
     {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_bg_circle_weight.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\bg_circle_weight.xml"
+    },
+    {
         "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\drawable_ic_notification.xml.flat",
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\drawable\\ic_notification.xml"
     },
@@ -112,11 +136,23 @@
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\activity_reminders.xml"
     },
     {
+        "merged": "com.dailyroutine.app-debug-32:/layout_activity_sleep_tracking.xml.flat",
+        "source": "com.dailyroutine.app-main-34:/layout/activity_sleep_tracking.xml"
+    },
+    {
         "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\layout_activity_walking_data.xml.flat",
         "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\activity_walking_data.xml"
     },
     {
-        "merged": "com.dailyroutine.app-debug-32:/drawable_bg_circle_sleep.xml.flat",
-        "source": "com.dailyroutine.app-main-34:/drawable/bg_circle_sleep.xml"
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\layout_activity_weight.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\activity_weight.xml"
+    },
+    {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\layout_item_calorie_bar.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\item_calorie_bar.xml"
+    },
+    {
+        "merged": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-debug-32:\\layout_item_meal.xml.flat",
+        "source": "C:\\Users\\TESTRIG\\.gradle\\daemon\\9.4.1\\com.dailyroutine.app-main-34:\\layout\\item_meal.xml"
     }
 ]

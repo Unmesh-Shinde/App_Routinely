@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bgPage">
@@ -14,9 +13,10 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="180dp"
             android:orientation="vertical"
-            android:padding="24dp"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="20dp"
             android:background="@drawable/bg_home_header">
 
             <TextView
@@ -24,17 +24,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Good Afternoon, John 👋"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white" />
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardProgress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="12dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#33FFFFFF">
+                app:cardBackgroundColor="#33FFFFFF"
+                android:clickable="true"
+                android:focusable="true"
+                app:rippleColor="#4DFFFFFF">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -46,7 +50,7 @@
                         android:id="@+id/tvHabitProgress"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Today's Progress: 3/8 habits completed"
+                        android:text="Today's Progress: 0/0 habits completed"
                         android:textColor="@android:color/white"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -56,7 +60,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:progress="60"
+                        android:progress="0"
                         app:trackColor="#40FFFFFF"
                         app:indicatorColor="@android:color/white"
                         app:trackThickness="8dp"
@@ -72,148 +76,116 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="24dp">
 
-            <!-- Today's Score Dashboard -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/cardBg">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Today's Score"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/textPrimary" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#EEE"
-                        android:layout_marginTop="12dp"
-                        android:layout_marginBottom="16dp" />
-
-                    <TableLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TableRow android:layout_marginBottom="8dp">
-                            <TextView android:text="Meals:" android:textColor="@color/textSecondary"/>
-                            <TextView android:id="@+id/tvScoreMeals" android:text="3/5" android:gravity="end" android:textStyle="bold" android:textColor="@color/healthNutrition"/>
-                        </TableRow>
-                        <TableRow android:layout_marginBottom="8dp">
-                            <TextView android:text="Workout:" android:textColor="@color/textSecondary"/>
-                            <TextView android:id="@+id/tvScoreWorkout" android:text="Done ✅" android:gravity="end" android:textStyle="bold" android:textColor="@color/healthWorkout"/>
-                        </TableRow>
-                        <TableRow android:layout_marginBottom="8dp">
-                            <TextView android:text="Water:" android:textColor="@color/textSecondary"/>
-                            <TextView android:id="@+id/tvScoreWater" android:text="2.1L" android:gravity="end" android:textStyle="bold" android:textColor="@color/healthSleep"/>
-                        </TableRow>
-                        <TableRow>
-                            <TextView android:text="Sleep:" android:textColor="@color/textSecondary"/>
-                            <TextView android:id="@+id/tvScoreSleep" android:text="7h 20m" android:gravity="end" android:textStyle="bold" android:textColor="@color/healthSleep"/>
-                        </TableRow>
-                    </TableLayout>
-
-                    <TextView
-                        android:id="@+id/tvScoreOverall"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Overall: 78%"
-                        android:gravity="center"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/primary" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Upcoming Reminder Card -->
+            <!-- Upcoming Reminder (Slim) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardUpcoming"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
                 app:cardBackgroundColor="@color/primaryLight"
                 app:strokeWidth="1dp"
                 app:strokeColor="@color/primary">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
+                    android:padding="12dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🔔" android:textSize="24sp"/>
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🔔" android:textSize="20sp"/>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="14dp" android:orientation="vertical">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Upcoming Reminder" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/primary"/>
-                        <TextView android:id="@+id/tvUpcomingText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💧 Drink Water - 02:00 PM" android:textStyle="bold" android:textColor="@color/textPrimary" android:layout_marginTop="2dp"/>
+                        <TextView android:id="@+id/tvUpcomingText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Upcoming tasks appearing here..." android:textSize="14sp" android:textStyle="bold" android:textColor="@color/textPrimary" android:layout_marginTop="2dp"/>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Main Modules -->
+            <!-- Main Modules (Nutrition / Workout) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDiet"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/cardBg"
+                app:rippleColor="@color/healthNutrition">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:paddingHorizontal="16dp" android:gravity="center_vertical">
+                    <TextView android:layout_width="42dp" android:layout_height="44dp" android:text="🥗" android:textSize="22sp" android:gravity="center" android:background="@drawable/bg_circle_diet"/>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nutrition" android:textSize="17sp" android:textStyle="bold" android:textColor="@color/textPrimary"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Meal schedule" android:textSize="12sp" android:textColor="@color/textSecondary"/>
+                    </LinearLayout>
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@android:drawable/ic_media_play" app:tint="@color/healthNutrition" android:contentDescription="Open Nutrition"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardWorkout"
+                android:layout_width="match_parent"
+                android:layout_height="76dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/cardBg"
+                app:rippleColor="@color/healthWorkout">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="horizontal" android:paddingHorizontal="16dp" android:gravity="center_vertical">
+                    <TextView android:layout_width="44dp" android:layout_height="44dp" android:text="💪" android:textSize="22sp" android:gravity="center" android:background="@drawable/bg_circle_workout"/>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="12dp" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Workout" android:textSize="17sp" android:textStyle="bold" android:textColor="@color/textPrimary"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Training routine" android:textSize="12sp" android:textColor="@color/textSecondary"/>
+                    </LinearLayout>
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@android:drawable/ic_media_play" app:tint="@color/healthWorkout" android:contentDescription="Open Workout"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Action Buttons (Health Sync / Reminders) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardDiet"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
-                    app:rippleColor="@color/healthNutrition">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="20dp" android:gravity="center_vertical">
-                        <TextView android:layout_width="56dp" android:layout_height="56dp" android:text="🥗" android:textSize="32sp" android:gravity="center" android:background="@drawable/bg_circle_diet"/>
-                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nutrition" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/textPrimary"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Meal schedule" android:textSize="14sp" android:textColor="@color/textSecondary"/>
-                            <TextView android:id="@+id/tvStatusDiet" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="2 of 5 meals completed" android:textSize="12sp" android:textColor="@color/healthNutrition" android:textStyle="bold"/>
-                        </LinearLayout>
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_media_play" app:tint="@color/healthNutrition"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnHealthSync"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:text="Health Sync"
+                    app:icon="@drawable/ic_fitness_center"
+                    app:iconTint="@android:color/white"
+                    android:backgroundTint="@color/healthSync"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    app:cornerRadius="10dp"/>
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardWorkout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
-                    app:rippleColor="@color/healthWorkout">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="20dp" android:gravity="center_vertical">
-                        <TextView android:layout_width="56dp" android:layout_height="56dp" android:text="💪" android:textSize="32sp" android:gravity="center" android:background="@drawable/bg_circle_workout"/>
-                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:orientation="vertical">
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Workout" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/textPrimary"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Training routine" android:textSize="14sp" android:textColor="@color/textSecondary"/>
-                            <TextView android:id="@+id/tvStatusWorkout" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="45 min remaining" android:textSize="12sp" android:textColor="@color/healthWorkout" android:textStyle="bold"/>
-                        </LinearLayout>
-                        <ImageView android:layout_width="24dp" android:layout_height="24dp" android:src="@android:drawable/ic_media_play" app:tint="@color/healthWorkout"/>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                <Space android:layout_width="16dp" android:layout_height="wrap_content"/>
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReminders"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:text="Reminders"
+                    app:icon="@android:drawable/ic_lock_idle_alarm"
+                    android:backgroundTint="@color/primary"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    app:cornerRadius="10dp"/>
             </LinearLayout>
 
             <!-- Wellness Tracking Grid -->
@@ -221,10 +193,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wellness Tracking"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/textPrimary"
-                android:layout_marginBottom="16dp"/>
+                android:layout_marginBottom="10dp"/>
 
             <GridLayout
                 android:layout_width="match_parent"
@@ -237,16 +209,20 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardWalking"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="110dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="1dp"
-                    app:cardBackgroundColor="@color/cardBg">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:gravity="center">
-                        <TextView android:layout_width="40dp" android:layout_height="40dp" android:text="🚶" android:textSize="20sp" android:gravity="center" android:background="@drawable/bg_circle_walking"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Steps" android:textStyle="bold" android:textColor="@color/textPrimary"/>
-                        <TextView android:id="@+id/tvValSteps" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="6,400" android:textSize="12sp" android:textColor="@color/healthWalking"/>
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#1A000000"
+                    app:cardBackgroundColor="@color/cardBg"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp" android:gravity="center">
+                        <TextView android:layout_width="44dp" android:layout_height="44dp" android:text="🚶" android:textSize="24sp" android:gravity="center" android:background="@drawable/bg_circle_walking"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Step Tracker" android:textStyle="bold" android:textSize="14sp" android:textColor="@color/textPrimary"/>
+                        <TextView android:id="@+id/tvValSteps" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/healthWalking"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -254,16 +230,20 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardSleep"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="110dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="1dp"
-                    app:cardBackgroundColor="@color/cardBg">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:gravity="center">
-                        <TextView android:layout_width="40dp" android:layout_height="40dp" android:text="😴" android:textSize="20sp" android:gravity="center" android:background="@drawable/bg_circle_sleep"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Sleep" android:textStyle="bold" android:textColor="@color/textPrimary"/>
-                        <TextView android:id="@+id/tvValSleep" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="7h 20m" android:textSize="12sp" android:textColor="@color/healthSleep"/>
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#1A000000"
+                    app:cardBackgroundColor="@color/cardBg"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp" android:gravity="center">
+                        <TextView android:layout_width="44dp" android:layout_height="44dp" android:text="😴" android:textSize="24sp" android:gravity="center" android:background="@drawable/bg_circle_sleep"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Sleep" android:textStyle="bold" android:textSize="14sp" android:textColor="@color/textPrimary"/>
+                        <TextView android:id="@+id/tvValSleep" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0h" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/healthSleep"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -271,16 +251,20 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardCalories"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="110dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="1dp"
-                    app:cardBackgroundColor="@color/cardBg">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:gravity="center">
-                        <TextView android:layout_width="40dp" android:layout_height="40dp" android:text="🔥" android:textSize="20sp" android:gravity="center" android:background="@drawable/bg_circle_calories"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Calories" android:textStyle="bold" android:textColor="@color/textPrimary"/>
-                        <TextView android:id="@+id/tvValCalories" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1,250" android:textSize="12sp" android:textColor="@color/healthCalories"/>
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#1A000000"
+                    app:cardBackgroundColor="@color/cardBg"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp" android:gravity="center">
+                        <TextView android:layout_width="44dp" android:layout_height="44dp" android:text="🔥" android:textSize="24sp" android:gravity="center" android:background="@drawable/bg_circle_calories"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Calories" android:textStyle="bold" android:textSize="14sp" android:textColor="@color/textPrimary"/>
+                        <TextView android:id="@+id/tvValCalories" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/healthCalories"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -288,59 +272,26 @@
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardWeight"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="110dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="4dp"
                     app:cardCornerRadius="16dp"
-                    app:cardElevation="1dp"
-                    app:cardBackgroundColor="@color/cardBg">
-                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:gravity="center">
-                        <TextView android:layout_width="40dp" android:layout_height="40dp" android:text="⚖️" android:textSize="20sp" android:gravity="center" android:background="@drawable/bg_circle_weight"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Weight" android:textStyle="bold" android:textColor="@color/textPrimary"/>
-                        <TextView android:id="@+id/tvValWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="74.5 kg" android:textSize="12sp" android:textColor="@color/healthWeight"/>
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#1A000000"
+                    app:cardBackgroundColor="@color/cardBg"
+                    android:clickable="true"
+                    android:focusable="true">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="12dp" android:gravity="center">
+                        <TextView android:layout_width="44dp" android:layout_height="44dp" android:text="⚖️" android:textSize="24sp" android:gravity="center" android:background="@drawable/bg_circle_weight"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Weight" android:textStyle="bold" android:textSize="14sp" android:textColor="@color/textPrimary"/>
+                        <TextView android:id="@+id/tvValWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kg" android:textSize="15sp" android:textStyle="bold" android:textColor="@color/healthWeight"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
             </GridLayout>
 
-            <View android:layout_width="match_parent" android:layout_height="100dp"/>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="@android:color/transparent">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnHealthSync"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:text="Health Sync"
-            app:icon="@drawable/ic_fitness_center"
-            android:textColor="@color/primary"
-            android:textAllCaps="false"
-            app:cornerRadius="12dp"/>
-
-        <Space android:layout_width="16dp" android:layout_height="wrap_content"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnReminders"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:text="Reminders"
-            app:icon="@android:drawable/ic_lock_idle_alarm"
-            android:backgroundTint="@color/primary"
-            android:textColor="@android:color/white"
-            android:textAllCaps="false"
-            app:cornerRadius="12dp"/>
-    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

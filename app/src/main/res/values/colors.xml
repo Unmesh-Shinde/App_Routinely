@@ -13,6 +13,7 @@
     <color name="healthWalking">#26A69A</color>    <!-- Teal -->
     <color name="healthWeight">#78909C</color>
     <color name="healthCalories">#EC407A</color>
+    <color name="healthSync">#009688</color>
 
     <!-- Backgrounds -->
     <color name="bgPage">#F5F5F7</color>

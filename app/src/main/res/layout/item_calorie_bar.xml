@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="60dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="bottom|center_horizontal"
+    android:padding="4dp">
+
+    <TextView
+        android:id="@+id/tvBarValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1200"
+        android:textSize="10sp"
+        android:textColor="@color/textSecondary"
+        android:layout_marginBottom="4dp"/>
+
+    <View
+        android:id="@+id/viewBar"
+        android:layout_width="32dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_calorie_bar" />
+
+    <TextView
+        android:id="@+id/tvBarLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mon"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:textColor="@color/textPrimary"
+        android:layout_marginTop="6dp"/>
+
+    <TextView
+        android:id="@+id/tvBarDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12 Oct"
+        android:textSize="9sp"
+        android:textColor="@color/textSecondary"
+        android:layout_marginTop="2dp"/>
+
+</LinearLayout>
