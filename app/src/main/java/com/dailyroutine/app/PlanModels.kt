@@ -58,6 +58,5 @@ data class Exercise(
 }
 
 data class WorkoutPlan(
-    val duration: ChallengeDuration,
-    val dailyExercises: MutableMap<Int, MutableList<Exercise>> = mutableMapOf() // Day (1..days) -> List of exercises
+    val dailyExercises: MutableMap<String, MutableList<Exercise>> = mutableMapOf() // Date (yyyy-MM-dd) -> List of exercises
 ) : Serializable

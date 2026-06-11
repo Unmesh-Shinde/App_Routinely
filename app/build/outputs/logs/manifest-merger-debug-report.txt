@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:2:1-92:12
-INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:2:1-92:12
-INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:2:1-92:12
-INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:2:1-92:12
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:2:1-115:12
+INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:2:1-115:12
+INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:2:1-115:12
+INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:2:1-115:12
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\6fcd257212f58928ef189eab02bf90e0\transformed\material-1.11.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\27ce8cc530c15caee9f3933e10a1552e\transformed\constraintlayout-2.1.4\AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\a60d6bb10b5a7af8e51063944d87c267\transformed\appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
@@ -74,9 +74,83 @@ uses-permission#android.permission.POST_NOTIFICATIONS
 ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:8:5-76
 	android:name
 		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:8:22-74
+uses-permission#android.permission.health.READ_STEPS
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:11:5-75
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:11:22-73
+uses-permission#android.permission.health.READ_SLEEP
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:12:5-75
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:12:22-73
+queries
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:14:5-31:15
+package#com.google.android.apps.fitness
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:15:9-67
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:15:18-64
+package#com.sec.android.app.shealth
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:16:9-63
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:16:18-60
+package#com.fitbit.FitbitMobile
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:17:9-59
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:17:18-56
+package#com.garmin.android.apps.connectmobile
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:18:9-73
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:18:18-70
+package#com.xiaomi.wearable
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:19:9-55
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:19:18-52
+package#com.xiaomi.hm.health
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:20:9-56
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:20:18-53
+package#com.huami.watch.hmwatchmanager
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:21:9-66
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:21:18-63
+package#com.noisefit
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:22:9-48
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:22:18-45
+package#com.coveiot.boat
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:23:9-52
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:23:18-49
+package#com.huawei.health
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:24:9-53
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:24:18-50
+package#com.realme.link
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:25:9-51
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:25:18-48
+package#com.google.android.apps.healthdata
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:26:9-70
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:26:18-67
+package#com.fossil.wearables.fossil
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:27:9-63
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:27:18-60
+package#com.withings.wiscale2
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:28:9-57
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:28:18-54
+package#fi.polar.beat
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:29:9-49
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:29:18-46
+package#com.stt.android.suunto
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:30:9-58
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:30:18-55
 application
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:10:5-91:19
-INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:10:5-91:19
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:33:5-114:19
+INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:33:5-114:19
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\6fcd257212f58928ef189eab02bf90e0\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\6fcd257212f58928ef189eab02bf90e0\transformed\material-1.11.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\27ce8cc530c15caee9f3933e10a1552e\transformed\constraintlayout-2.1.4\AndroidManifest.xml:9:5-20
@@ -98,139 +172,139 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\TESTRIG\.gradle\ca
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\2666bee558c9eaa52515a04f117aa9dd\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:15:9-35
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:38:9-35
 	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:13:9-41
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:36:9-41
 	android:roundIcon
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:14:9-54
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:37:9-54
 	android:icon
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:12:9-43
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:35:9-43
 	android:allowBackup
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:11:9-35
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:34:9-35
 	android:theme
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:16:9-50
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:39:9-50
 activity#com.dailyroutine.app.MainActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:18:9-26:20
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:41:9-49:20
 	android:launchMode
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:21:13-43
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:44:13-43
 	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:20:13-36
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:43:13-36
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:19:13-41
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:42:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:22:13-25:29
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:45:13-48:29
 action#android.intent.action.MAIN
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:23:17-68
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:46:17-68
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:23:25-66
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:46:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:24:17-76
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:47:17-76
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:24:27-74
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:47:27-74
 activity#com.dailyroutine.app.SignupActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:28:9-31:56
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:51:9-54:56
 	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:30:13-37
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:53:13-37
 	android:theme
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:31:13-54
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:54:13-54
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:29:13-43
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:52:13-43
 activity#com.dailyroutine.app.RemindersActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:33:9-36:45
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:56:9-59:45
 	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:36:13-43
-	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:35:13-37
-	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:34:13-46
-activity#com.dailyroutine.app.DietPlanActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:38:9-41:40
-	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:41:13-38
-	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:40:13-37
-	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:39:13-45
-activity#com.dailyroutine.app.WorkoutPlanActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:43:9-46:43
-	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:46:13-41
-	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:45:13-37
-	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:44:13-48
-activity#com.dailyroutine.app.WalkingDataActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:48:9-51:43
-	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:51:13-41
-	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:50:13-37
-	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:49:13-48
-activity#com.dailyroutine.app.SleepTrackingActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:53:9-56:45
-	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:56:13-43
-	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:55:13-37
-	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:54:13-50
-activity#com.dailyroutine.app.WeightActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:58:9-61:46
-	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:61:13-44
-	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:60:13-37
-	android:name
 		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:59:13-43
+	android:exported
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:58:13-37
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:57:13-46
+activity#com.dailyroutine.app.DietPlanActivity
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:61:9-64:40
+	android:label
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:64:13-38
+	android:exported
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:63:13-37
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:62:13-45
+activity#com.dailyroutine.app.WorkoutPlanActivity
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:66:9-69:43
+	android:label
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:69:13-41
+	android:exported
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:68:13-37
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:67:13-48
+activity#com.dailyroutine.app.WalkingDataActivity
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:71:9-74:43
+	android:label
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:74:13-41
+	android:exported
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:73:13-37
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:72:13-48
+activity#com.dailyroutine.app.SleepTrackingActivity
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:76:9-79:45
+	android:label
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:79:13-43
+	android:exported
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:78:13-37
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:77:13-50
+activity#com.dailyroutine.app.WeightActivity
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:81:9-84:46
+	android:label
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:84:13-44
+	android:exported
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:83:13-37
+	android:name
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:82:13-43
 activity#com.dailyroutine.app.CaloriesActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:63:9-66:48
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:86:9-89:48
 	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:66:13-46
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:89:13-46
 	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:65:13-37
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:88:13-37
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:64:13-45
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:87:13-45
 activity#com.dailyroutine.app.HabitProgressActivity
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:68:9-71:45
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:91:9-94:45
 	android:label
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:71:13-43
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:94:13-43
 	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:70:13-37
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:93:13-37
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:69:13-50
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:92:13-50
 receiver#com.dailyroutine.app.ReminderReceiver
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:73:9-75:39
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:96:9-98:39
 	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:75:13-37
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:98:13-37
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:74:13-45
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:97:13-45
 receiver#com.dailyroutine.app.ReminderActionReceiver
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:77:9-79:39
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:100:9-102:39
 	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:79:13-37
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:102:13-37
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:78:13-51
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:101:13-51
 receiver#com.dailyroutine.app.BootReceiver
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:81:9-89:20
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:104:9-112:20
 	android:exported
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:83:13-36
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:106:13-36
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:82:13-41
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:105:13-41
 intent-filter#action:name:android.intent.action.BOOT_COMPLETED+action:name:android.intent.action.QUICKBOOT_POWERON+action:name:com.htc.intent.action.QUICKBOOT_POWERON
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:84:13-88:29
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:107:13-111:29
 action#android.intent.action.BOOT_COMPLETED
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:85:17-78
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:108:17-78
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:85:25-76
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:108:25-76
 action#android.intent.action.QUICKBOOT_POWERON
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:86:17-81
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:109:17-81
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:86:25-79
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:109:25-79
 action#com.htc.intent.action.QUICKBOOT_POWERON
-ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:87:17-81
+ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:110:17-81
 	android:name
-		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:87:25-79
+		ADDED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:110:25-79
 uses-sdk
 INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml

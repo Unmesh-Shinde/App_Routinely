@@ -3222,6 +3222,7 @@ id btnEditGoal
 id btnEditStepGoal
 id btnHealthSync
 id btnPickDate
+id btnPickDateWorkout
 id btnPickExTime
 id btnPickMealTime
 id btnPickTime
@@ -3232,17 +3233,14 @@ id buttonPanel
 id cache_measures
 id callMeasure
 id cancel_button
-id card10Days
-id card15Days
-id card30Days
 id cardCalories
 id cardDiet
 id cardProgress
 id cardSleep
 id cardUpcoming
 id cardWalking
-id cardWeekly
 id cardWeight
+id cardWellnessScore
 id cardWorkout
 id carryVelocity
 id center
@@ -3399,7 +3397,6 @@ id linear
 id listMode
 id list_item
 id llAppList
-id llChallenges
 id llConnectApp
 id llDays
 id llFixed
@@ -3413,7 +3410,7 @@ id llTodayEmpty
 id llWeeklyGraph
 id llWeeklySleepGraph
 id llWeeklyStepsGraph
-id llWorkoutDays
+id llWorkoutDaysStrip
 id m3_side_sheet
 id marquee
 id masked
@@ -3530,6 +3527,7 @@ id position
 id postLayout
 id pressed
 id progressHabits
+id progressWellness
 id progress_circular
 id progress_horizontal
 id radio
@@ -3698,6 +3696,7 @@ id tvMonthlyWarning
 id tvPendingCount
 id tvProgress
 id tvSelectedDate
+id tvSelectedDateWorkout
 id tvStepGoal
 id tvSubtitle
 id tvSyncing
@@ -3711,6 +3710,8 @@ id tvValSteps
 id tvValWeight
 id tvWeeklySleepWarning
 id tvWeeklyWarning
+id tvWellnessMsg
+id tvWellnessScore
 id unchecked
 id uniform
 id unlabeled

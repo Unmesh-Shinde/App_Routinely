@@ -42,64 +42,48 @@ class PlanManager(context: Context) {
         prefs.edit().putString("diet_calendar_data", gson.toJson(plan)).apply()
     }
 
-    // --- Workout Plan Management ---
+    // --- Calendar-Based Workout Plan Management ---
 
-    fun getWorkoutPlan(duration: ChallengeDuration): WorkoutPlan {
-        val key = "workout_${duration.name}"
-        val json = prefs.getString(key, null)
+    private fun getFullWorkoutPlan(): WorkoutPlan {
+        val json = prefs.getString("workout_calendar_data", null)
         return if (json != null) {
             val type = object : TypeToken<WorkoutPlan>() {}.type
-            gson.fromJson(json, type) ?: WorkoutPlan(duration)
+            gson.fromJson(json, type) ?: WorkoutPlan()
         } else {
-            WorkoutPlan(duration)
+            WorkoutPlan()
         }
     }
 
-    fun saveWorkoutPlan(plan: WorkoutPlan) {
-        val key = "workout_${plan.duration.name}"
-        prefs.edit().putString(key, gson.toJson(plan)).apply()
+    fun getExercisesForDate(date: String): MutableList<Exercise> {
+        return getFullWorkoutPlan().dailyExercises[date] ?: mutableListOf()
     }
 
-    // Updated sync logic for date-based meals
-    fun syncMealReminder(context: Context, meal: Meal, date: String) {
-        val mgr = ReminderManager(context)
-        if (!meal.isReminderEnabled) {
-            mgr.deleteReminder(Reminder(id = meal.id))
-            return
-        }
-        
-        // For individual calendar dates, we set it to trigger on that specific day
-        // For simplicity in our current ReminderManager (which uses repeatDays), 
-        // we'll map this date to its weekday, or treat it as a recurring daily reminder 
-        // if it's meant to be a general routine.
-        
-        // However, since it's a specific DATE, we should ideally add date support to ReminderManager.
-        // For now, let's keep it as "Every Day" if it's in the calendar, but marked with the date in title.
-        
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val calDate = sdf.parse(date) ?: Date()
-        val calendar = Calendar.getInstance().apply { time = calDate }
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) // 1=Sun, 2=Mon...
-
-        mgr.saveReminder(Reminder(
-            id = meal.id,
-            title = "Meal: ${meal.name}",
-            type = ReminderType.MEAL,
-            hour = meal.hour,
-            minute = meal.minute,
-            repeatDays = listOf(dayOfWeek), // Only on that specific weekday
-            isHidden = true,
-            dishType = meal.name,
-            ingredients = meal.description
-        ))
+    fun saveExerciseForDate(date: String, ex: Exercise) {
+        val plan = getFullWorkoutPlan()
+        val list = plan.dailyExercises.getOrPut(date) { mutableListOf() }
+        val idx = list.indexOfFirst { it.id == ex.id }
+        if (idx >= 0) list[idx] = ex else list.add(ex)
+        prefs.edit().putString("workout_calendar_data", gson.toJson(plan)).apply()
     }
 
-    fun syncExerciseReminder(context: Context, ex: Exercise, day: Int, duration: ChallengeDuration) {
+    fun deleteExerciseForDate(date: String, ex: Exercise) {
+        val plan = getFullWorkoutPlan()
+        plan.dailyExercises[date]?.removeIf { it.id == ex.id }
+        prefs.edit().putString("workout_calendar_data", gson.toJson(plan)).apply()
+    }
+
+    // Updated sync logic for date-based exercises
+    fun syncExerciseReminder(context: Context, ex: Exercise, date: String) {
         val mgr = ReminderManager(context)
         if (!ex.isReminderEnabled) {
             mgr.deleteReminder(Reminder(id = ex.id))
             return
         }
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        val calDate = sdf.parse(date) ?: Date()
+        val calendar = Calendar.getInstance().apply { time = calDate }
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
 
         mgr.saveReminder(Reminder(
             id = ex.id,
@@ -107,8 +91,44 @@ class PlanManager(context: Context) {
             type = ReminderType.EXERCISE,
             hour = ex.hour,
             minute = ex.minute,
-            repeatDays = listOf(1, 2, 3, 4, 5, 6, 7), // Every day for challenges
+            repeatDays = listOf(dayOfWeek),
             isHidden = true
         ))
+    }
+
+    fun syncMealReminder(context: Context, meal: Meal, date: String) {
+        val mgr = ReminderManager(context)
+        if (!meal.isReminderEnabled) {
+            mgr.deleteReminder(Reminder(id = meal.id))
+            return
+        }
+
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        val calDate = sdf.parse(date) ?: Date()
+        val calendar = Calendar.getInstance().apply { time = calDate }
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+        mgr.saveReminder(Reminder(
+            id = meal.id,
+            title = "Meal: ${meal.name}",
+            type = ReminderType.MEAL,
+            hour = meal.hour,
+            minute = meal.minute,
+            repeatDays = listOf(dayOfWeek),
+            isHidden = true,
+            dishType = meal.name,
+            ingredients = meal.description
+        ))
+    }
+
+    // --- Legacy Challenge Management (If needed, can be refactored to use dates) ---
+
+    fun getWorkoutPlan(duration: ChallengeDuration): WorkoutPlan {
+        // This could be deprecated or refactored to return a challenge template
+        return WorkoutPlan()
+    }
+
+    fun saveWorkoutPlan(plan: WorkoutPlan) {
+        // Logic for saving a whole plan/challenge
     }
 }

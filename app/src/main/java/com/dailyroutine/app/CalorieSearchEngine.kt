@@ -3,137 +3,134 @@ package com.dailyroutine.app
 import java.util.regex.Pattern
 
 object CalorieSearchEngine {
-    // Database values are per 100g for mass-based items, or per standard serving (1 piece) for others.
+    // DB: cals per 100g/ml or per 1 standard piece.
     private val foodDatabase = mapOf(
-        // --- Indian Breads (Per Piece) ---
-        "roti" to 85, "chapati" to 85, "phulka" to 70, "paratha" to 250, "naan" to 280,
-        "butter naan" to 350, "garlic naan" to 330, "kulcha" to 210, "missi roti" to 160, 
-        "poori" to 125, "bhatura" to 230, "rumali roti" to 130, "thepla" to 110,
-        "jowar roti" to 90, "bajra roti" to 110, "makki roti" to 120, "lacha paratha" to 300,
-
-        // --- Rice & Biryanis (Per 100g cooked) ---
-        "rice" to 130, "cooked rice" to 130, "white rice" to 130, "brown rice" to 110,
-        "pulao" to 150, "veg pulao" to 160, "biryani" to 200, "veg biryani" to 180,
-        "chicken biryani" to 220, "mutton biryani" to 240, "egg biryani" to 190,
-        "jeera rice" to 140, "khichdi" to 120, "lemon rice" to 150, "fried rice" to 180, 
-        "curd rice" to 110, "basmati rice" to 130, "schezwan rice" to 190,
-
-        // --- Dals & Pulses (Per 100g cooked) ---
-        "dal" to 100, "dal tadka" to 120, "dal makhani" to 160, "chole" to 140,
-        "rajma" to 140, "sambhar" to 80, "rasam" to 40, "moong dal" to 100,
-        "lobia" to 110, "kadhi" to 90, "moong chilka" to 100, "masoor dal" to 100,
-        "arhar dal" to 110, "urad dal" to 110, "chana dal" to 120,
-
-        // --- Paneer & Veg Main Course (Per 100g) ---
-        "paneer butter masala" to 240, "palak paneer" to 160, "matar paneer" to 180,
-        "shahi paneer" to 220, "kadhai paneer" to 200, "paneer tikka" to 180,
-        "aloo gobhi" to 120, "bhindi" to 100, "baingan bharta" to 110,
-        "mixed veg" to 120, "malai kofta" to 250, "dum aloo" to 150, "gajar halwa" to 250,
-        "aloo mattar" to 130, "jeera aloo" to 110, "veg korma" to 180, "mix veg curry" to 140,
-
-        // --- Non-Veg Main Course (Per 100g) ---
-        "chicken curry" to 180, "butter chicken" to 240, "chicken tikka masala" to 220,
-        "fish curry" to 160, "fish fry" to 250, "mutton curry" to 250, "egg curry" to 150,
-        "egg bhurji" to 180, "omelette" to 160, "boiled egg" to 75, "tandoori chicken" to 180,
-        "chicken fry" to 280, "mutton rogan josh" to 280, "prawn curry" to 160,
-
-        // --- Breakfast & Snacks (Per piece or 100g) ---
-        "samosa" to 210, "pakora" to 160, "vada pav" to 310, "pav bhaji" to 150,
-        "pani puri" to 40, "bhel puri" to 150, "aloo tikki" to 180, "dhokla" to 160,
-        "idli" to 55, "dosa" to 130, "masala dosa" to 260, "medu vada" to 160,
-        "poha" to 180, "upma" to 200, "maggi" to 310, "momos" to 40, "bread butter" to 200,
-        "sandwich" to 250, "veg sandwich" to 230, "cheese sandwich" to 320, "burger" to 250, "chicken burger" to 300,
-
-        // --- Fruits & Salads ---
+        "whole wheat bread" to 75, "white bread" to 80, "brown bread" to 75,
+        "roti" to 85, "chapati" to 85, "phulka" to 70, "paratha" to 250, "naan" to 280, "sandwich" to 250,
+        "rice" to 130, "biryani" to 200, "dal" to 100, "paneer butter masala" to 240,
+        "chicken curry" to 180, "egg curry" to 150, "salad" to 30, "vegetable salad" to 35,
         "apple" to 52, "banana" to 89, "orange" to 47, "mango" to 60,
-        "papaya" to 43, "watermelon" to 30, "salad" to 30, "sprouts" to 125,
-        "guava" to 68, "grapes" to 67, "pomegranate" to 83, "cucumber" to 15,
-
-        // --- Beverages & Dairy ---
-        "milk" to 60, "curd" to 65, "yogurt" to 65, "lassi" to 80,
-        "chaas" to 30, "tea" to 30, "coffee" to 40, "juice" to 50,
-        "buttermilk" to 35, "green tea" to 2, "coconut water" to 20,
-
-        // --- Ingredients & Toppings ---
-        "butter" to 717, "ghee" to 900, "oil" to 884, "cheese" to 400, "nuts" to 600,
-        "sugar" to 387, "honey" to 304, "cream" to 340, "mayonnaise" to 680
+        "tomato" to 18, "onion" to 40, "cabbage" to 25, "cucumber" to 15,
+        "milk" to 60, "buttermilk" to 30, "curd" to 65, "yogurt" to 65, "lassi" to 80,
+        "butter" to 717, "ghee" to 900, "oil" to 884, "olive oil" to 884, "cheese slice" to 70,
+        "cheese" to 400, "mayonnaise" to 680, "mayo" to 680, "tomato sauce" to 100,
+        "mustard dressing" to 450, "mustard" to 60, "almond" to 7, "cashew" to 9, 
+        "pistachio" to 4, "peanut" to 6, "roasted peanuts" to 160 // per handful
     )
 
-    private val portionMultipliers = mapOf(
-        "bowl" to 1.5,
-        "small bowl" to 0.8,
-        "large bowl" to 2.2,
-        "plate" to 2.0,
-        "full plate" to 2.5,
-        "half plate" to 1.0,
-        "cup" to 1.0,
-        "small cup" to 0.6,
-        "large cup" to 1.5,
-        "glass" to 1.2,
-        "spoon" to 0.2,
-        "tablespoon" to 0.3
+    // Ingredients that should use a tiny default portion (15g/ml) if no quantity is found
+    private val smallIngredients = listOf(
+        "butter", "ghee", "oil", "mayo", "sauce", "ketchup", "mustard", "honey", "cream", 
+        "onion", "tomato", "cucumber", "dressing", "dressing", "cheese"
+    )
+
+    private val unitMultipliers = mapOf(
+        "teaspoon" to 0.05, "tsp" to 0.05,
+        "tablespoon" to 0.15, "tbsp" to 0.15,
+        "handful" to 0.3, "bowl" to 1.5,
+        "plate" to 2.0, "glass" to 2.5, "cup" to 1.5, "slice" to 1.0,
+        "gm" to 0.01, "gram" to 0.01, "ml" to 0.01
     )
 
     fun getCalories(text: String): Int {
-        val normalized = text.lowercase().trim()
+        val normalized = text.lowercase().replace("probably around", "").replace("fillings of", "").trim()
         if (normalized.isEmpty()) return 0
 
-        // Split into distinct meal components
-        val sections = normalized.split(" and ", " with ", "&", ",", "+").filter { it.isNotBlank() }
-        var totalSum = 0
+        // Handle common typos or slang
+        val sanitized = normalized.replace("raosted", "roasted").replace("pieces", "").replace("portion", "")
 
-        for (section in sections) {
-            totalSum += analyzeSection(section)
+        val segments = sanitized.split(
+            " and ", " with ", " including ", " plus ", " along with ", 
+            ",", ";", "&", "+", " side of "
+        ).filter { it.isNotBlank() }
+
+        var total = 0.0
+        var globalMultiplier = 1.0
+
+        for (segment in segments) {
+            val res = analyzeSegment(segment)
+            
+            // Quantity Context
+            if (segment.contains(" each")) {
+                total += (res.calories * globalMultiplier)
+            } else {
+                total += res.calories
+                if (res.isPrimary && res.quantity > 1) {
+                    globalMultiplier = res.quantity
+                }
+            }
         }
 
-        // Final Sanity Check: If calculation results in impossible values for a single meal, cap it.
-        // A single meal entry shouldn't realistically exceed 3500 kcal (a full day's worth).
-        return totalSum.coerceAtMost(3500)
+        // Realistic Cap for a single meal
+        return total.toInt().coerceAtMost(2500)
     }
 
-    private fun analyzeSection(section: String): Int {
-        var baseCals = 0
-        var foundFoodKey = ""
+    data class ParseResult(val calories: Double, val quantity: Double, val isPrimary: Boolean)
+
+    private fun analyzeSegment(segment: String): ParseResult {
+        var foundBase = 0.0
+        var isPrimary = false
         
-        // Match Food Database - Try longest matches first
+        // Match Food
+        var foodKey = ""
         val sortedKeys = foodDatabase.keys.sortedByDescending { it.length }
-        for (food in sortedKeys) {
-            if (section.contains(food)) {
-                baseCals = foodDatabase[food] ?: 0
-                foundFoodKey = food
+        for (key in sortedKeys) {
+            if (segment.contains(key)) {
+                foundBase = foodDatabase[key]?.toDouble() ?: 0.0
+                foodKey = key
+                if (key.contains("sandwich") || key.contains("bread") || key.contains("roti") || 
+                    key.contains("dosa") || key.contains("burger") || key.contains("biryani")) {
+                    isPrimary = true
+                }
                 break
             }
         }
 
-        if (foundFoodKey.isEmpty()) return 250 // Default fallback
+        if (foodKey.isEmpty()) return ParseResult(0.0, 1.0, false)
 
-        // Detection logic: Grams vs. Quantity
-        val gramPattern = Pattern.compile("(\\d+)\\s*(gram|g|gm)")
-        val gramMatcher = gramPattern.matcher(section)
+        // Extract Number
+        val numPattern = Pattern.compile("(\\d+(\\.\\d+)?)")
+        val matcher = numPattern.matcher(segment)
+        var foundNumber: Double? = null
+        if (matcher.find()) {
+            foundNumber = matcher.group(1)?.toDoubleOrNull()
+        }
+
+        // Extract Unit
+        var unitMult = 1.0
+        var foundUnit = false
+        for ((unit, mult) in unitMultipliers) {
+            if (segment.contains(unit)) {
+                unitMult = mult
+                foundUnit = true
+                // Priority: if user specified ml or gram, ignore container multipliers (glass/bowl)
+                if (unit == "ml" || unit == "gram" || unit == "gm") break 
+            }
+        }
+
+        // Logic: How to calculate the multiplier?
+        var finalMultiplier = 1.0
         
-        if (gramMatcher.find()) {
-            // Logic for Mass (Grams): calories = (grams / 100) * baseCals (since DB is per 100g)
-            val grams = gramMatcher.group(1)?.toDoubleOrNull() ?: 100.0
-            // If the item is naturally piece-based (roti, apple) but user entered grams, we treat DB value as per 100g too.
-            return (baseCals * (grams / 100.0)).toInt()
-        }
-
-        // Logic for Quantity (1, 2, 3...): calories = quantity * baseCals
-        val numPattern = Pattern.compile("(\\d+)")
-        val numMatcher = numPattern.matcher(section)
-        var multiplier = 1.0
-        if (numMatcher.find()) {
-            multiplier = numMatcher.group(1)?.toDoubleOrNull() ?: 1.0
-        }
-
-        // Apply Portion Multipliers if any
-        for ((portion, mult) in portionMultipliers) {
-            if (section.contains(portion)) {
-                multiplier *= mult
-                break
+        if (foundNumber != null && foundUnit) {
+            // e.g. "300 ml" -> multiplier = 300 * 0.01 = 3.0
+            finalMultiplier = foundNumber * unitMult
+        } else if (foundNumber != null) {
+            // e.g. "2 roti" -> multiplier = 2.0
+            finalMultiplier = foundNumber
+        } else if (foundUnit) {
+            // e.g. "bowl of dal" -> multiplier = unit default (1.5)
+            finalMultiplier = unitMult
+        } else {
+            // NO QUANTITY AND NO UNIT FOUND
+            // Check if it's a small ingredient (should be a tiny serving)
+            val isSmall = smallIngredients.any { foodKey.contains(it) }
+            if (isSmall) {
+                finalMultiplier = 0.15 // Default to 15g/ml serving
+            } else {
+                finalMultiplier = 1.0 // Default to 100g or 1 piece
             }
         }
 
-        return (baseCals * multiplier).toInt()
+        return ParseResult(foundBase * finalMultiplier, foundNumber ?: 1.0, isPrimary)
     }
 }

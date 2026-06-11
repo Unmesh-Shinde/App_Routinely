@@ -7,6 +7,29 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+    <!-- Health Connect Permissions -->
+    <uses-permission android:name="android.permission.health.READ_STEPS"/>
+    <uses-permission android:name="android.permission.health.READ_SLEEP"/>
+
+    <queries>
+        <package android:name="com.google.android.apps.fitness" />
+        <package android:name="com.sec.android.app.shealth" />
+        <package android:name="com.fitbit.FitbitMobile" />
+        <package android:name="com.garmin.android.apps.connectmobile" />
+        <package android:name="com.xiaomi.wearable" />
+        <package android:name="com.xiaomi.hm.health" />
+        <package android:name="com.huami.watch.hmwatchmanager" />
+        <package android:name="com.noisefit" />
+        <package android:name="com.coveiot.boat" />
+        <package android:name="com.huawei.health" />
+        <package android:name="com.realme.link" />
+        <package android:name="com.google.android.apps.healthdata" />
+        <package android:name="com.fossil.wearables.fossil" />
+        <package android:name="com.withings.wiscale2" />
+        <package android:name="fi.polar.beat" />
+        <package android:name="com.stt.android.suunto" />
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

@@ -127,11 +127,9 @@ class MainActivity : AppCompatActivity() {
         // Count today's plan items
         val calendar = Calendar.getInstance()
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(calendar.time)
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-        val planDay = if (dayOfWeek == 1) 7 else dayOfWeek - 1
         
         val todayMeals = planManager.getMealsForDate(todayStr).size
-        val todayWorkout = planManager.getWorkoutPlan(ChallengeDuration.WEEKLY).dailyExercises[planDay]?.size ?: 0
+        val todayWorkout = planManager.getExercisesForDate(todayStr).size
         
         val totalHabits = activeRemindersCount + todayMeals + todayWorkout
         val doneHabits = RoutineProgressStore.getDoneCount(this)
@@ -143,27 +141,48 @@ class MainActivity : AppCompatActivity() {
         findViewById<LinearProgressIndicator>(R.id.progressHabits).progress = progress
 
         // Wellness Tracking (Dynamic)
-        val steps = healthDataManager.getSteps()
-        val sleep = healthDataManager.getSleep()
-        val calories = healthDataManager.getCalories()
-        val weight = healthDataManager.getWeight()
+        val stepsStr = healthDataManager.getSteps().replace(",", "")
+        val stepsCount = stepsStr.toIntOrNull() ?: 0
+        val sleepStr = healthDataManager.getSleep().replace("h", "").replace("m", "").trim()
+        // Simple parse for "7h 15m" -> approx 7.25
+        val sleepHours = try {
+            val parts = healthDataManager.getSleep().split(" ")
+            var h = 0.0
+            var m = 0.0
+            parts.forEach { 
+                if (it.contains("h")) h = it.replace("h", "").toDoubleOrNull() ?: 0.0
+                if (it.contains("m")) m = it.replace("m", "").toDoubleOrNull() ?: 0.0
+            }
+            h + (m / 60.0)
+        } catch(e: Exception) { 0.0 }
 
-        findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected()) steps else "0"
-        findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected()) sleep else "0h"
-        findViewById<TextView>(R.id.tvValCalories).text = if (healthDataManager.isConnected()) calories else "0"
-        findViewById<TextView>(R.id.tvValWeight).text = if (healthDataManager.isConnected()) weight else "0 kg"
+        findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected()) healthDataManager.getSteps() else "0"
+        findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected()) healthDataManager.getSleep() else "0h"
+        findViewById<TextView>(R.id.tvValCalories).text = if (healthDataManager.isConnected()) healthDataManager.getCalories() else "0"
+        findViewById<TextView>(R.id.tvValWeight).text = if (healthDataManager.isConnected()) healthDataManager.getWeight() else "0 kg"
+
+        // Calculate and Update Wellness Score
+        val score = WellnessScoreManager.calculateDailyScore(this, stepsCount, sleepHours, doneHabits, totalHabits)
+        findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(R.id.progressWellness).progress = score
+        findViewById<TextView>(R.id.tvWellnessScore).text = score.toString()
+        findViewById<TextView>(R.id.tvWellnessMsg).text = when {
+            score >= 90 -> "Excellent! You're a wellness pro! 🏆"
+            score >= 70 -> "Great job! Keep up the momentum! ✨"
+            score >= 40 -> "Good start! You're making progress. 👍"
+            else -> "Keep moving to reach your goals! 💪"
+        }
 
         // Upcoming Reminder
         val now = Calendar.getInstance()
         val upcoming = allReminders
-            .filter { it.isEnabled && !it.isIntervalBased && !it.isHidden }
+            .filter { it.isEnabled && !it.isIntervalBased }
             .filter { (it.hour * 60 + it.minute) > (now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)) }
             .minByOrNull { it.hour * 60 + it.minute }
 
         if (upcoming != null) {
             findViewById<View>(R.id.cardUpcoming).visibility = View.VISIBLE
             findViewById<TextView>(R.id.tvUpcomingText).text = 
-                "${upcoming.type.emoji} ${upcoming.title} - ${upcoming.formatTime()}"
+                "${upcoming.type.emoji} ${upcoming.title.replace("Meal: ", "").replace("Exercise: ", "")} - ${upcoming.formatTime()}"
         } else {
             findViewById<View>(R.id.cardUpcoming).visibility = View.GONE
         }

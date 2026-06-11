@@ -1,6 +1,7 @@
 package com.dailyroutine.app
 
 import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,15 +12,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.text.SimpleDateFormat
+import java.util.*
 
 class WorkoutPlanActivity : AppCompatActivity() {
 
     private lateinit var planManager: PlanManager
-    private lateinit var currentPlan: WorkoutPlan
-    private var selectedDay = 1
     private lateinit var adapter: ExerciseAdapter
-    private var currentDuration = ChallengeDuration.TEN_DAYS
+    private var selectedCalendar = Calendar.getInstance()
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    private val displayFormatter = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,82 +36,69 @@ class WorkoutPlanActivity : AppCompatActivity() {
 
         planManager = PlanManager(this)
 
-        val cardWeekly = findViewById<View>(R.id.cardWeekly)
-        val card10 = findViewById<View>(R.id.card10Days)
-        val card15 = findViewById<View>(R.id.card15Days)
-        val card30 = findViewById<View>(R.id.card30Days)
-        val llDays = findViewById<LinearLayout>(R.id.llWorkoutDays)
         val rvExercises = findViewById<RecyclerView>(R.id.rvExercises)
-        val fabAdd = findViewById<FloatingActionButton>(R.id.fabAddExercise)
-
         adapter = ExerciseAdapter { editExercise(it) }
         rvExercises.layoutManager = LinearLayoutManager(this)
         rvExercises.adapter = adapter
 
-        val cards = listOf(cardWeekly, card10, card15, card30)
-        cards.forEachIndexed { i, card ->
-            card.setOnClickListener {
-                currentDuration = when (i) {
-                    0 -> ChallengeDuration.WEEKLY
-                    1 -> ChallengeDuration.TEN_DAYS
-                    2 -> ChallengeDuration.FIFTEEN_DAYS
-                    else -> ChallengeDuration.THIRTY_DAYS
+        findViewById<MaterialButton>(R.id.btnPickDateWorkout).setOnClickListener {
+            showDatePicker()
+        }
+
+        findViewById<FloatingActionButton>(R.id.fabAddExercise).setOnClickListener {
+            showExerciseDialog(null)
+        }
+
+        setupDateStrip()
+        updateDateUI()
+    }
+
+    private fun setupDateStrip() {
+        val container = findViewById<LinearLayout>(R.id.llWorkoutDaysStrip)
+        container.removeAllViews()
+        
+        val tempCal = selectedCalendar.clone() as Calendar
+        tempCal.add(Calendar.DAY_OF_YEAR, -3)
+
+        val stripDateFormatter = SimpleDateFormat("EEE\ndd", Locale.US)
+
+        for (i in 0 until 7) {
+            val dateStr = dateFormatter.format(tempCal.time)
+            val isSelected = dateStr == dateFormatter.format(selectedCalendar.time)
+            
+            val btn = Button(this, null, android.R.attr.buttonStyleSmall).apply {
+                text = stripDateFormatter.format(tempCal.time)
+                setOnClickListener {
+                    val clickedCal = Calendar.getInstance()
+                    clickedCal.time = dateFormatter.parse(dateStr) ?: Date()
+                    selectedCalendar = clickedCal
+                    updateDateUI()
+                    setupDateStrip()
                 }
-                loadPlan(currentDuration)
-                setupDaySelector(llDays)
-                updateChallengeUI(cards)
+                alpha = if (isSelected) 1f else 0.5f
+                if (isSelected) setBackgroundColor(0x33FFFFFF)
             }
-        }
-
-        fabAdd.setOnClickListener { showExerciseDialog(null) }
-
-        loadPlan(ChallengeDuration.TEN_DAYS)
-        setupDaySelector(llDays)
-        updateChallengeUI(cards)
-    }
-
-    private fun updateChallengeUI(cards: List<View>) {
-        cards.forEachIndexed { i, card ->
-            val isSelected = when (i) {
-                0 -> currentDuration == ChallengeDuration.WEEKLY
-                1 -> currentDuration == ChallengeDuration.TEN_DAYS
-                2 -> currentDuration == ChallengeDuration.FIFTEEN_DAYS
-                else -> currentDuration == ChallengeDuration.THIRTY_DAYS
-            }
-            card.alpha = if (isSelected) 1f else 0.6f
+            container.addView(btn)
+            tempCal.add(Calendar.DAY_OF_YEAR, 1)
         }
     }
 
-    private fun loadPlan(duration: ChallengeDuration) {
-        currentPlan = planManager.getWorkoutPlan(duration)
-        selectedDay = 1
+    private fun showDatePicker() {
+        DatePickerDialog(this, { _, y, m, d ->
+            selectedCalendar.set(y, m, d)
+            updateDateUI()
+            setupDateStrip()
+        }, selectedCalendar.get(Calendar.YEAR), selectedCalendar.get(Calendar.MONTH), selectedCalendar.get(Calendar.DAY_OF_MONTH)).show()
+    }
+
+    private fun updateDateUI() {
+        findViewById<TextView>(R.id.tvSelectedDateWorkout).text = displayFormatter.format(selectedCalendar.time)
         refreshExercises()
     }
 
-    private fun setupDaySelector(container: LinearLayout) {
-        container.removeAllViews()
-        for (i in 1..currentPlan.duration.days) {
-            val btn = Button(this, null, android.R.attr.buttonStyleSmall).apply {
-                text = "Day $i"
-                setOnClickListener {
-                    selectedDay = i
-                    updateDayButtons(container)
-                    refreshExercises()
-                }
-                alpha = if (i == selectedDay) 1f else 0.5f
-            }
-            container.addView(btn)
-        }
-    }
-
-    private fun updateDayButtons(container: LinearLayout) {
-        for (i in 0 until container.childCount) {
-            container.getChildAt(i).alpha = if (i + 1 == selectedDay) 1f else 0.5f
-        }
-    }
-
     private fun refreshExercises() {
-        val list = currentPlan.dailyExercises[selectedDay] ?: mutableListOf()
+        val dateStr = dateFormatter.format(selectedCalendar.time)
+        val list = planManager.getExercisesForDate(dateStr)
         adapter.submitList(list.sortedBy { it.hour * 60 + it.minute })
     }
 
@@ -176,12 +167,9 @@ class WorkoutPlanActivity : AppCompatActivity() {
                 intensity = sliderIntensity.value.toInt()
             )
             
-            val list = currentPlan.dailyExercises.getOrPut(selectedDay) { mutableListOf() }
-            val idx = list.indexOfFirst { it.id == newEx.id }
-            if (idx >= 0) list[idx] = newEx else list.add(newEx)
-            
-            planManager.saveWorkoutPlan(currentPlan)
-            planManager.syncExerciseReminder(this@WorkoutPlanActivity, newEx, selectedDay, currentPlan.duration)
+            val dateStr = dateFormatter.format(selectedCalendar.time)
+            planManager.saveExerciseForDate(dateStr, newEx)
+            planManager.syncExerciseReminder(this@WorkoutPlanActivity, newEx, dateStr)
             refreshExercises()
             dialog.dismiss()
         }
@@ -226,8 +214,8 @@ class WorkoutPlanActivity : AppCompatActivity() {
             }
 
             holder.itemView.findViewById<View>(R.id.btnDelete).setOnClickListener {
-                currentPlan.dailyExercises[selectedDay]?.remove(ex)
-                planManager.saveWorkoutPlan(currentPlan)
+                val dateStr = dateFormatter.format(selectedCalendar.time)
+                planManager.deleteExerciseForDate(dateStr, ex)
                 refreshExercises()
             }
         }

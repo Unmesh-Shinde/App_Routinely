@@ -51,9 +51,9 @@ class HabitProgressActivity : AppCompatActivity() {
             Reminder(id = it.id, title = it.name, type = ReminderType.MEAL, hour = it.hour, minute = it.minute)
         }
 
-        val workouts = planManager.getWorkoutPlan(ChallengeDuration.WEEKLY).dailyExercises[planDay]?.map {
+        val workouts = planManager.getExercisesForDate(todayStr).map {
             Reminder(id = it.id, title = it.name, type = ReminderType.EXERCISE, hour = it.hour, minute = it.minute)
-        } ?: emptyList()
+        }
 
         val all = allReminders + meals + workouts
         
