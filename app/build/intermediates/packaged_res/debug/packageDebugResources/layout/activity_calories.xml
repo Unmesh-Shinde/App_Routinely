@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bgPage">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/healthCalories">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Calories Tracker"
+            app:titleTextColor="@android:color/white"/>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/healthCalories"
+            app:tabTextColor="#FFCDD2"
+            app:tabSelectedTextColor="@android:color/white"
+            app:tabIndicatorColor="@android:color/white"
+            app:tabMode="fixed">
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Today"/>
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weekly"/>
+            <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Monthly"/>
+        </com.google.android.material.tabs.TabLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🎯" android:textSize="24sp"/>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Daily Target" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/textSecondary" android:textAllCaps="true"/>
+                        <TextView android:id="@+id/tvCalorieGoal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="2000 kcal" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/healthCalories"/>
+                    </LinearLayout>
+                    <Button android:id="@+id/btnEditGoal" style="@style/Widget.MaterialComponents.Button.TextButton" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Edit" android:textColor="@color/healthCalories"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvAnalyzing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🔍 AI Engine analyzing meals..."
+                    android:textSize="11sp"
+                    android:textStyle="italic"
+                    android:textColor="@color/primary"
+                    android:paddingHorizontal="16dp"
+                    android:paddingBottom="12dp"
+                    android:visibility="gone"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <FrameLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- Today View -->
+            <LinearLayout
+                android:id="@+id/viewToday"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:id="@+id/llTodayEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="32dp"
+                    android:visibility="gone">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🍽️" android:textSize="64sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No Meals Found" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/textPrimary" android:layout_marginTop="16dp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Add meals to your Nutrition plan to see calorie breakdowns." android:textSize="14sp" android:textColor="@color/textSecondary" android:gravity="center" android:layout_marginTop="8dp"/>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTodayCalories"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="16dp"
+                    android:clipToPadding="false"/>
+                <TextView
+                    android:id="@+id/tvDailyWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="⚠️ You have exceeded your daily calorie limit!"
+                    android:textColor="#E65100"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:background="#FFF3E0"
+                    android:visibility="gone"/>
+            </LinearLayout>
+
+            <!-- Weekly View -->
+            <LinearLayout
+                android:id="@+id/viewWeekly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Graph Placeholder Area -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:id="@+id/llWeeklyGraph"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="bottom"/>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/tvWeeklyWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="⚠️ You have exceeded your calorie limit for this week!"
+                    android:textColor="#E65100"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:background="#FFF3E0"
+                    android:visibility="gone"
+                    android:layout_marginTop="16dp"/>
+            </LinearLayout>
+
+            <!-- Monthly View -->
+            <LinearLayout
+                android:id="@+id/viewMonthly"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:id="@+id/llMonthlyGraph"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:padding="16dp"
+                        android:gravity="bottom"/>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/tvMonthlyWarning"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:text="⚠️ Limit exceeded in weeks: ..."
+                    android:textColor="#E65100"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:background="#FFF3E0"
+                    android:visibility="gone"
+                    android:layout_marginTop="16dp"/>
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
