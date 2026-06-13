@@ -7,6 +7,8 @@ object UserPreferencesStore {
     private const val PREFS_NAME = "user_prefs"
     private const val KEY_USER_NAME = "user_name"
     private const val KEY_IS_SIGNED_UP = "is_signed_up"
+    private const val KEY_STREAK_COUNT = "streak_count"
+    private const val KEY_LAST_STREAK_UPDATE = "last_streak_update"
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -26,5 +28,21 @@ object UserPreferencesStore {
 
     fun setUserName(context: Context, name: String) {
         getPrefs(context).edit().putString(KEY_USER_NAME, name).apply()
+    }
+
+    fun getStreakCount(context: Context): Int {
+        return getPrefs(context).getInt(KEY_STREAK_COUNT, 0)
+    }
+
+    fun setStreakCount(context: Context, count: Int) {
+        getPrefs(context).edit().putInt(KEY_STREAK_COUNT, count).apply()
+    }
+
+    fun getLastStreakUpdate(context: Context): String {
+        return getPrefs(context).getString(KEY_LAST_STREAK_UPDATE, "") ?: ""
+    }
+
+    fun setLastStreakUpdate(context: Context, date: String) {
+        getPrefs(context).edit().putString(KEY_LAST_STREAK_UPDATE, date).apply()
     }
 }

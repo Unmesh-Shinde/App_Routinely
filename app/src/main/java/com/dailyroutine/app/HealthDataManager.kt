@@ -14,6 +14,8 @@ class HealthDataManager(context: Context) {
         private const val KEY_WEIGHT = "current_weight"
         private const val KEY_CALORIE_GOAL = "daily_calorie_goal"
         private const val KEY_STEP_GOAL = "daily_step_goal"
+        private const val KEY_WATER_PREFIX = "water_intake_"
+        private const val KEY_WEIGHT_HISTORY = "weight_history_data"
     }
 
     fun isConnected(): Boolean = prefs.getBoolean(KEY_IS_CONNECTED, false)
@@ -31,6 +33,30 @@ class HealthDataManager(context: Context) {
 
     fun getDailyStepGoal(): Int = prefs.getInt(KEY_STEP_GOAL, 10000)
     fun setDailyStepGoal(goal: Int) = prefs.edit().putInt(KEY_STEP_GOAL, goal).apply()
+
+    fun getWaterIntake(date: String): Double = prefs.getFloat(KEY_WATER_PREFIX + date, 0.0f).toDouble()
+    fun addWaterIntake(date: String, amount: Double) {
+        val current = getWaterIntake(date)
+        prefs.edit().putFloat(KEY_WATER_PREFIX + date, (current + amount).toFloat()).apply()
+    }
+
+    fun getWeight(date: String): Double {
+        val history = getWeightHistory()
+        return history[date] ?: 0.0
+    }
+
+    fun saveWeight(date: String, weight: Double) {
+        val history = getWeightHistory().toMutableMap()
+        history[date] = weight
+        val json = com.google.gson.Gson().toJson(history)
+        prefs.edit().putString(KEY_WEIGHT_HISTORY, json).apply()
+    }
+
+    private fun getWeightHistory(): Map<String, Double> {
+        val json = prefs.getString(KEY_WEIGHT_HISTORY, null) ?: return emptyMap()
+        val type = object : com.google.gson.reflect.TypeToken<Map<String, Double>>() {}.type
+        return com.google.gson.Gson().fromJson(json, type) ?: emptyMap()
+    }
 
     fun calculateDistanceKm(steps: Int): Double {
         // Average stride length ~0.76m

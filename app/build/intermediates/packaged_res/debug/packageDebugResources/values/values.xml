@@ -3,6 +3,7 @@
     <color name="accent">#7E57C2</color>
     <color name="bgPage">#F5F5F7</color>
     <color name="cardBg">#FFFFFF</color>
+    <color name="cardStroke">#E0E0E0</color>
     <color name="chipCustom">#BDBDBD</color>
     <color name="chipExercise">#FF9800</color>
     <color name="chipMeal">#4CAF50</color>

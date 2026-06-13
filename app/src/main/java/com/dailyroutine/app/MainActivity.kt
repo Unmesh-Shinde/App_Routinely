@@ -39,33 +39,38 @@ class MainActivity : AppCompatActivity() {
 
         updateGreeting()
         updateDashboard()
+        updateStreak()
 
         findViewById<View>(R.id.cardProgress).setOnClickListener {
             startActivity(Intent(this, HabitProgressActivity::class.java))
         }
 
-        findViewById<MaterialCardView>(R.id.cardDiet).setOnClickListener {
+        findViewById<View>(R.id.cardDiet).setOnClickListener {
             startActivity(Intent(this, DietPlanActivity::class.java))
         }
 
-        findViewById<MaterialCardView>(R.id.cardWorkout).setOnClickListener {
+        findViewById<View>(R.id.cardWorkout).setOnClickListener {
             startActivity(Intent(this, WorkoutPlanActivity::class.java))
         }
 
-        findViewById<MaterialCardView>(R.id.cardWalking).setOnClickListener {
+        findViewById<View>(R.id.cardWalking).setOnClickListener {
             startActivity(Intent(this, WalkingDataActivity::class.java))
         }
 
-        findViewById<MaterialCardView>(R.id.cardSleep).setOnClickListener {
+        findViewById<View>(R.id.cardSleep).setOnClickListener {
             startActivity(Intent(this, SleepTrackingActivity::class.java))
         }
 
-        findViewById<MaterialCardView>(R.id.cardWeight).setOnClickListener {
+        findViewById<View>(R.id.cardWeight).setOnClickListener {
             startActivity(Intent(this, WeightActivity::class.java))
         }
 
-        findViewById<MaterialCardView>(R.id.cardCalories).setOnClickListener {
+        findViewById<View>(R.id.cardCalories).setOnClickListener {
             startActivity(Intent(this, CaloriesActivity::class.java))
+        }
+
+        findViewById<View>(R.id.cardWater).setOnClickListener {
+            showWaterQuickAdd()
         }
 
         findViewById<MaterialButton>(R.id.btnHealthSync).setOnClickListener {
@@ -76,7 +81,6 @@ class MainActivity : AppCompatActivity() {
                 .putString("steps_count", "7,250")
                 .putString("sleep_hours", "7h 15m")
                 .putString("calories_burnt", "1,420")
-                .putString("current_weight", "74.2 kg")
                 .apply()
             
             updateDashboard()
@@ -106,6 +110,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updateDashboard()
+        updateStreak()
     }
 
     private fun updateGreeting() {
@@ -118,6 +123,29 @@ class MainActivity : AppCompatActivity() {
             else -> "Good Night, $name 👋"
         }
         findViewById<TextView>(R.id.tvGreeting).text = greeting
+    }
+
+    private fun updateStreak() {
+        val streak = UserPreferencesStore.getStreakCount(this)
+        findViewById<TextView>(R.id.tvStreak).text = "🔥 $streak Days"
+    }
+
+    private fun showWaterQuickAdd() {
+        val options = arrayOf("+250 ml", "+500 ml", "+1 Liter")
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Add Water Intake")
+            .setItems(options) { _, which ->
+                val amount = when(which) {
+                    0 -> 0.25
+                    1 -> 0.5
+                    else -> 1.0
+                }
+                val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+                healthDataManager.addWaterIntake(today, amount)
+                updateDashboard()
+                Toast.makeText(this, "Added $amount L! 💧", Toast.LENGTH_SHORT).show()
+            }
+            .show()
     }
 
     private fun updateDashboard() {
@@ -143,10 +171,10 @@ class MainActivity : AppCompatActivity() {
         // Wellness Tracking (Dynamic)
         val stepsStr = healthDataManager.getSteps().replace(",", "")
         val stepsCount = stepsStr.toIntOrNull() ?: 0
-        val sleepStr = healthDataManager.getSleep().replace("h", "").replace("m", "").trim()
-        // Simple parse for "7h 15m" -> approx 7.25
+        
+        val sleepValue = healthDataManager.getSleep()
         val sleepHours = try {
-            val parts = healthDataManager.getSleep().split(" ")
+            val parts = sleepValue.split(" ")
             var h = 0.0
             var m = 0.0
             parts.forEach { 
@@ -159,7 +187,12 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected()) healthDataManager.getSteps() else "0"
         findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected()) healthDataManager.getSleep() else "0h"
         findViewById<TextView>(R.id.tvValCalories).text = if (healthDataManager.isConnected()) healthDataManager.getCalories() else "0"
-        findViewById<TextView>(R.id.tvValWeight).text = if (healthDataManager.isConnected()) healthDataManager.getWeight() else "0 kg"
+        
+        val weightVal = healthDataManager.getWeight(todayStr)
+        findViewById<TextView>(R.id.tvValWeight).text = if (weightVal > 0) "$weightVal kg" else "0 kg"
+        
+        val waterVal = healthDataManager.getWaterIntake(todayStr)
+        findViewById<TextView>(R.id.tvValWater).text = "%.1f L".format(waterVal)
 
         // Calculate and Update Wellness Score
         val score = WellnessScoreManager.calculateDailyScore(this, stepsCount, sleepHours, doneHabits, totalHabits)
@@ -199,7 +232,7 @@ class MainActivity : AppCompatActivity() {
     private fun requestExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(android.app.AlarmManager::class.java)
-            if (!alarmManager.canScheduleExactAlarms()) {
+            if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
                 val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                 startActivity(intent)
             }

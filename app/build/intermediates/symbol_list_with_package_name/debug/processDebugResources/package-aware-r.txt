@@ -1367,6 +1367,7 @@ color button_material_light
 color call_notification_answer_color
 color call_notification_decline_color
 color cardBg
+color cardStroke
 color cardview_dark_background
 color cardview_light_background
 color cardview_shadow_end_color

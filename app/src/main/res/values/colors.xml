@@ -18,6 +18,7 @@
     <!-- Backgrounds -->
     <color name="bgPage">#F5F5F7</color>
     <color name="cardBg">#FFFFFF</color>
+    <color name="cardStroke">#E0E0E0</color>
     <color name="fieldBg">#F0F0F6</color>
     <color name="fieldStroke">#D0D0E0</color>
 

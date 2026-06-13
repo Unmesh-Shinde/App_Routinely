@@ -3,6 +3,7 @@ local
 color accent
 color bgPage
 color cardBg
+color cardStroke
 color chipCustom
 color chipExercise
 color chipMeal
