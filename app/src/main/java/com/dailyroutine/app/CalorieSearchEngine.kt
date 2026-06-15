@@ -21,7 +21,7 @@ object CalorieSearchEngine {
     // Ingredients that should use a tiny default portion (15g/ml) if no quantity is found
     private val smallIngredients = listOf(
         "butter", "ghee", "oil", "mayo", "sauce", "ketchup", "mustard", "honey", "cream", 
-        "onion", "tomato", "cucumber", "dressing", "dressing", "cheese"
+        "onion", "tomato", "cucumber", "dressing", "cheese"
     )
 
     private val unitMultipliers = mapOf(
@@ -132,5 +132,16 @@ object CalorieSearchEngine {
         }
 
         return ParseResult(foundBase * finalMultiplier, foundNumber ?: 1.0, isPrimary)
+    }
+
+    fun calculateActiveBurn(steps: Int, weight: Double, doneExercises: List<Exercise>): Int {
+        // A. Walking Burn: approx 0.00055 kcal per step per kg
+        val userWeight = if (weight > 0) weight else 70.0
+        val walkingBurn = steps * userWeight * 0.00055
+        
+        // B. Workout Burn: Intensity * multiplier
+        val workoutBurn = doneExercises.sumOf { (it.intensity * 2.5) }
+        
+        return (walkingBurn + workoutBurn).toInt()
     }
 }

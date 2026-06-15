@@ -71,7 +71,14 @@ class ReminderReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val message = reminder.type.defaultMessage
+        val message = when (reminder.type) {
+            ReminderType.MEAL -> {
+                val dish = reminder.dishType.takeIf { it.isNotBlank() } ?: "your scheduled meal"
+                "Time for your meal: $dish. Mark as eaten?"
+            }
+            ReminderType.EXERCISE -> "Workout Time: ${reminder.title}. Ready to crush it?"
+            else -> reminder.type.defaultMessage
+        }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)

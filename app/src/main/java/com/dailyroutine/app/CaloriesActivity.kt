@@ -72,7 +72,25 @@ class CaloriesActivity : AppCompatActivity() {
     }
 
     private fun updateGoalDisplay() {
-        findViewById<TextView>(R.id.tvCalorieGoal).text = "$dailyGoal kcal"
+        val display = "$dailyGoal kcal"
+        findViewById<TextView>(R.id.tvCalorieGoal).text = display
+        
+        // Show if it matches BMR recommendation (simulated)
+        val weight = healthDataManager.getWeight(dateFormatter.format(Date())).let { if (it > 0) it else 70.0 }
+        val age = UserPreferencesStore.getUserAge(this)
+        val height = UserPreferencesStore.getUserHeight(this)
+        val gender = UserPreferencesStore.getUserGender(this)
+        
+        var bmr = if (gender == "Male") {
+            ((10 * weight) + (6.25 * height) - (5 * age) + 5).toInt()
+        } else {
+            ((10 * weight) + (6.25 * height) - (5 * age) - 161).toInt()
+        }
+        bmr = (bmr * 1.2).toInt() // Light activity multiplier
+        
+        if (dailyGoal != bmr) {
+            // We could show a small hint here if needed
+        }
     }
 
     private fun setupTabs() {
@@ -115,6 +133,7 @@ class CaloriesActivity : AppCompatActivity() {
     private fun refreshTodayView() {
         val todayStr = dateFormatter.format(Date())
         val meals = planManager.getMealsForDate(todayStr)
+        val doneIds = RoutineProgressStore.getDoneIds(this)
         
         val tvAnalyzing = findViewById<TextView>(R.id.tvAnalyzing)
         if (meals.isNotEmpty()) {
@@ -129,8 +148,23 @@ class CaloriesActivity : AppCompatActivity() {
         
         adapter.submitList(meals)
         
-        val total = meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
-        findViewById<View>(R.id.tvDailyWarning).visibility = if (total > dailyGoal) View.VISIBLE else View.GONE
+        val intakeTotal = meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
+        findViewById<View>(R.id.tvDailyWarning).visibility = if (intakeTotal > dailyGoal) View.VISIBLE else View.GONE
+
+        // Energy Balance Calculation
+        val stepsStr = healthDataManager.getSteps().replace(",", "")
+        val steps = stepsStr.toIntOrNull() ?: 0
+        val weight = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
+        
+        val doneExercises = planManager.getExercisesForDate(todayStr).filter { it.id.toString() in doneIds }
+        val burnedTotal = CalorieSearchEngine.calculateActiveBurn(steps, weight, doneExercises)
+        val netBalance = intakeTotal - burnedTotal
+
+        findViewById<TextView>(R.id.tvIntakeSum).text = intakeTotal.toString()
+        findViewById<TextView>(R.id.tvBurnedSum).text = burnedTotal.toString()
+        findViewById<TextView>(R.id.tvNetBalance).text = netBalance.toString()
+        
+        findViewById<TextView>(R.id.tvDailyWarning).visibility = if (netBalance > dailyGoal) View.VISIBLE else View.GONE
     }
 
     private fun refreshWeeklyView() {

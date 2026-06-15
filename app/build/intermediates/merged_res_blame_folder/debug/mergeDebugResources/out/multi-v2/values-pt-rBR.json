@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.dailyroutine.app-mergeDebugResources-30:/values-pt-rBR/values-pt-rBR.xml",
+            "outputFile": "com.dailyroutine.app-mergeDebugResources-31:/values-pt-rBR/values-pt-rBR.xml",
             "map": [
                 {
                     "source": "C:\\Users\\TESTRIG\\.gradle\\caches\\9.4.1\\transforms\\6fcd257212f58928ef189eab02bf90e0\\transformed\\material-1.11.0\\res\\values-pt-rBR\\values-pt-rBR.xml",

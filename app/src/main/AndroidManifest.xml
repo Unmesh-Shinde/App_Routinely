@@ -46,6 +46,11 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Health Connect Intent Filter -->
+            <intent-filter>
+                <action android:name="androidx.health.connect.client.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
         </activity>
 
         <activity
@@ -92,6 +97,11 @@
             android:name=".HabitProgressActivity"
             android:exported="false"
             android:label="Daily Progress"/>
+
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"
+            android:label="My Profile"/>
 
         <receiver
             android:name=".ReminderReceiver"

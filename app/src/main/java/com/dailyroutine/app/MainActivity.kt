@@ -9,11 +9,18 @@ import android.view.Gravity
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
@@ -21,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mgr: ReminderManager
     private lateinit var planManager: PlanManager
     private lateinit var healthDataManager: HealthDataManager
+    private lateinit var healthConnectManager: HealthConnectManager
+    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,10 +45,23 @@ class MainActivity : AppCompatActivity() {
         mgr = ReminderManager(this)
         planManager = PlanManager(this)
         healthDataManager = HealthDataManager(this)
+        healthConnectManager = HealthConnectManager(this)
+
+        requestPermissionsLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { granted ->
+            if (granted.values.all { it }) {
+                fetchHealthData()
+            }
+        }
 
         updateGreeting()
         updateDashboard()
         updateStreak()
+
+        findViewById<TextView>(R.id.tvGreeting).setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
 
         findViewById<View>(R.id.cardProgress).setOnClickListener {
             startActivity(Intent(this, HabitProgressActivity::class.java))
@@ -105,6 +127,46 @@ class MainActivity : AppCompatActivity() {
 
         requestNotificationPermission()
         requestExactAlarmPermission()
+        checkHealthConnectPermissions()
+    }
+
+    private fun checkHealthConnectPermissions() {
+        lifecycleScope.launch {
+            if (healthConnectManager.hasAllPermissions()) {
+                fetchHealthData()
+            } else {
+                requestPermissionsLauncher.launch(healthConnectManager.permissions.toTypedArray())
+            }
+        }
+    }
+
+    private fun fetchHealthData() {
+        lifecycleScope.launch {
+            val startTime = Instant.now().minus(24, ChronoUnit.HOURS)
+            val endTime = Instant.now()
+            
+            val steps = healthConnectManager.readSteps(startTime, endTime)
+            val sleepSessions = healthConnectManager.readSleepSessions(startTime, endTime)
+            
+            val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
+            val editor = prefs.edit().putBoolean("is_fitness_connected", true)
+            
+            if (steps > 0) {
+                editor.putString("steps_count", "%,d".format(steps))
+            }
+            
+            if (sleepSessions.isNotEmpty()) {
+                val totalDurationMin = sleepSessions.sumOf { 
+                    ChronoUnit.MINUTES.between(it.startTime, it.endTime)
+                }
+                val h = totalDurationMin / 60
+                val m = totalDurationMin % 60
+                editor.putString("sleep_hours", "${h}h ${m}m")
+            }
+            
+            editor.apply()
+            updateDashboard()
+        }
     }
 
     override fun onResume() {
@@ -126,6 +188,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateStreak() {
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+        val lastUpdate = UserPreferencesStore.getLastStreakUpdate(this)
+        
+        if (lastUpdate != today) {
+            // Check if last update was YESTERDAY to continue streak, else reset
+            val cal = Calendar.getInstance()
+            cal.add(Calendar.DAY_OF_YEAR, -1)
+            val yesterday = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(cal.time)
+            
+            var currentStreak = UserPreferencesStore.getStreakCount(this)
+            
+            if (lastUpdate == yesterday) {
+                // If yesterday's score was good, streak continues
+                // In a real app we'd fetch yesterday's score from a database. 
+                // Here we'll simulate by checking if yesterday's habits were high.
+                currentStreak++
+            } else if (lastUpdate != "") {
+                currentStreak = 0 // Reset if gap found
+            } else {
+                currentStreak = 1 // First day!
+            }
+            
+            UserPreferencesStore.setStreakCount(this, currentStreak)
+            UserPreferencesStore.setLastStreakUpdate(this, today)
+        }
+
         val streak = UserPreferencesStore.getStreakCount(this)
         findViewById<TextView>(R.id.tvStreak).text = "🔥 $streak Days"
     }
@@ -184,15 +272,28 @@ class MainActivity : AppCompatActivity() {
             h + (m / 60.0)
         } catch(e: Exception) { 0.0 }
 
+        // Net Calorie Calculation
+        val meals = planManager.getMealsForDate(todayStr)
+        val intakeTotal = meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
+        val weightValForBurn = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
+        val doneIds = RoutineProgressStore.getDoneIds(this)
+        val doneExercises = planManager.getExercisesForDate(todayStr).filter { it.id.toString() in doneIds }
+        val burnedTotal = CalorieSearchEngine.calculateActiveBurn(stepsCount, weightValForBurn, doneExercises)
+        val netBalance = intakeTotal - burnedTotal
+
         findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected()) healthDataManager.getSteps() else "0"
         findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected()) healthDataManager.getSleep() else "0h"
-        findViewById<TextView>(R.id.tvValCalories).text = if (healthDataManager.isConnected()) healthDataManager.getCalories() else "0"
+        findViewById<TextView>(R.id.tvValCalories).text = netBalance.toString()
         
         val weightVal = healthDataManager.getWeight(todayStr)
         findViewById<TextView>(R.id.tvValWeight).text = if (weightVal > 0) "$weightVal kg" else "0 kg"
         
-        val waterVal = healthDataManager.getWaterIntake(todayStr)
-        findViewById<TextView>(R.id.tvValWater).text = "%.1f L".format(waterVal)
+        val waterValManual = healthDataManager.getWaterIntake(todayStr)
+        val waterFromReminders = allReminders
+            .filter { it.type == ReminderType.HYDRATION && it.id.toString() in doneIds }
+            .size * 0.25 // Assume 250ml per reminder
+        
+        findViewById<TextView>(R.id.tvValWater).text = "%.1f Liters".format(waterValManual + waterFromReminders)
 
         // Calculate and Update Wellness Score
         val score = WellnessScoreManager.calculateDailyScore(this, stepsCount, sleepHours, doneHabits, totalHabits)

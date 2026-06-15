@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bgPage">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/primary">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="My Profile"
+            app:titleTextColor="@android:color/white"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/cardStroke">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView style="@style/LabelText" android:text="Full Name"/>
+                    <EditText
+                        android:id="@+id/etProfileName"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:paddingHorizontal="12dp"
+                        android:inputType="textPersonName|textCapWords"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="20dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="10dp">
+                            <TextView style="@style/LabelText" android:text="Age (Years)"/>
+                            <EditText
+                                android:id="@+id/etProfileAge"
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/bg_field"
+                                android:paddingHorizontal="12dp"
+                                android:inputType="number"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="10dp">
+                            <TextView style="@style/LabelText" android:text="Height (cm)"/>
+                            <EditText
+                                android:id="@+id/etProfileHeight"
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:layout_marginTop="6dp"
+                                android:background="@drawable/bg_field"
+                                android:paddingHorizontal="12dp"
+                                android:inputType="number"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView style="@style/LabelText" android:text="Gender" android:layout_marginTop="20dp"/>
+                    <Spinner
+                        android:id="@+id/spinnerGender"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Analytics Results -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardAnalytics"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#F0F4C3"
+                android:visibility="gone">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Scientific Insights"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="#33691E"
+                        android:textAllCaps="true"/>
+                    <TextView
+                        android:id="@+id/tvBmiResult"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Your BMI: 22.5 (Normal)"
+                        android:textStyle="bold"
+                        android:textColor="@color/textPrimary"/>
+                    <TextView
+                        android:id="@+id/tvBmrResult"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Your BMR: 1750 kcal/day"
+                        android:textColor="@color/textSecondary"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnApplyGoal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="Apply Recommended Calorie Goal"
+                        android:textAllCaps="false"
+                        app:cornerRadius="12dp"
+                        android:backgroundTint="#8BC34A"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveProfile"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="32dp"
+                android:text="Save &amp; Calculate"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -8,7 +8,7 @@
 7-->INJECTED
 8        android:minSdkVersion="26"
 8-->INJECTED
-9        android:targetSdkVersion="34" />
+9        android:targetSdkVersion="35" />
 9-->INJECTED
 10
 11    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -99,7 +99,7 @@
 44-->[androidx.core:core:1.12.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\2666bee558c9eaa52515a04f117aa9dd\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
 45
 46    <application
-46-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:33:5-114:19
+46-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:33:5-124:19
 47        android:allowBackup="true"
 47-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:34:9-35
 48        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
@@ -119,7 +119,7 @@
 56        android:theme="@style/Theme.DailyRoutine" >
 56-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:39:9-50
 57        <activity
-57-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:41:9-49:20
+57-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:41:9-54:20
 58            android:name="com.dailyroutine.app.MainActivity"
 58-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:42:13-41
 59            android:exported="true"
@@ -136,177 +136,209 @@
 64-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:47:17-76
 64-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:47:27-74
 65            </intent-filter>
-66        </activity>
-67        <activity
-67-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:51:9-54:56
-68            android:name="com.dailyroutine.app.SignupActivity"
-68-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:52:13-43
-69            android:exported="false"
-69-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:53:13-37
-70            android:theme="@style/Theme.DailyRoutine" />
-70-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:54:13-54
-71        <activity
-71-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:56:9-59:45
-72            android:name="com.dailyroutine.app.RemindersActivity"
-72-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:57:13-46
-73            android:exported="false"
-73-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:58:13-37
-74            android:label="View Reminders" />
-74-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:59:13-43
-75        <activity
-75-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:61:9-64:40
-76            android:name="com.dailyroutine.app.DietPlanActivity"
-76-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:62:13-45
-77            android:exported="false"
-77-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:63:13-37
-78            android:label="Diet Plan" />
-78-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:64:13-38
-79        <activity
-79-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:66:9-69:43
-80            android:name="com.dailyroutine.app.WorkoutPlanActivity"
-80-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:67:13-48
-81            android:exported="false"
-81-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:68:13-37
-82            android:label="Workout Plan" />
-82-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:69:13-41
-83        <activity
-83-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:71:9-74:43
-84            android:name="com.dailyroutine.app.WalkingDataActivity"
-84-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:72:13-48
-85            android:exported="false"
-85-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:73:13-37
-86            android:label="Step Tracker" />
-86-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:74:13-41
-87        <activity
-87-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:76:9-79:45
-88            android:name="com.dailyroutine.app.SleepTrackingActivity"
-88-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:77:13-50
-89            android:exported="false"
-89-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:78:13-37
-90            android:label="Sleep Tracking" />
-90-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:79:13-43
-91        <activity
-91-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:81:9-84:46
-92            android:name="com.dailyroutine.app.WeightActivity"
-92-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:82:13-43
-93            android:exported="false"
-93-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:83:13-37
-94            android:label="Weight Tracking" />
-94-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:84:13-44
-95        <activity
-95-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:86:9-89:48
-96            android:name="com.dailyroutine.app.CaloriesActivity"
-96-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:87:13-45
-97            android:exported="false"
-97-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:88:13-37
-98            android:label="Calories Tracking" />
-98-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:89:13-46
-99        <activity
-99-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:91:9-94:45
-100            android:name="com.dailyroutine.app.HabitProgressActivity"
-100-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:92:13-50
-101            android:exported="false"
-101-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:93:13-37
-102            android:label="Daily Progress" />
-102-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:94:13-43
-103
-104        <receiver
-104-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:96:9-98:39
-105            android:name="com.dailyroutine.app.ReminderReceiver"
-105-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:97:13-45
-106            android:exported="false" />
+66
+67            <!-- Health Connect Intent Filter -->
+68            <intent-filter>
+68-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:51:13-53:29
+69                <action android:name="androidx.health.connect.client.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+69-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:52:17-107
+69-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:52:25-104
+70            </intent-filter>
+71        </activity>
+72        <activity
+72-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:56:9-59:56
+73            android:name="com.dailyroutine.app.SignupActivity"
+73-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:57:13-43
+74            android:exported="false"
+74-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:58:13-37
+75            android:theme="@style/Theme.DailyRoutine" />
+75-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:59:13-54
+76        <activity
+76-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:61:9-64:45
+77            android:name="com.dailyroutine.app.RemindersActivity"
+77-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:62:13-46
+78            android:exported="false"
+78-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:63:13-37
+79            android:label="View Reminders" />
+79-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:64:13-43
+80        <activity
+80-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:66:9-69:40
+81            android:name="com.dailyroutine.app.DietPlanActivity"
+81-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:67:13-45
+82            android:exported="false"
+82-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:68:13-37
+83            android:label="Diet Plan" />
+83-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:69:13-38
+84        <activity
+84-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:71:9-74:43
+85            android:name="com.dailyroutine.app.WorkoutPlanActivity"
+85-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:72:13-48
+86            android:exported="false"
+86-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:73:13-37
+87            android:label="Workout Plan" />
+87-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:74:13-41
+88        <activity
+88-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:76:9-79:43
+89            android:name="com.dailyroutine.app.WalkingDataActivity"
+89-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:77:13-48
+90            android:exported="false"
+90-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:78:13-37
+91            android:label="Step Tracker" />
+91-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:79:13-41
+92        <activity
+92-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:81:9-84:45
+93            android:name="com.dailyroutine.app.SleepTrackingActivity"
+93-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:82:13-50
+94            android:exported="false"
+94-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:83:13-37
+95            android:label="Sleep Tracking" />
+95-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:84:13-43
+96        <activity
+96-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:86:9-89:46
+97            android:name="com.dailyroutine.app.WeightActivity"
+97-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:87:13-43
+98            android:exported="false"
+98-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:88:13-37
+99            android:label="Weight Tracking" />
+99-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:89:13-44
+100        <activity
+100-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:91:9-94:48
+101            android:name="com.dailyroutine.app.CaloriesActivity"
+101-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:92:13-45
+102            android:exported="false"
+102-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:93:13-37
+103            android:label="Calories Tracking" />
+103-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:94:13-46
+104        <activity
+104-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:96:9-99:45
+105            android:name="com.dailyroutine.app.HabitProgressActivity"
+105-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:97:13-50
+106            android:exported="false"
 106-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:98:13-37
-107        <receiver
-107-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:100:9-102:39
-108            android:name="com.dailyroutine.app.ReminderActionReceiver"
-108-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:101:13-51
-109            android:exported="false" />
-109-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:102:13-37
-110        <receiver
-110-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:104:9-112:20
-111            android:name="com.dailyroutine.app.BootReceiver"
-111-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:105:13-41
-112            android:exported="true" >
-112-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:106:13-36
-113            <intent-filter>
-113-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:107:13-111:29
-114                <action android:name="android.intent.action.BOOT_COMPLETED" />
-114-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:108:17-78
-114-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:108:25-76
-115                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-115-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:109:17-81
-115-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:109:25-79
-116                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
-116-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:110:17-81
-116-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:110:25-79
-117            </intent-filter>
-118        </receiver>
-119
-120        <provider
-120-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
-121            android:name="androidx.startup.InitializationProvider"
-121-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
-122            android:authorities="com.dailyroutine.app.androidx-startup"
-122-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
-123            android:exported="false" >
-123-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
-124            <meta-data
-124-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
-125                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-125-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
-126                android:value="androidx.startup" />
-126-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
-127            <meta-data
-127-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\804a95c27e424bbe01e48fa4b7d626f5\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
-128                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-128-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\804a95c27e424bbe01e48fa4b7d626f5\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
-129                android:value="androidx.startup" />
-129-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\804a95c27e424bbe01e48fa4b7d626f5\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
-130            <meta-data
-130-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
-131                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-131-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
-132                android:value="androidx.startup" />
-132-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
-133        </provider>
-134
-135        <receiver
-135-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
-136            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-136-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
-137            android:directBootAware="false"
-137-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
-138            android:enabled="true"
-138-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
-139            android:exported="true"
-139-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
-140            android:permission="android.permission.DUMP" >
-140-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
-141            <intent-filter>
-141-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
-142                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-142-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
-142-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
-143            </intent-filter>
-144            <intent-filter>
-144-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
-145                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-145-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
-145-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
-146            </intent-filter>
-147            <intent-filter>
-147-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
-148                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-148-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
-148-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
-149            </intent-filter>
-150            <intent-filter>
-150-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
-151                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-151-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
-151-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
-152            </intent-filter>
-153        </receiver>
-154    </application>
-155
-156</manifest>
+107            android:label="Daily Progress" />
+107-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:99:13-43
+108        <activity
+108-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:101:9-104:41
+109            android:name="com.dailyroutine.app.ProfileActivity"
+109-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:102:13-44
+110            android:exported="false"
+110-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:103:13-37
+111            android:label="My Profile" />
+111-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:104:13-39
+112
+113        <receiver
+113-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:106:9-108:39
+114            android:name="com.dailyroutine.app.ReminderReceiver"
+114-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:107:13-45
+115            android:exported="false" />
+115-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:108:13-37
+116        <receiver
+116-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:110:9-112:39
+117            android:name="com.dailyroutine.app.ReminderActionReceiver"
+117-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:111:13-51
+118            android:exported="false" />
+118-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:112:13-37
+119        <receiver
+119-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:114:9-122:20
+120            android:name="com.dailyroutine.app.BootReceiver"
+120-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:115:13-41
+121            android:exported="true" >
+121-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:116:13-36
+122            <intent-filter>
+122-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:117:13-121:29
+123                <action android:name="android.intent.action.BOOT_COMPLETED" />
+123-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:118:17-78
+123-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:118:25-76
+124                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+124-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:119:17-81
+124-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:119:25-79
+125                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+125-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:120:17-81
+125-->C:\Users\TESTRIG\Downloads\DailyRoutineHybridApp_updated\DailyRoutineHybridApp\app\src\main\AndroidManifest.xml:120:25-79
+126            </intent-filter>
+127        </receiver>
+128
+129        <service
+129-->[androidx.health.connect:connect-client:1.1.0-alpha11] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\a38f07aff0a276a258f32752948efe3e\transformed\connect-client-1.1.0-alpha11\AndroidManifest.xml:24:9-32:19
+130            android:name="androidx.health.platform.client.impl.sdkservice.HealthDataSdkService"
+130-->[androidx.health.connect:connect-client:1.1.0-alpha11] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\a38f07aff0a276a258f32752948efe3e\transformed\connect-client-1.1.0-alpha11\AndroidManifest.xml:25:13-96
+131            android:enabled="true"
+131-->[androidx.health.connect:connect-client:1.1.0-alpha11] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\a38f07aff0a276a258f32752948efe3e\transformed\connect-client-1.1.0-alpha11\AndroidManifest.xml:26:13-35
+132            android:exported="true" >
+132-->[androidx.health.connect:connect-client:1.1.0-alpha11] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\a38f07aff0a276a258f32752948efe3e\transformed\connect-client-1.1.0-alpha11\AndroidManifest.xml:27:13-36
+133            <intent-filter>
+133-->[androidx.health.connect:connect-client:1.1.0-alpha11] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\a38f07aff0a276a258f32752948efe3e\transformed\connect-client-1.1.0-alpha11\AndroidManifest.xml:29:13-31:29
+134                <action android:name="androidx.health.platform.client.ACTION_BIND_SDK_SERVICE" />
+134-->[androidx.health.connect:connect-client:1.1.0-alpha11] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\a38f07aff0a276a258f32752948efe3e\transformed\connect-client-1.1.0-alpha11\AndroidManifest.xml:30:17-98
+134-->[androidx.health.connect:connect-client:1.1.0-alpha11] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\a38f07aff0a276a258f32752948efe3e\transformed\connect-client-1.1.0-alpha11\AndroidManifest.xml:30:25-95
+135            </intent-filter>
+136        </service>
+137
+138        <provider
+138-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+139            android:name="androidx.startup.InitializationProvider"
+139-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+140            android:authorities="com.dailyroutine.app.androidx-startup"
+140-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+141            android:exported="false" >
+141-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+142            <meta-data
+142-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+143                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+143-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+144                android:value="androidx.startup" />
+144-->[androidx.emoji2:emoji2:1.2.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\bb45d04b6980b81c82f57f598a75d1dc\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+145            <meta-data
+145-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\804a95c27e424bbe01e48fa4b7d626f5\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:29:13-31:52
+146                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+146-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\804a95c27e424bbe01e48fa4b7d626f5\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:30:17-78
+147                android:value="androidx.startup" />
+147-->[androidx.lifecycle:lifecycle-process:2.6.1] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\804a95c27e424bbe01e48fa4b7d626f5\transformed\lifecycle-process-2.6.1\AndroidManifest.xml:31:17-49
+148            <meta-data
+148-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:29:13-31:52
+149                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+149-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:30:17-85
+150                android:value="androidx.startup" />
+150-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:31:17-49
+151        </provider>
+152
+153        <receiver
+153-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:34:9-52:20
+154            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+154-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:35:13-76
+155            android:directBootAware="false"
+155-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:36:13-44
+156            android:enabled="true"
+156-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:37:13-35
+157            android:exported="true"
+157-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:38:13-36
+158            android:permission="android.permission.DUMP" >
+158-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:39:13-57
+159            <intent-filter>
+159-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:40:13-42:29
+160                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+160-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:17-91
+160-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:41:25-88
+161            </intent-filter>
+162            <intent-filter>
+162-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:43:13-45:29
+163                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+163-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:17-85
+163-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:44:25-82
+164            </intent-filter>
+165            <intent-filter>
+165-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:46:13-48:29
+166                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+166-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:17-88
+166-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:47:25-85
+167            </intent-filter>
+168            <intent-filter>
+168-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:49:13-51:29
+169                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+169-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:17-95
+169-->[androidx.profileinstaller:profileinstaller:1.3.0] C:\Users\TESTRIG\.gradle\caches\9.4.1\transforms\d8156cad4aac8d7380a32e0745e31e8a\transformed\profileinstaller-1.3.0\AndroidManifest.xml:50:25-92
+170            </intent-filter>
+171        </receiver>
+172    </application>
+173
+174</manifest>

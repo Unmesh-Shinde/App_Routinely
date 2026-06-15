@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.dailyroutine.app-mergeDebugResources-30:/values-v23/values-v23.xml",
+            "outputFile": "com.dailyroutine.app-mergeDebugResources-31:/values-v23/values-v23.xml",
             "map": [
                 {
                     "source": "C:\\Users\\TESTRIG\\.gradle\\caches\\9.4.1\\transforms\\37d9e450a829d1a2419de890ad86ab26\\transformed\\cardview-1.0.0\\res\\values-v23\\values-v23.xml",

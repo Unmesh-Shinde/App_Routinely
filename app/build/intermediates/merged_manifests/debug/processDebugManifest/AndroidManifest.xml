@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="26"
-        android:targetSdkVersion="34" />
+        android:targetSdkVersion="35" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -63,6 +63,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Health Connect Intent Filter -->
+            <intent-filter>
+                <action android:name="androidx.health.connect.client.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
         </activity>
         <activity
             android:name="com.dailyroutine.app.SignupActivity"
@@ -100,6 +105,10 @@
             android:name="com.dailyroutine.app.HabitProgressActivity"
             android:exported="false"
             android:label="Daily Progress" />
+        <activity
+            android:name="com.dailyroutine.app.ProfileActivity"
+            android:exported="false"
+            android:label="My Profile" />
 
         <receiver
             android:name="com.dailyroutine.app.ReminderReceiver"
@@ -116,6 +125,15 @@
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name="androidx.health.platform.client.impl.sdkservice.HealthDataSdkService"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="androidx.health.platform.client.ACTION_BIND_SDK_SERVICE" />
+            </intent-filter>
+        </service>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

@@ -78,6 +78,35 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardEnergyBalance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:weightSum="3">
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Intake" android:textSize="10sp" android:textAllCaps="true" android:textColor="@color/textSecondary"/>
+                    <TextView android:id="@+id/tvIntakeSum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/textPrimary"/>
+                </LinearLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Burned" android:textSize="10sp" android:textAllCaps="true" android:textColor="@color/textSecondary"/>
+                    <TextView android:id="@+id/tvBurnedSum" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="16sp" android:textStyle="bold" android:textColor="#E65100"/>
+                </LinearLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Net" android:textSize="10sp" android:textAllCaps="true" android:textColor="@color/textSecondary"/>
+                    <TextView android:id="@+id/tvNetBalance" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="16sp" android:textStyle="bold" android:textColor="@color/healthSync"/>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <FrameLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
