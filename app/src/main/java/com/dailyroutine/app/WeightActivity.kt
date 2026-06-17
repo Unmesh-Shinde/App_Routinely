@@ -84,7 +84,7 @@ class WeightActivity : AppCompatActivity() {
     private fun refreshTodayView() {
         val todayStr = dateFormatter.format(Date())
         val weight = healthDataManager.getWeight(todayStr)
-        findViewById<TextView>(R.id.tvCurrentWeight).text = if (weight > 0) "%.1f kg".format(weight) else "Not Logged"
+        findViewById<TextView>(R.id.tvCurrentWeight).text = if (weight > 0) "%.1f kg".format(weight) else "No weight data added"
     }
 
     private fun refreshWeeklyView() {

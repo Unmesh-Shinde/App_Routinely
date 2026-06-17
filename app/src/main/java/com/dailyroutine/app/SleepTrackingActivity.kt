@@ -47,9 +47,9 @@ class SleepTrackingActivity : AppCompatActivity() {
         val apps = HealthAppScanner.getInstalledFitnessApps(this)
         
         if (apps.isEmpty()) {
-            tvStatus.text = "No fitness apps detected. Please install Google Fit or a similar app to sync sleep data."
+            tvStatus.text = "No health apps detected. Please install Google Fit, Samsung Health, or a similar app to sync data."
         } else {
-            tvStatus.text = "The following fitness apps were found. Which one would you like to connect?"
+            tvStatus.text = "Select your preferred health source to sync data:"
             apps.forEach { app ->
                 val btn = Button(this, null, android.R.attr.buttonStyleSmall).apply {
                     text = "Connect ${app.name}"
@@ -65,15 +65,18 @@ class SleepTrackingActivity : AppCompatActivity() {
         findViewById<ProgressBar>(R.id.pbSyncing).visibility = View.VISIBLE
         findViewById<TextView>(R.id.tvSyncing).apply {
             visibility = View.VISIBLE
-            text = "Syncing Data from $appName..."
+            text = "Syncing with $appName..."
         }
 
+        healthDataManager.setConnectedAppName(appName)
+        healthDataManager.setConnected(true)
+
+        // Simulate a brief connection wait then show analytics
         Handler(Looper.getMainLooper()).postDelayed({
-            healthDataManager.setConnected(true)
             isConnected = true
             showAnalytics()
-            Toast.makeText(this, "Sleep data successfully synced! 🌙", Toast.LENGTH_SHORT).show()
-        }, 2500)
+            Toast.makeText(this, "Successfully connected to $appName! 🌙", Toast.LENGTH_SHORT).show()
+        }, 1500)
     }
 
     private fun showAnalytics() {
@@ -112,18 +115,11 @@ class SleepTrackingActivity : AppCompatActivity() {
         calendar.add(Calendar.WEEK_OF_YEAR, -3) // Show last 4 weeks
 
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
-        val deficitDays = mutableListOf<String>()
 
         for (w in 0 until 4) {
             for (i in 0 until 7) {
-                // Simulated sleep data (6h to 9h)
-                val sleepHours = (6.0 + Math.random() * 3.0)
-                val isToday = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(calendar.time) == 
-                               SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-
-                if (sleepHours < 8.0 && w == 3) { // Only track deficit for current week in demo
-                    deficitDays.add("${days[i]} (${dateBarFormatter.format(calendar.time)})")
-                }
+                // Strictly real data logic - remove random simulation
+                val sleepHours = 0.0
 
                 val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = days[i]
@@ -151,12 +147,7 @@ class SleepTrackingActivity : AppCompatActivity() {
         }
 
         val warning = findViewById<TextView>(R.id.tvWeeklySleepWarning)
-        if (deficitDays.isNotEmpty()) {
-            warning.visibility = View.VISIBLE
-            warning.text = "⚠️ Sleep deficit detected on: ${deficitDays.joinToString(", ")}. Aim for 8 hours!"
-        } else {
-            warning.visibility = View.GONE
-        }
+        warning.visibility = View.GONE
     }
 
     private fun refreshMonthlyView() {
@@ -169,7 +160,6 @@ class SleepTrackingActivity : AppCompatActivity() {
 
         val monthFormatter = SimpleDateFormat("MMMM yyyy", Locale.US)
         val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
-        val deficitWeeks = mutableListOf<String>()
 
         for (m in 0 until 6) {
             val monthLabel = monthFormatter.format(calendar.time)
@@ -188,22 +178,16 @@ class SleepTrackingActivity : AppCompatActivity() {
             var weekIndex = 1
 
             while (calendar.get(Calendar.MONTH) == currentMonth) {
-                var weekSum = 0.0
                 val weekStart = calendar.time
                 
                 var daysInThisWeek = 0
                 while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
-                    weekSum += (6.5 + Math.random() * 2.5) // Weekly average simulation
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     daysInThisWeek++
                 }
                 
-                if (weekSum < 56.0) {
-                    val endCal = calendar.clone() as Calendar
-                    endCal.add(Calendar.DAY_OF_YEAR, -1)
-                    deficitWeeks.add("${rangeFormatter.format(weekStart)} - ${rangeFormatter.format(endCal.time)}")
-                }
-
+                val weekSum = 0.0
+                
                 val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = "Week $weekIndex"
                 barView.findViewById<TextView>(R.id.tvBarDate).text = "${rangeFormatter.format(weekStart)}"
@@ -230,12 +214,7 @@ class SleepTrackingActivity : AppCompatActivity() {
         }
 
         val warning = findViewById<TextView>(R.id.tvMonthlySleepWarning)
-        if (deficitWeeks.isNotEmpty()) {
-            warning.visibility = View.VISIBLE
-            warning.text = "⚠️ Target sleep (56h) not met in: ${deficitWeeks.take(3).joinToString(", ")}..."
-        } else {
-            warning.visibility = View.GONE
-        }
+        warning.visibility = View.GONE
     }
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()

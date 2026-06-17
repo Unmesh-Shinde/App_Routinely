@@ -5,10 +5,11 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.SleepSessionRecord
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
+import androidx.health.connect.client.request.AggregateRequest
 import java.time.Instant
-import java.time.ZonedDateTime
 
 class HealthConnectManager(private val context: Context) {
 
@@ -16,25 +17,47 @@ class HealthConnectManager(private val context: Context) {
 
     val permissions = setOf(
         HealthPermission.getReadPermission(StepsRecord::class),
-        HealthPermission.getReadPermission(SleepSessionRecord::class)
+        HealthPermission.getReadPermission(SleepSessionRecord::class),
+        HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class)
     )
 
-    suspend fun hasAllPermissions(): Boolean {
+    suspend fun getGrantedPermissions(): Set<String> {
         return healthConnectClient.permissionController.getGrantedPermissions()
-            .containsAll(permissions)
+    }
+
+    suspend fun hasAnyPermission(): Boolean {
+        return getGrantedPermissions().intersect(permissions).isNotEmpty()
+    }
+
+    suspend fun hasAllPermissions(): Boolean {
+        return getGrantedPermissions().containsAll(permissions)
     }
 
     suspend fun readSteps(startTime: Instant, endTime: Instant): Long {
         return try {
-            val response = healthConnectClient.readRecords(
-                ReadRecordsRequest(
-                    StepsRecord::class,
+            val response = healthConnectClient.aggregate(
+                AggregateRequest(
+                    metrics = setOf(StepsRecord.COUNT_TOTAL),
                     timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
                 )
             )
-            response.records.sumOf { it.count }
+            response[StepsRecord.COUNT_TOTAL] ?: 0L
         } catch (e: Exception) {
             0L
+        }
+    }
+
+    suspend fun readCalories(startTime: Instant, endTime: Instant): Double {
+        return try {
+            val response = healthConnectClient.readRecords(
+                ReadRecordsRequest(
+                    ActiveCaloriesBurnedRecord::class,
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                )
+            )
+            response.records.sumOf { it.energy.inKilocalories }
+        } catch (e: Exception) {
+            0.0
         }
     }
 

@@ -14,6 +14,9 @@ import androidx.core.app.NotificationCompat
 class ReminderReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
+        val wakeLock = powerManager.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "DailyRoutine:ReminderWakeLock")
+        wakeLock.acquire(5000) // Acquire for 5 seconds to ensure notification shows
         val id = intent.getIntExtra(ReminderManager.EXTRA_ID, -1)
         val title = intent.getStringExtra(ReminderManager.EXTRA_TITLE) ?: "Reminder"
         val typeName = intent.getStringExtra(ReminderManager.EXTRA_TYPE) ?: ReminderType.CUSTOM.name
@@ -56,7 +59,7 @@ class ReminderReceiver : BroadcastReceiver() {
                 action = ReminderActionReceiver.ACTION_DONE
                 putExtra(ReminderManager.EXTRA_ID, reminder.id)
             },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )
 
         val snoozeIntent = PendingIntent.getBroadcast(
@@ -68,7 +71,7 @@ class ReminderReceiver : BroadcastReceiver() {
                 putExtra(ReminderManager.EXTRA_TITLE, reminder.title)
                 putExtra(ReminderManager.EXTRA_TYPE, reminder.type.name)
             },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         )
 
         val message = when (reminder.type) {
@@ -80,13 +83,16 @@ class ReminderReceiver : BroadcastReceiver() {
             else -> reminder.type.defaultMessage
         }
 
+        val soundUri = reminder.soundUri?.let { android.net.Uri.parse(it) } 
+            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("${reminder.type.emoji} ${reminder.title}")
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setAutoCancel(true)
-            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setSound(soundUri)
             .setVibrate(longArrayOf(0, 200, 100, 200))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
@@ -101,10 +107,6 @@ class ReminderReceiver : BroadcastReceiver() {
     private fun ensureChannel(nm: NotificationManager) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (nm.getNotificationChannel(CHANNEL_ID) != null) return
-            val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            val audioAttr = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                .build()
 
             NotificationChannel(
                 CHANNEL_ID,
@@ -112,7 +114,7 @@ class ReminderReceiver : BroadcastReceiver() {
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Notifications for your daily routine reminders"
-                setSound(sound, audioAttr)
+                setSound(null, null) // Allow builder to specify sound
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 200, 100, 200)
             }.also { nm.createNotificationChannel(it) }

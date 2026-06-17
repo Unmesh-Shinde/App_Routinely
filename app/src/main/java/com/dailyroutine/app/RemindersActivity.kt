@@ -18,6 +18,7 @@ import java.util.*
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
 
 class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListener {
 
@@ -28,6 +29,24 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     private lateinit var fab: ExtendedFloatingActionButton
     private lateinit var banner: TextView
     private lateinit var progressText: TextView
+
+    private val systemToneLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val uri = result.data?.getParcelableExtra<android.net.Uri>(android.media.RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            ReminderDialogHelper.updateActiveTone(uri?.toString())
+        }
+    }
+
+    private val fileToneLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            ReminderDialogHelper.updateActiveTone(it.toString())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +101,7 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     }
 
     private fun refresh() {
-        val list = mgr.getAllReminders().filter { !it.isHidden }
+        val list = mgr.getAllReminders()
         adapter.setReminders(list)
         emptyGroup.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
         updateBanner(list)
@@ -133,9 +152,33 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     }
 
     private fun showDialog(existing: Reminder?) {
-        ReminderDialogHelper.showDialog(this, mgr, existing, rv) {
+        ReminderDialogHelper.showDialog(
+            this, mgr, existing, rv,
+            onTonePickerRequested = { currentUri ->
+                showToneSourcePicker(currentUri)
+            }
+        ) {
             refresh()
         }
+    }
+
+    private fun showToneSourcePicker(currentUri: String?) {
+        val options = arrayOf("System Ringtones", "File Manager (MP3/Audio)")
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Pick Notification Tone")
+            .setItems(options) { _, which ->
+                if (which == 0) {
+                    val intent = Intent(android.media.RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TYPE, android.media.RingtoneManager.TYPE_NOTIFICATION)
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone")
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, currentUri?.let { android.net.Uri.parse(it) })
+                    }
+                    systemToneLauncher.launch(intent)
+                } else {
+                    fileToneLauncher.launch(arrayOf("audio/*"))
+                }
+            }
+            .show()
     }
 
     companion object {

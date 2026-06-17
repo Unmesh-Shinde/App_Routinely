@@ -16,7 +16,11 @@ class HealthDataManager(context: Context) {
         private const val KEY_STEP_GOAL = "daily_step_goal"
         private const val KEY_WATER_PREFIX = "water_intake_"
         private const val KEY_WEIGHT_HISTORY = "weight_history_data"
+        private const val KEY_SOURCE_APP = "connected_health_app_name"
     }
+
+    fun getConnectedAppName(): String = prefs.getString(KEY_SOURCE_APP, "None") ?: "None"
+    fun setConnectedAppName(name: String) = prefs.edit().putString(KEY_SOURCE_APP, name).apply()
 
     fun isConnected(): Boolean = prefs.getBoolean(KEY_IS_CONNECTED, false)
 

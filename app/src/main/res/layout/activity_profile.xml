@@ -8,7 +8,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary">
+        android:background="@color/primary"
+        android:paddingTop="64dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -22,6 +23,8 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingBottom="80dp"
+        android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -52,13 +55,16 @@
                         android:layout_marginTop="6dp"
                         android:background="@drawable/bg_field"
                         android:paddingHorizontal="12dp"
-                        android:inputType="textPersonName|textCapWords"/>
+                        android:inputType="textPersonName|textCapWords"
+                        android:autofillHints="name"
+                        android:hint="Name"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="20dp">
+                        android:layout_marginTop="20dp"
+                        android:baselineAligned="false">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -74,7 +80,8 @@
                                 android:layout_marginTop="6dp"
                                 android:background="@drawable/bg_field"
                                 android:paddingHorizontal="12dp"
-                                android:inputType="number"/>
+                                android:inputType="number"
+                                android:hint="Age"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -91,7 +98,8 @@
                                 android:layout_marginTop="6dp"
                                 android:background="@drawable/bg_field"
                                 android:paddingHorizontal="12dp"
-                                android:inputType="number"/>
+                                android:inputType="number"
+                                android:hint="Height"/>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -106,63 +114,12 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Analytics Results -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAnalytics"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#F0F4C3"
-                android:visibility="gone">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Scientific Insights"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textColor="#33691E"
-                        android:textAllCaps="true"/>
-                    <TextView
-                        android:id="@+id/tvBmiResult"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Your BMI: 22.5 (Normal)"
-                        android:textStyle="bold"
-                        android:textColor="@color/textPrimary"/>
-                    <TextView
-                        android:id="@+id/tvBmrResult"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Your BMR: 1750 kcal/day"
-                        android:textColor="@color/textSecondary"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnApplyGoal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Apply Recommended Calorie Goal"
-                        android:textAllCaps="false"
-                        app:cornerRadius="12dp"
-                        android:backgroundTint="#8BC34A"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveProfile"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="32dp"
-                android:text="Save &amp; Calculate"
+                android:text="Save Changes"
                 android:textAllCaps="false"
                 android:textStyle="bold"
                 app:cornerRadius="16dp"/>

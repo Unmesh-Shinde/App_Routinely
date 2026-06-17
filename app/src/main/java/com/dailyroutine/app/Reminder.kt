@@ -47,7 +47,7 @@ enum class ReminderType(
 }
 
 data class Reminder(
-    val id: Int = System.currentTimeMillis().toInt(),
+    val id: Int = (System.currentTimeMillis() % 1000000).toInt() + (1..1000).random(),
     val title: String = "",
     val type: ReminderType = ReminderType.CUSTOM,
     val hour: Int = 8,
@@ -58,7 +58,10 @@ data class Reminder(
     val isEnabled: Boolean = true,
     val dishType: String = "",
     val ingredients: String = "",
-    val isHidden: Boolean = false
+    val isHidden: Boolean = false,
+    val soundUri: String? = null,
+    val isMonthly: Boolean = false,
+    val dayOfMonth: Int = 1
 ) : Serializable {
     fun formatTime(): String {
         val h = if (hour == 0 || hour == 12) 12 else hour % 12

@@ -109,7 +109,12 @@
 
         <receiver
             android:name=".ReminderActionReceiver"
-            android:exported="false"/>
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.dailyroutine.app.ACTION_DONE" />
+                <action android:name="com.dailyroutine.app.ACTION_SNOOZE" />
+            </intent-filter>
+        </receiver>
 
         <receiver
             android:name=".BootReceiver"

@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.health.connect.client.HealthConnectClient
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -30,6 +31,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var healthDataManager: HealthDataManager
     private lateinit var healthConnectManager: HealthConnectManager
     private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
+    
+    private val systemToneLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val uri = result.data?.getParcelableExtra<android.net.Uri>(android.media.RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+            ReminderDialogHelper.updateActiveTone(uri?.toString())
+        }
+    }
+
+    private val fileToneLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            ReminderDialogHelper.updateActiveTone(it.toString())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +65,15 @@ class MainActivity : AppCompatActivity() {
         planManager = PlanManager(this)
         healthDataManager = HealthDataManager(this)
         healthConnectManager = HealthConnectManager(this)
+        
+        // Ensure all alarms are scheduled
+        mgr.scheduleAllEnabled()
 
         requestPermissionsLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { granted ->
-            if (granted.values.all { it }) {
-                fetchHealthData()
-            }
+            // Proceed even if not all are granted (Parameter Aware sync)
+            fetchHealthData()
         }
 
         updateGreeting()
@@ -96,17 +117,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<MaterialButton>(R.id.btnHealthSync).setOnClickListener {
-            // Simulate fetching data from a fitness band
-            val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
-            prefs.edit()
-                .putBoolean("is_fitness_connected", true)
-                .putString("steps_count", "7,250")
-                .putString("sleep_hours", "7h 15m")
-                .putString("calories_burnt", "1,420")
-                .apply()
-            
-            updateDashboard()
-            Toast.makeText(this, "Health Data Synced from Band! ⌚", Toast.LENGTH_SHORT).show()
+            startHealthAppScanning()
         }
 
         findViewById<MaterialButton>(R.id.btnReminders).setOnClickListener { view ->
@@ -115,8 +126,15 @@ class MainActivity : AppCompatActivity() {
             popup.menu.add("View Reminders")
             popup.setOnMenuItemClickListener { item ->
                 when (item.title) {
-                    "Set Reminders" -> ReminderDialogHelper.showDialog(this, mgr, null, view) {
-                        updateDashboard()
+                    "Set Reminders" -> {
+                        ReminderDialogHelper.showDialog(
+                            this, mgr, null, view,
+                            onTonePickerRequested = { currentUri ->
+                                showToneSourcePicker(currentUri)
+                            }
+                        ) {
+                            updateDashboard()
+                        }
                     }
                     "View Reminders" -> startActivity(Intent(this, RemindersActivity::class.java))
                 }
@@ -127,45 +145,115 @@ class MainActivity : AppCompatActivity() {
 
         requestNotificationPermission()
         requestExactAlarmPermission()
-        checkHealthConnectPermissions()
+        
+        addDefaultsOnFirstRun()
+
+        val healthPrefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
+        if (healthPrefs.getBoolean("needs_initial_permission_request", true)) {
+            startHealthAppScanning()
+            healthPrefs.edit().putBoolean("needs_initial_permission_request", false).apply()
+        }
+    }
+
+    private fun addDefaultsOnFirstRun() {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        if (prefs.getBoolean("is_first_run", true)) {
+            mgr.saveReminder(Reminder(title = "Drink Water", type = ReminderType.HYDRATION, isIntervalBased = true, intervalMinutes = 120))
+            mgr.saveReminder(Reminder(title = "Healthy Meal", type = ReminderType.MEAL, hour = 13, minute = 0))
+            mgr.saveReminder(Reminder(title = "Meditation", type = ReminderType.MEDITATION, hour = 8, minute = 0))
+            prefs.edit().putBoolean("is_first_run", false).apply()
+            updateDashboard()
+        }
+    }
+
+    private fun startHealthAppScanning() {
+        val apps = HealthAppScanner.getInstalledFitnessApps(this)
+        if (apps.isEmpty()) {
+            Toast.makeText(this, "No fitness apps found! Please install Google Fit, Samsung Health, etc.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val appNames = apps.map { it.name }.toTypedArray()
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Select Health App Source")
+            .setItems(appNames) { _, which ->
+                val selectedApp = apps[which]
+                healthDataManager.setConnectedAppName(selectedApp.name)
+                checkHealthConnectPermissions()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun checkHealthConnectPermissions() {
+        val availability = androidx.health.connect.client.HealthConnectClient.getSdkStatus(this)
+        if (availability != androidx.health.connect.client.HealthConnectClient.SDK_AVAILABLE) {
+            Toast.makeText(this, "Health Connect SDK not available on this device.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         lifecycleScope.launch {
-            if (healthConnectManager.hasAllPermissions()) {
+            if (healthConnectManager.hasAnyPermission()) {
                 fetchHealthData()
             } else {
-                requestPermissionsLauncher.launch(healthConnectManager.permissions.toTypedArray())
+                val appName = healthDataManager.getConnectedAppName()
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(this@MainActivity)
+                    .setTitle("Link with $appName? ⌚")
+                    .setMessage("To automatically fetch your Steps, Sleep, and Calories, we use Android's Health Connect system. \n\nIMPORTANT: Please ensure Google Fit is linked to Health Connect in its settings first.")
+                    .setPositiveButton("Grant Permissions") { _, _ ->
+                        requestPermissionsLauncher.launch(healthConnectManager.permissions.toTypedArray())
+                    }
+                    .setNeutralButton("Settings") { _, _ ->
+                        val intent = Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS)
+                        startActivity(intent)
+                    }
+                    .setNegativeButton("Not Now", null)
+                    .show()
             }
         }
     }
 
     private fun fetchHealthData() {
+        val appName = healthDataManager.getConnectedAppName()
+        
         lifecycleScope.launch {
-            val startTime = Instant.now().minus(24, ChronoUnit.HOURS)
-            val endTime = Instant.now()
-            
-            val steps = healthConnectManager.readSteps(startTime, endTime)
-            val sleepSessions = healthConnectManager.readSleepSessions(startTime, endTime)
+            val now = Instant.now()
+            // Midnight today in local time
+            val startTime = ZonedDateTime.now().toLocalDate().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+            val endTime = now
             
             val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
             val editor = prefs.edit().putBoolean("is_fitness_connected", true)
-            
-            if (steps > 0) {
+
+            // 1. Try Steps
+            try {
+                val steps = healthConnectManager.readSteps(startTime, endTime)
+                // Use a different storage format to trigger update even if same (or check > 0)
                 editor.putString("steps_count", "%,d".format(steps))
-            }
-            
-            if (sleepSessions.isNotEmpty()) {
-                val totalDurationMin = sleepSessions.sumOf { 
-                    ChronoUnit.MINUTES.between(it.startTime, it.endTime)
+            } catch (e: Exception) { /* Permission Denied or Empty */ }
+
+            // 2. Try Sleep
+            try {
+                val sleepSessions = healthConnectManager.readSleepSessions(startTime, endTime)
+                if (sleepSessions.isNotEmpty()) {
+                    val totalDurationMin = sleepSessions.sumOf { 
+                        java.time.Duration.between(it.startTime, it.endTime).toMinutes()
+                    }
+                    val h = totalDurationMin / 60
+                    val m = totalDurationMin % 60
+                    editor.putString("sleep_hours", "${h}h ${m}m")
                 }
-                val h = totalDurationMin / 60
-                val m = totalDurationMin % 60
-                editor.putString("sleep_hours", "${h}h ${m}m")
-            }
+            } catch (e: Exception) { /* Denied */ }
+
+            // 3. Try Calories
+            try {
+                val burnedCals = healthConnectManager.readCalories(startTime, endTime)
+                if (burnedCals > 0) editor.putString("calories_burnt", "%.0f".format(burnedCals))
+            } catch (e: Exception) { /* Denied */ }
             
             editor.apply()
             updateDashboard()
+            Toast.makeText(this@MainActivity, "Data Synced from $appName! ✅", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -179,12 +267,12 @@ class MainActivity : AppCompatActivity() {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val name = UserPreferencesStore.getUserName(this)
         val greeting = when (hour) {
-            in 0..11 -> "Good Morning, $name 👋"
-            in 12..16 -> "Good Afternoon, $name 👋"
-            in 17..20 -> "Good Evening, $name 👋"
-            else -> "Good Night, $name 👋"
+            in 0..11 -> "Good Morning"
+            in 12..16 -> "Good Afternoon"
+            in 17..20 -> "Good Evening"
+            else -> "Good Night"
         }
-        findViewById<TextView>(R.id.tvGreeting).text = greeting
+        findViewById<TextView>(R.id.tvGreeting).text = "$greeting, $name!"
     }
 
     private fun updateStreak() {
@@ -281,12 +369,12 @@ class MainActivity : AppCompatActivity() {
         val burnedTotal = CalorieSearchEngine.calculateActiveBurn(stepsCount, weightValForBurn, doneExercises)
         val netBalance = intakeTotal - burnedTotal
 
-        findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected()) healthDataManager.getSteps() else "0"
-        findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected()) healthDataManager.getSleep() else "0h"
-        findViewById<TextView>(R.id.tvValCalories).text = netBalance.toString()
+        findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected() && stepsCount > 0) healthDataManager.getSteps() else "0"
+        findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected() && sleepHours > 0) healthDataManager.getSleep() else "0h"
+        findViewById<TextView>(R.id.tvValCalories).text = if (netBalance != 0) netBalance.toString() else "0"
         
         val weightVal = healthDataManager.getWeight(todayStr)
-        findViewById<TextView>(R.id.tvValWeight).text = if (weightVal > 0) "$weightVal kg" else "0 kg"
+        findViewById<TextView>(R.id.tvValWeight).text = if (weightVal > 0) "$weightVal kg" else "Not Logged"
         
         val waterValManual = healthDataManager.getWaterIntake(todayStr)
         val waterFromReminders = allReminders
@@ -308,18 +396,48 @@ class MainActivity : AppCompatActivity() {
 
         // Upcoming Reminder
         val now = Calendar.getInstance()
-        val upcoming = allReminders
-            .filter { it.isEnabled && !it.isIntervalBased }
-            .filter { (it.hour * 60 + it.minute) > (now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)) }
+        val currentMinutes = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
+
+        // Find ALL enabled reminders that are at a fixed time
+        val fixedReminders = allReminders.filter { it.isEnabled && !it.isIntervalBased }
+
+        // 1. Find the next one TODAY
+        var upcoming = fixedReminders
+            .filter { (it.hour * 60 + it.minute) > currentMinutes }
             .minByOrNull { it.hour * 60 + it.minute }
+
+        // 2. If nothing left today, find the first one for TOMORROW
+        if (upcoming == null) {
+            upcoming = fixedReminders.minByOrNull { it.hour * 60 + it.minute }
+        }
 
         if (upcoming != null) {
             findViewById<View>(R.id.cardUpcoming).visibility = View.VISIBLE
+            val timePrefix = if ((upcoming.hour * 60 + upcoming.minute) <= currentMinutes) "Tomorrow at " else ""
             findViewById<TextView>(R.id.tvUpcomingText).text = 
-                "${upcoming.type.emoji} ${upcoming.title.replace("Meal: ", "").replace("Exercise: ", "")} - ${upcoming.formatTime()}"
+                "${upcoming.type.emoji} ${upcoming.title.replace("Meal: ", "").replace("Exercise: ", "")} - $timePrefix${upcoming.formatTime()}"
         } else {
             findViewById<View>(R.id.cardUpcoming).visibility = View.GONE
         }
+    }
+
+    private fun showToneSourcePicker(currentUri: String?) {
+        val options = arrayOf("System Ringtones", "File Manager (MP3/Audio)")
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Pick Notification Tone")
+            .setItems(options) { _, which ->
+                if (which == 0) {
+                    val intent = Intent(android.media.RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TYPE, android.media.RingtoneManager.TYPE_NOTIFICATION)
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone")
+                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, currentUri?.let { android.net.Uri.parse(it) })
+                    }
+                    systemToneLauncher.launch(intent)
+                } else {
+                    fileToneLauncher.launch(arrayOf("audio/*"))
+                }
+            }
+            .show()
     }
 
     private fun requestNotificationPermission() {

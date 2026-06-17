@@ -109,7 +109,8 @@ class WalkingDataActivity : AppCompatActivity() {
 
         for (w in 0 until 4) {
             for (i in 0 until 7) {
-                val dailySteps = if (healthDataManager.isConnected()) (4000..12000).random() else 0
+                // Remove random mock data - strictly 0 unless today is matched (simulated logic for history can be added later if needed)
+                val dailySteps = 0
                 
                 val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = days[i]
@@ -163,15 +164,14 @@ class WalkingDataActivity : AppCompatActivity() {
             var weekIndex = 1
 
             while (calendar.get(Calendar.MONTH) == currentMonth) {
-                var weekSum = 0
                 val weekStart = calendar.time
                 
                 var daysInThisWeek = 0
                 while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
-                    weekSum += if (healthDataManager.isConnected()) (4000..12000).random() * 7 else 0
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     daysInThisWeek++
                 }
+                val weekSum = 0
                 
                 val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = "Week $weekIndex"

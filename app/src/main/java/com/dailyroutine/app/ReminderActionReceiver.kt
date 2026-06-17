@@ -9,7 +9,7 @@ class ReminderActionReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val reminderId = intent.getIntExtra(ReminderManager.EXTRA_ID, -1)
-        if (reminderId < 0) return
+        if (reminderId == -1) return
 
         val manager = ReminderManager(context)
         val reminder = manager.getReminderById(reminderId) ?: Reminder(
@@ -24,10 +24,12 @@ class ReminderActionReceiver : BroadcastReceiver() {
             ACTION_DONE -> {
                 RoutineProgressStore.markDone(context, reminderId)
                 nm?.cancel(reminderId)
+                android.widget.Toast.makeText(context, "Habit Completed! ✅", android.widget.Toast.LENGTH_SHORT).show()
             }
             ACTION_SNOOZE -> {
                 manager.scheduleSnooze(reminder, minutes = 10)
                 nm?.cancel(reminderId)
+                android.widget.Toast.makeText(context, "Snoozed for 10 min ⏰", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }

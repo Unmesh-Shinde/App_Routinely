@@ -24,6 +24,10 @@ class SignupActivity : AppCompatActivity() {
 
             UserPreferencesStore.setUserName(this, name)
             UserPreferencesStore.setSignedUp(this, true)
+            
+            // Mark as needing permission check on next Main launch
+            val healthPrefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
+            healthPrefs.edit().putBoolean("needs_initial_permission_request", true).apply()
 
             startActivity(Intent(this, MainActivity::class.java))
             finish()

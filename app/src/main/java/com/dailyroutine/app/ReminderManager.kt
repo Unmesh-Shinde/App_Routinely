@@ -24,17 +24,22 @@ class ReminderManager(context: Context) {
         return try {
             val type = object : TypeToken<MutableList<Reminder>>() {}.type
             val rawList: MutableList<Reminder>? = gson.fromJson(json, type)
-            // Filter out any entries where type might have become null due to enum mismatch
-            rawList?.filter { it.type != null }?.toMutableList() ?: mutableListOf()
-        } catch (_: Exception) {
+            
+            // 1. Clean the list: Filter out any nulls or entries with missing critical data
+            val cleanedList = rawList?.filterNotNull()?.filter { it.type != null } ?: mutableListOf()
+            
+            // 2. Sort safely
+            cleanedList.sortedWith(
+                compareBy<Reminder> { !it.isEnabled }
+                    .thenBy { if (it.isIntervalBased) 1 else 0 }
+                    .thenBy { it.type.ordinal }
+                    .thenBy { if (it.isIntervalBased) it.intervalMinutes else it.hour * 60 + it.minute }
+                    .thenBy { it.title.lowercase() }
+            ).toMutableList()
+        } catch (e: Exception) {
+            // If parsing fails completely, return an empty list
             mutableListOf()
-        }.sortedWith(
-            compareBy<Reminder> { !it.isEnabled }
-                .thenBy { if (it.isIntervalBased) 1 else 0 }
-                .thenBy { it.type?.ordinal ?: ReminderType.CUSTOM.ordinal }
-                .thenBy { if (it.isIntervalBased) it.intervalMinutes else it.hour * 60 + it.minute }
-                .thenBy { it.title.lowercase() }
-        ).toMutableList()
+        }
     }
 
     fun getReminderById(id: Int): Reminder? = getAllReminders().find { it.id == id }
@@ -136,6 +141,21 @@ class ReminderManager(context: Context) {
 
     private fun nextFixedTriggerMs(reminder: Reminder): Long? {
         val now = Calendar.getInstance()
+        
+        if (reminder.isMonthly) {
+            val cal = Calendar.getInstance().apply {
+                set(Calendar.DAY_OF_MONTH, reminder.dayOfMonth)
+                set(Calendar.HOUR_OF_DAY, reminder.hour)
+                set(Calendar.MINUTE, reminder.minute)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            if (cal.before(now)) {
+                cal.add(Calendar.MONTH, 1)
+            }
+            return cal.timeInMillis
+        }
+
         for (daysAhead in 0..7) {
             val cal = Calendar.getInstance().apply {
                 add(Calendar.DAY_OF_YEAR, daysAhead)
