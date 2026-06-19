@@ -17,10 +17,18 @@ class HealthDataManager(context: Context) {
         private const val KEY_WATER_PREFIX = "water_intake_"
         private const val KEY_WEIGHT_HISTORY = "weight_history_data"
         private const val KEY_SOURCE_APP = "connected_health_app_name"
+        private const val KEY_SOURCE_PKG = "connected_health_app_package"
+        private const val KEY_MOVE_MINS = "move_minutes_count"
     }
+
+    fun getMoveMinutes(): Int = prefs.getInt(KEY_MOVE_MINS, 0)
+    fun setMoveMinutes(mins: Int) = prefs.edit().putInt(KEY_MOVE_MINS, mins).apply()
 
     fun getConnectedAppName(): String = prefs.getString(KEY_SOURCE_APP, "None") ?: "None"
     fun setConnectedAppName(name: String) = prefs.edit().putString(KEY_SOURCE_APP, name).apply()
+
+    fun getConnectedAppPackage(): String? = prefs.getString(KEY_SOURCE_PKG, null)
+    fun setConnectedAppPackage(pkg: String) = prefs.edit().putString(KEY_SOURCE_PKG, pkg).apply()
 
     fun isConnected(): Boolean = prefs.getBoolean(KEY_IS_CONNECTED, false)
 
