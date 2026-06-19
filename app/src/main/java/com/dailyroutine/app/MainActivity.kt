@@ -15,6 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
+import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.SleepSessionRecord
+import androidx.health.connect.client.records.StepsRecord
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
@@ -31,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var planManager: PlanManager
     private lateinit var healthDataManager: HealthDataManager
     private lateinit var healthConnectManager: HealthConnectManager
-    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Set<String>>
     
     private val systemToneLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -71,7 +75,7 @@ class MainActivity : AppCompatActivity() {
         mgr.scheduleAllEnabled()
 
         requestPermissionsLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
+            PermissionController.createRequestPermissionResultContract()
         ) { granted ->
             fetchHealthData()
         }
@@ -186,29 +190,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkHealthConnectPermissions() {
-        android.util.Log.d("DailyRoutineHealth", "Starting Permission Check...")
-        val availability = androidx.health.connect.client.HealthConnectClient.getSdkStatus(this)
-        android.util.Log.d("DailyRoutineHealth", "SDK Status: $availability")
-
-        if (availability != androidx.health.connect.client.HealthConnectClient.SDK_AVAILABLE) {
+        val availability = HealthConnectClient.getSdkStatus(this)
+        if (availability != HealthConnectClient.SDK_AVAILABLE) {
             Toast.makeText(this, "Health Connect SDK not available on this device.", Toast.LENGTH_SHORT).show()
             return
         }
 
         lifecycleScope.launch {
-            val hasAny = healthConnectManager.hasAnyPermission()
-            android.util.Log.d("DailyRoutineHealth", "Has ANY permission: $hasAny")
-
-            if (hasAny) {
+            if (healthConnectManager.hasAnyPermission()) {
                 fetchHealthData()
             } else {
                 val appName = healthDataManager.getConnectedAppName()
-                android.util.Log.d("DailyRoutineHealth", "No permissions found. Prompting for $appName")
                 com.google.android.material.dialog.MaterialAlertDialogBuilder(this@MainActivity)
                     .setTitle("Link with $appName? ⌚")
                     .setMessage("To automatically fetch your Steps, Sleep, and Calories, we use Android's Health Connect system. \n\nIMPORTANT: Please ensure Google Fit is linked to Health Connect in its settings first.")
                     .setPositiveButton("Grant Permissions") { _, _ ->
-                        requestPermissionsLauncher.launch(healthConnectManager.permissions.toTypedArray())
+                        requestPermissionsLauncher.launch(healthConnectManager.permissions)
                     }
                     .setNeutralButton("Settings") { _, _ ->
                         val intent = Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS)
@@ -226,68 +223,57 @@ class MainActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val now = Instant.now()
-            val startTime = java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-            val endTime = now
-            android.util.Log.d("DailyRoutineHealth", "Time Range: $startTime to $endTime")
-
             val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
             val editor = prefs.edit().putBoolean("is_fitness_connected", true)
+            val granted = healthConnectManager.getGrantedPermissions()
 
-            var stepsFound = 0L
-            var sleepFound = ""
-            var caloriesFound = ""
+            var stepsToday = 0L
+            var sleepToday = ""
+            var caloriesToday = ""
 
-            // 1. Try Steps (Hybrid)
-            try {
-                stepsFound = healthConnectManager.readSteps(startTime, endTime)
-                android.util.Log.d("DailyRoutineHealth", "Steps Found: $stepsFound")
-                editor.putString("steps_count", "%,d".format(stepsFound))
-            } catch (e: Exception) { 
-                android.util.Log.e("DailyRoutineHealth", "Step Sync Error", e)
+            // 1. Fetch Today's Data (Aggregation)
+            val startOfToday = java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+            
+            if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
+                stepsToday = healthConnectManager.readSteps(startOfToday, now)
+                editor.putString("steps_count", "%,d".format(stepsToday))
+            }
+            if (granted.contains(HealthPermission.getReadPermission(SleepSessionRecord::class))) {
+                val sleepSessions = healthConnectManager.readSleepSessions(startOfToday, now)
+                val totalDurationMin = sleepSessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
+                sleepToday = "${totalDurationMin / 60}h ${totalDurationMin % 60}m"
+                editor.putString("sleep_hours", sleepToday)
+            }
+            if (granted.contains(HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class))) {
+                val burnedCals = healthConnectManager.readCalories(startOfToday, now)
+                caloriesToday = "%.0f".format(burnedCals)
+                editor.putString("calories_burnt", caloriesToday)
             }
 
-            // 2. Try Sleep (Sessions)
-            try {
-                val sleepSessions = healthConnectManager.readSleepSessions(startTime, endTime)
-                android.util.Log.d("DailyRoutineHealth", "Sleep Sessions Found: ${sleepSessions.size}")
-                if (sleepSessions.isNotEmpty()) {
-                    val totalDurationMin = sleepSessions.sumOf { 
-                        java.time.Duration.between(it.startTime, it.endTime).toMinutes()
-                    }
-                    val h = totalDurationMin / 60
-                    val m = totalDurationMin % 60
-                    sleepFound = "${h}h ${m}m"
-                    editor.putString("sleep_hours", sleepFound)
-                }
-            } catch (e: Exception) { 
-                android.util.Log.e("DailyRoutineHealth", "Sleep Sync Error", e)
-            }
+            // 2. Fetch Last 7 Days (Historical Backfill)
+            for (i in 1..7) {
+                val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+                val dayEnd = java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+                val dateStr = java.time.LocalDate.now().minusDays(i.toLong()).toString()
 
-            // 3. Try Calories (Active Burn)
-            try {
-                val burnedCals = healthConnectManager.readCalories(startTime, endTime)
-                android.util.Log.d("DailyRoutineHealth", "Burned Calories Found: $burnedCals")
-                if (burnedCals > 0) {
-                    caloriesFound = "%.0f".format(burnedCals)
-                    editor.putString("calories_burnt", caloriesFound)
+                if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
+                    healthDataManager.saveHistoricalSteps(dateStr, healthConnectManager.readSteps(dayStart, dayEnd))
                 }
-            } catch (e: Exception) { 
-                android.util.Log.e("DailyRoutineHealth", "Calorie Sync Error", e)
+                if (granted.contains(HealthPermission.getReadPermission(SleepSessionRecord::class))) {
+                    val sessions = healthConnectManager.readSleepSessions(dayStart, dayEnd)
+                    val mins = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
+                    healthDataManager.saveHistoricalSleep(dateStr, mins / 60.0)
+                }
+                if (granted.contains(HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class))) {
+                    healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readCalories(dayStart, dayEnd))
+                }
             }
 
             editor.apply()
             updateDashboard()
-
-            val summary = StringBuilder("Sync complete from $appName!")
-            if (stepsFound > 0) summary.append("\nSteps: %,d".format(stepsFound))
-            if (sleepFound.isNotEmpty()) summary.append("\nSleep: $sleepFound")
-            if (caloriesFound.isNotEmpty()) summary.append("\nBurned: $caloriesFound kcal")
-
-            if (stepsFound == 0L && sleepFound.isEmpty() && caloriesFound.isEmpty()) {
-                Toast.makeText(this@MainActivity, "No data found in $appName. Ensure it is connected to Health Connect.", Toast.LENGTH_LONG).show()
-            } else {
-                Toast.makeText(this@MainActivity, summary.toString(), Toast.LENGTH_LONG).show()
-            }
+            
+            val summary = "Today's Sync: $stepsToday steps, $caloriesToday kcal. Past 7 days also updated! ✅"
+            Toast.makeText(this@MainActivity, summary, Toast.LENGTH_LONG).show()
         }
     }
 

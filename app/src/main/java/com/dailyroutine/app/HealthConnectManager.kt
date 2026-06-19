@@ -21,7 +21,8 @@ class HealthConnectManager(private val context: Context) {
         HealthPermission.getReadPermission(SleepSessionRecord::class),
         HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
         HealthPermission.getReadPermission(DistanceRecord::class),
-        "android.permission.health.READ_HEALTH_DATA_HISTORY"
+        "android.permission.health.READ_HEALTH_DATA_HISTORY",
+        "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"
     )
 
     suspend fun getGrantedPermissions(): Set<String> {
@@ -30,6 +31,10 @@ class HealthConnectManager(private val context: Context) {
         } catch (e: Exception) {
             emptySet()
         }
+    }
+
+    suspend fun hasPermission(permission: String): Boolean {
+        return getGrantedPermissions().contains(permission)
     }
 
     suspend fun hasAnyPermission(): Boolean {

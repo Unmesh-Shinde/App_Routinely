@@ -75,5 +75,20 @@ class HealthDataManager(context: Context) {
     fun getSteps(): String = if (isConnected()) prefs.getString(KEY_STEPS, "0") ?: "0" else "0"
     fun getSleep(): String = if (isConnected()) prefs.getString(KEY_SLEEP, "0h") ?: "0h" else "0h"
     fun getCalories(): String = if (isConnected()) prefs.getString(KEY_CALORIES, "0") ?: "0" else "0"
-    fun getWeight(): String = if (isConnected()) prefs.getString(KEY_WEIGHT, "0 kg") ?: "0 kg" else "0 kg"
+    fun getWeight(): String = if (isConnected()) prefs.getString(KEY_WEIGHT, "Not Logged") ?: "Not Logged" else "Not Logged"
+
+    fun saveHistoricalSteps(date: String, count: Long) {
+        prefs.edit().putLong("hist_steps_$date", count).apply()
+    }
+    fun getHistoricalSteps(date: String): Long = prefs.getLong("hist_steps_$date", 0L)
+
+    fun saveHistoricalSleep(date: String, hours: Double) {
+        prefs.edit().putFloat("hist_sleep_$date", hours.toFloat()).apply()
+    }
+    fun getHistoricalSleep(date: String): Double = prefs.getFloat("hist_sleep_$date", 0.0f).toDouble()
+
+    fun saveHistoricalCalories(date: String, cals: Double) {
+        prefs.edit().putFloat("hist_cals_$date", cals.toFloat()).apply()
+    }
+    fun getHistoricalCalories(date: String): Double = prefs.getFloat("hist_cals_$date", 0.0f).toDouble()
 }
