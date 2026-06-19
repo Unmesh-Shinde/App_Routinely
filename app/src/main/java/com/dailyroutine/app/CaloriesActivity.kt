@@ -72,25 +72,7 @@ class CaloriesActivity : AppCompatActivity() {
     }
 
     private fun updateGoalDisplay() {
-        val display = "$dailyGoal kcal"
-        findViewById<TextView>(R.id.tvCalorieGoal).text = display
-        
-        // Show if it matches BMR recommendation (simulated)
-        val weight = healthDataManager.getWeight(dateFormatter.format(Date())).let { if (it > 0) it else 70.0 }
-        val age = UserPreferencesStore.getUserAge(this)
-        val height = UserPreferencesStore.getUserHeight(this)
-        val gender = UserPreferencesStore.getUserGender(this)
-        
-        var bmr = if (gender == "Male") {
-            ((10 * weight) + (6.25 * height) - (5 * age) + 5).toInt()
-        } else {
-            ((10 * weight) + (6.25 * height) - (5 * age) - 161).toInt()
-        }
-        bmr = (bmr * 1.2).toInt() // Light activity multiplier
-        
-        if (dailyGoal != bmr) {
-            // We could show a small hint here if needed
-        }
+        findViewById<TextView>(R.id.tvCalorieGoal).text = "$dailyGoal kcal"
     }
 
     private fun setupTabs() {
