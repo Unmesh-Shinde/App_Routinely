@@ -217,7 +217,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun fetchHealthData() {
         val appName = healthDataManager.getConnectedAppName()
-        android.util.Log.d("DailyRoutineHealth", "Attempting to fetch data for: $appName")
+        val appPkg = healthDataManager.getConnectedAppPackage()
+        android.util.Log.d("DailyRoutineHealth", "Attempting to fetch data for: $appName ($appPkg)")
 
         lifecycleScope.launch {
             val now = Instant.now()
@@ -233,21 +234,21 @@ class MainActivity : AppCompatActivity() {
             var sleepToday = ""
             var caloriesToday = ""
 
-            // 1. Fetch Today's Data (Native System Aggregation for 1:1 Parity)
+            // 1. Today's Data (Locked to Package Name for 1:1 match)
             if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
-                stepsToday = healthConnectManager.readSteps(startOfToday, now)
+                stepsToday = healthConnectManager.readSteps(startOfToday, now, appPkg)
                 editor.putString("steps_count", "%,d".format(stepsToday))
             }
             if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
-                distanceToday = healthConnectManager.readDistanceMeters(startOfToday, now) / 1000.0
+                distanceToday = healthConnectManager.readDistanceMeters(startOfToday, now, appPkg) / 1000.0
                 editor.putString("distance_val", "%.2f km".format(distanceToday))
             }
             if (granted.contains(HealthPermission.getReadPermission(ExerciseSessionRecord::class))) {
-                moveMinsToday = healthConnectManager.readMoveMinutes(startOfToday, now)
+                moveMinsToday = healthConnectManager.readMoveMinutes(startOfToday, now, appPkg)
                 healthDataManager.setMoveMinutes(moveMinsToday)
             }
             if (granted.contains(HealthPermission.getReadPermission(SleepSessionRecord::class))) {
-                val sleepSessions = healthConnectManager.readSleepSessions(startOfToday, now)
+                val sleepSessions = healthConnectManager.readSleepSessions(startOfToday, now, appPkg)
                 if (sleepSessions.isNotEmpty()) {
                     val totalDurationMin = sleepSessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
                     sleepToday = "${totalDurationMin / 60}h ${totalDurationMin % 60}m"
@@ -255,7 +256,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             if (granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
-                val burnedCals = healthConnectManager.readTotalCalories(startOfToday, now)
+                val burnedCals = healthConnectManager.readTotalCalories(startOfToday, now, appPkg)
                 caloriesToday = "%.0f".format(burnedCals)
                 editor.putString("calories_burnt", caloriesToday)
             }
@@ -267,15 +268,15 @@ class MainActivity : AppCompatActivity() {
                 val dateStr = java.time.LocalDate.now().minusDays(i.toLong()).toString()
 
                 if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
-                    healthDataManager.saveHistoricalSteps(dateStr, healthConnectManager.readSteps(dayStart, dayEnd))
+                    healthDataManager.saveHistoricalSteps(dateStr, healthConnectManager.readSteps(dayStart, dayEnd, appPkg))
                 }
                 if (granted.contains(HealthPermission.getReadPermission(SleepSessionRecord::class))) {
-                    val sessions = healthConnectManager.readSleepSessions(dayStart, dayEnd)
+                    val sessions = healthConnectManager.readSleepSessions(dayStart, dayEnd, appPkg)
                     val mins = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
                     healthDataManager.saveHistoricalSleep(dateStr, mins / 60.0)
                 }
                 if (granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
-                    healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readTotalCalories(dayStart, dayEnd))
+                    healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readTotalCalories(dayStart, dayEnd, appPkg))
                 }
             }
 

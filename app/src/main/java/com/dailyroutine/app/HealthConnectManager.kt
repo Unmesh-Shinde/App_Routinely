@@ -46,13 +46,14 @@ class HealthConnectManager(private val context: Context) {
         return false
     }
 
-    // UPDATED: No more hard package filtering in aggregate, letting Health Connect do its native de-duplication
-    suspend fun readSteps(startTime: Instant, endTime: Instant): Long {
+    suspend fun readSteps(startTime: Instant, endTime: Instant, filterPackage: String? = null): Long {
+        val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.aggregate(
                 AggregateRequest(
                     metrics = setOf(StepsRecord.COUNT_TOTAL),
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    dataOriginFilter = originFilter
                 )
             )
             response[StepsRecord.COUNT_TOTAL] ?: 0L
@@ -61,12 +62,14 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    suspend fun readDistanceMeters(startTime: Instant, endTime: Instant): Double {
+    suspend fun readDistanceMeters(startTime: Instant, endTime: Instant, filterPackage: String? = null): Double {
+        val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.aggregate(
                 AggregateRequest(
                     metrics = setOf(DistanceRecord.DISTANCE_TOTAL),
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    dataOriginFilter = originFilter
                 )
             )
             response[DistanceRecord.DISTANCE_TOTAL]?.inMeters ?: 0.0
@@ -75,33 +78,30 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    suspend fun readTotalCalories(startTime: Instant, endTime: Instant): Double {
+    suspend fun readTotalCalories(startTime: Instant, endTime: Instant, filterPackage: String? = null): Double {
+        val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
-            // Google Fit "Calories" = Basal + Active
             val response = healthConnectClient.aggregate(
                 AggregateRequest(
-                    metrics = setOf(TotalCaloriesBurnedRecord.ENERGY_TOTAL, ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL),
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                    metrics = setOf(TotalCaloriesBurnedRecord.ENERGY_TOTAL),
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    dataOriginFilter = originFilter
                 )
             )
-            val total = response[TotalCaloriesBurnedRecord.ENERGY_TOTAL]?.inKilocalories ?: 0.0
-            if (total > 0) return total
-            
-            // Fallback: Manually sum if total record is missing
-            val active = response[ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL]?.inKilocalories ?: 0.0
-            return active // Basal is hard to manually aggregate without specific BMR records
+            response[TotalCaloriesBurnedRecord.ENERGY_TOTAL]?.inKilocalories ?: 0.0
         } catch (e: Exception) {
             0.0
         }
     }
 
-    suspend fun readMoveMinutes(startTime: Instant, endTime: Instant): Int {
+    suspend fun readMoveMinutes(startTime: Instant, endTime: Instant, filterPackage: String? = null): Int {
+        val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
-            // Move minutes are roughly total active session durations
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest(
                     ExerciseSessionRecord::class,
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    dataOriginFilter = originFilter
                 )
             )
             val totalMins = response.records.sumOf { 
@@ -113,12 +113,14 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    suspend fun readSleepSessions(startTime: Instant, endTime: Instant): List<SleepSessionRecord> {
+    suspend fun readSleepSessions(startTime: Instant, endTime: Instant, filterPackage: String? = null): List<SleepSessionRecord> {
+        val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.readRecords(
                 ReadRecordsRequest(
                     SleepSessionRecord::class,
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    dataOriginFilter = originFilter
                 )
             )
             response.records
