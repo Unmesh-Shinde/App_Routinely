@@ -145,5 +145,30 @@
             </intent-filter>
         </receiver>
 
+        <!-- Wellness Widget -->
+        <receiver
+            android:name=".WellnessWidget"
+            android:exported="true"
+            android:label="Daily Wellness Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.dailyroutine.app.ACTION_ADD_WATER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/wellness_widget_info" />
+        </receiver>
+
+        <!-- File Provider for PDF Sharing -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 </manifest>

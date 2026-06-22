@@ -115,6 +115,20 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExportReport"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:text="Export Wellness Report (PDF)"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"
+                app:strokeColor="@color/primary"
+                app:icon="@android:drawable/ic_menu_save"
+                app:iconTint="@color/primary"/>
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveProfile"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"

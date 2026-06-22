@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_home_header"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/widgetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Daily Wellness"
+        android:textColor="@android:color/white"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="6dp"
+        android:baselineAligned="false">
+
+        <!-- Steps -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tvWidgetSteps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Steps"
+                android:textColor="#B3FFFFFF"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <!-- Distance -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tvWidgetDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0km"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Distance"
+                android:textColor="#B3FFFFFF"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <!-- Calories -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tvWidgetCalories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kcal"
+                android:textColor="#B3FFFFFF"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <!-- Water -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/tvWidgetWater"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0L"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Water"
+                android:textColor="#B3FFFFFF"
+                android:textSize="9sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/btnWidgetAddWater"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:background="@drawable/bg_chip"
+        android:backgroundTint="#4DFFFFFF"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💧 +250ml"
+            android:textColor="@android:color/white"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

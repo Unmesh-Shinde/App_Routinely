@@ -53,6 +53,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val dataUpdateReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(c: android.content.Context?, i: android.content.Intent?) {
+            updateDashboard()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
@@ -154,6 +160,20 @@ class MainActivity : AppCompatActivity() {
             startHealthAppScanning()
             healthPrefs.edit().putBoolean("needs_initial_permission_request", false).apply()
         }
+
+        // 🟢 Final Action: Schedule Background Auto-Sync
+        HealthSyncWorker.scheduleAutoSync(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerReceiver(dataUpdateReceiver, android.content.IntentFilter("com.dailyroutine.app.DATA_UPDATED"), 
+            RECEIVER_NOT_EXPORTED)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(dataUpdateReceiver)
     }
 
     private fun addDefaultsOnFirstRun() {
@@ -432,6 +452,9 @@ class MainActivity : AppCompatActivity() {
         } else {
             findViewById<View>(R.id.cardUpcoming).visibility = View.GONE
         }
+
+        // 🟢 Final Action: Update Home Widget
+        WellnessWidget.refresh(this)
     }
 
     private fun showToneSourcePicker(currentUri: String?) {

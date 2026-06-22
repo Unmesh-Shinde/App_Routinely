@@ -21,6 +21,7 @@ class ProfileActivity : AppCompatActivity() {
         val etHeight = findViewById<EditText>(R.id.etProfileHeight)
         val spinnerGender = findViewById<Spinner>(R.id.spinnerGender)
         val btnSave = findViewById<Button>(R.id.btnSaveProfile)
+        val btnExport = findViewById<Button>(R.id.btnExportReport)
 
         val genders = arrayOf("Male", "Female", "Other")
         spinnerGender.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, genders)
@@ -30,6 +31,10 @@ class ProfileActivity : AppCompatActivity() {
         etAge.setText(UserPreferencesStore.getUserAge(this).toString())
         etHeight.setText(UserPreferencesStore.getUserHeight(this).toString())
         spinnerGender.setSelection(genders.indexOf(UserPreferencesStore.getUserGender(this)).coerceAtLeast(0))
+
+        btnExport.setOnClickListener {
+            WellnessReportManager.generateAndShareReport(this)
+        }
 
         btnSave.setOnClickListener {
             val name = etName.text.toString().trim()
