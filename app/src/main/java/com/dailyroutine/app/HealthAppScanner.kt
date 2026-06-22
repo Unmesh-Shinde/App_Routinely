@@ -18,6 +18,8 @@ object HealthAppScanner {
         FitnessApp("boAt Crest", "com.coveiot.boat", null),
         FitnessApp("Huawei Health", "com.huawei.health", null),
         FitnessApp("Realme Link", "com.realme.link", null),
+        FitnessApp("OnePlus Health", "com.oneplus.health.orbit", null),
+        FitnessApp("HeyTap Health (Oppo)", "com.heytap.health", null),
         FitnessApp("Health Connect", "com.google.android.apps.healthdata", null),
         FitnessApp("Fossil", "com.fossil.wearables.fossil", null),
         FitnessApp("Withings Health Mate", "com.withings.wiscale2", null),
