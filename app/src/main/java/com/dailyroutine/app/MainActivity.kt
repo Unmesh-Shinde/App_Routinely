@@ -299,6 +299,11 @@ class MainActivity : AppCompatActivity() {
                 if (i <= 30 && granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
                     healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readTotalCalories(dayStart, dayEnd, appPkg))
                 }
+                // 🟢 NEW: Distance Backfill for 100% History Parity
+                if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
+                    val distKm = healthConnectManager.readDistanceMeters(dayStart, dayEnd, appPkg) / 1000.0
+                    prefs.edit().putString("hist_dist_$dateStr", "%.2f km".format(distKm)).apply()
+                }
             }
 
             editor.apply()
@@ -311,6 +316,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // 🔴 Day-Rollover Protection: Check if we need to finalize "Yesterday"
+        val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
+        val todayStr = java.time.LocalDate.now().toString()
+        val lastFinalized = prefs.getString("last_finalized_day", "")
+        
+        if (lastFinalized != "" && lastFinalized != todayStr) {
+            // New day detected! Finalize yesterday's data before starting today
+            fetchHealthData() // This will backfill yesterday correctly
+            prefs.edit().putString("last_finalized_day", todayStr).apply()
+        }
+
         updateDashboard()
         updateStreak()
     }

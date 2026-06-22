@@ -90,7 +90,8 @@ class HealthConnectManager(private val context: Context) {
 
     suspend fun readDistanceMeters(startTime: Instant, endTime: Instant, filterPackage: String? = null): Double {
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
-        return try {
+        // 1. Try Aggregation (Official way)
+        try {
             val response = healthConnectClient.aggregate(
                 AggregateRequest(
                     metrics = setOf(DistanceRecord.DISTANCE_TOTAL),
@@ -98,7 +99,24 @@ class HealthConnectManager(private val context: Context) {
                     dataOriginFilter = originFilter
                 )
             )
-            response[DistanceRecord.DISTANCE_TOTAL]?.inMeters ?: 0.0
+            val aggregated = response[DistanceRecord.DISTANCE_TOTAL]
+            if (aggregated != null) return aggregated.inMeters
+        } catch (e: Exception) { }
+
+        // 2. Manual Fallback Scan
+        return try {
+            val request = ReadRecordsRequest(
+                DistanceRecord::class,
+                timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                dataOriginFilter = originFilter
+            )
+            val response = healthConnectClient.readRecords(request)
+            val filteredRecords = if (filterPackage != null) {
+                response.records.filter { it.metadata.dataOrigin.packageName == filterPackage }
+            } else {
+                response.records
+            }
+            filteredRecords.sumOf { it.distance.inMeters }
         } catch (e: Exception) {
             0.0
         }
