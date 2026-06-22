@@ -168,18 +168,29 @@ class WalkingDataActivity : AppCompatActivity() {
             val barItems = mutableListOf<BarItem>()
             var weekIndex = 1
 
-            // Logic to chunk month into Monday-starting weeks
+            // Logic: 1st week starts on 1st, ends on first Sunday.
+            // Subsequent weeks start on Monday.
+            // Last week ends on the last day of the month.
             while (calendar.get(Calendar.MONTH) == currentMonth) {
                 var weekSum = 0L
                 val weekStart = calendar.time
                 
-                var daysInThisWeek = 0
-                // Continue until 7 days OR month changes
-                while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
+                // Determine when this specific week should end
+                // It ends if: 1. It hits Sunday OR 2. It hits the last day of the month
+                var isWeekOver = false
+                while (!isWeekOver) {
                     val dateKey = dateFormatter.format(calendar.time)
                     weekSum += healthDataManager.getHistoricalSteps(dateKey)
+                    
+                    val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+                    val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
+                    
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
-                    daysInThisWeek++
+                    val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
+                    
+                    if (isSunday || isNewMonth) {
+                        isWeekOver = true
+                    }
                 }
                 
                 val displayVal = if (weekSum > 1000) "%.1fk".format(weekSum/1000.0) else weekSum.toString()
@@ -197,7 +208,6 @@ class WalkingDataActivity : AppCompatActivity() {
             }
             
             monthDataList.add(MonthData(monthName, yearName, barItems))
-            // Calendar is automatically at start of next month here
         }
 
         rv.adapter = MonthGraphAdapter(monthDataList)

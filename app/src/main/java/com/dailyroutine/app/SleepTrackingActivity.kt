@@ -3,7 +3,6 @@ package com.dailyroutine.app
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -130,7 +129,7 @@ class SleepTrackingActivity : AppCompatActivity() {
                 val dateKey = dateFormatter.format(calendar.time)
                 val sleepHours = healthDataManager.getHistoricalSleep(dateKey)
 
-                val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
+                val barView = android.view.LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = days[i]
                 barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
                 barView.findViewById<TextView>(R.id.tvBarValue).text = if (sleepHours > 0) "%.1fh".format(sleepHours) else "-"
@@ -172,7 +171,7 @@ class SleepTrackingActivity : AppCompatActivity() {
 
         for (m in 0 until 6) {
             val monthName = monthFormatter.format(calendar.time)
-            val yearName = yearFormatter.format(calendar.time)
+            val year = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
             
             val barItems = mutableListOf<BarItem>()
@@ -182,12 +181,20 @@ class SleepTrackingActivity : AppCompatActivity() {
                 var weekSum = 0.0
                 val weekStart = calendar.time
                 
-                var daysInThisWeek = 0
-                while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
+                var isWeekOver = false
+                while (!isWeekOver) {
                     val dateKey = dateFormatter.format(calendar.time)
                     weekSum += healthDataManager.getHistoricalSleep(dateKey)
+                    
+                    val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+                    val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
+                    
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
-                    daysInThisWeek++
+                    val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
+                    
+                    if (isSunday || isNewMonth) {
+                        isWeekOver = true
+                    }
                 }
                 
                 if (weekSum < 56.0 && weekSum > 0) {
@@ -207,7 +214,7 @@ class SleepTrackingActivity : AppCompatActivity() {
                 )))
                 weekIndex++
             }
-            monthDataList.add(MonthData(monthName, yearName, barItems))
+            monthDataList.add(MonthData(monthName, year, barItems))
         }
 
         rv.adapter = MonthGraphAdapter(monthDataList)

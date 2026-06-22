@@ -206,8 +206,9 @@ class CaloriesActivity : AppCompatActivity() {
         val monthDataList = mutableListOf<MonthData>()
         
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.add(Calendar.MONTH, -5)
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
         
         val exceededWeekStrings = mutableListOf<String>()
         val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
@@ -227,12 +228,20 @@ class CaloriesActivity : AppCompatActivity() {
                 var weekSum = 0.0
                 val weekStart = calendar.time
                 
-                var daysInThisWeek = 0
-                while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
+                var isWeekOver = false
+                while (!isWeekOver) {
                     val dateStr = dateFormatter.format(calendar.time)
                     weekSum += healthDataManager.getHistoricalCalories(dateStr)
+                    
+                    val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+                    val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
+                    
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
-                    daysInThisWeek++
+                    val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
+                    
+                    if (isSunday || isNewMonth) {
+                        isWeekOver = true
+                    }
                 }
 
                 if (weekSum > dailyGoal * 7) {
@@ -244,7 +253,7 @@ class CaloriesActivity : AppCompatActivity() {
                 barItems.add(BarItem(BarData(
                     label = "Week $weekIndex",
                     date = rangeFormatter.format(weekStart),
-                    valueDisplay = "%.0f".format(weekSum),
+                    valueDisplay = if (weekSum > 0) "%.0f".format(weekSum) else "-",
                     heightPx = dpToPx(height),
                     color = 0xFFEF5350.toInt(),
                     backgroundRes = R.drawable.bg_calorie_bar
