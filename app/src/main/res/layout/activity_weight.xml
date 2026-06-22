@@ -35,6 +35,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
+        android:id="@+id/weightContentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="80dp"
@@ -91,18 +92,12 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:visibility="gone">
-            <HorizontalScrollView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMonthlyWeight"
                 android:layout_width="match_parent"
-                android:layout_height="320dp"
-                android:scrollbars="none">
-                <LinearLayout
-                    android:id="@+id/llMonthlyWeightGraph"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="bottom"/>
-            </HorizontalScrollView>
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
         </LinearLayout>
 
     </FrameLayout>

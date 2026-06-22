@@ -261,8 +261,8 @@ class MainActivity : AppCompatActivity() {
                 editor.putString("calories_burnt", caloriesToday)
             }
 
-            // 2. Historical Backfill
-            for (i in 1..7) {
+            // 2. Historical Backfill (Extended to 30 Days)
+            for (i in 1..30) {
                 val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
                 val dayEnd = java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
                 val dateStr = java.time.LocalDate.now().minusDays(i.toLong()).toString()
@@ -284,9 +284,10 @@ class MainActivity : AppCompatActivity() {
             updateDashboard()
             
             val summary = StringBuilder("Sync complete from $appName!")
-            if (stepsToday > 0) summary.append("\nSteps: %,d".format(stepsToday))
+            if (stepsToday > 0) summary.append("\nSteps Today: %,d".format(stepsToday))
             if (moveMinsToday > 0) summary.append("\nMove: $moveMinsToday min")
-            if (caloriesToday.isNotEmpty() && caloriesToday != "0") summary.append("\nBurned: $caloriesToday kcal")
+            if (caloriesToday.isNotEmpty() && caloriesToday != "0") summary.append("\nBurned Today: $caloriesToday kcal")
+            summary.append("\nPast 30 days also updated! ✅")
             
             Toast.makeText(this@MainActivity, summary.toString(), Toast.LENGTH_LONG).show()
         }

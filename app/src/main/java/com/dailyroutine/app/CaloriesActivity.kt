@@ -202,45 +202,35 @@ class CaloriesActivity : AppCompatActivity() {
     }
 
     private fun refreshMonthlyView() {
-        val container = findViewById<LinearLayout>(R.id.llMonthlyGraph)
-        container.removeAllViews()
+        val rv = findViewById<RecyclerView>(R.id.rvMonthlyCalories)
+        val monthDataList = mutableListOf<MonthData>()
         
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_MONTH, 1)
         calendar.add(Calendar.MONTH, -5)
         
         val exceededWeekStrings = mutableListOf<String>()
-        val monthFormatter = SimpleDateFormat("MMMM yyyy", Locale.US)
+        val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
+        val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
         val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
+        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
         for (m in 0 until 6) {
-            val monthLabel = monthFormatter.format(calendar.time)
-            
-            // Month Header
-            val monthText = TextView(this).apply {
-                text = monthLabel
-                textSize = 14f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                setPadding(dpToPx(16), dpToPx(12), dpToPx(16), dpToPx(8))
-                setTextColor(0xFFE57373.toInt())
-            }
-            container.addView(monthText)
-
+            val monthName = monthFormatter.format(calendar.time)
+            val yearName = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
+            
+            val barItems = mutableListOf<BarItem>()
             var weekIndex = 1
             
-            // Iterate through the month in 7-day chunks
             while (calendar.get(Calendar.MONTH) == currentMonth) {
-                var weekSum = 0
+                var weekSum = 0.0
                 val weekStart = calendar.time
                 
-                // Count up to 7 days, but stop if we hit a new month
                 var daysInThisWeek = 0
                 while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
                     val dateStr = dateFormatter.format(calendar.time)
-                    weekSum += planManager.getMealsForDate(dateStr).sumOf { 
-                        CalorieSearchEngine.getCalories("${it.name} ${it.description}") 
-                    }
+                    weekSum += healthDataManager.getHistoricalCalories(dateStr)
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     daysInThisWeek++
                 }
@@ -249,32 +239,25 @@ class CaloriesActivity : AppCompatActivity() {
                     exceededWeekStrings.add("${rangeFormatter.format(weekStart)} - ${rangeFormatter.format(calendar.time)}")
                 }
 
-                val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-                barView.findViewById<TextView>(R.id.tvBarLabel).text = "Week $weekIndex"
-                barView.findViewById<TextView>(R.id.tvBarDate).text = "${rangeFormatter.format(weekStart)}"
-                barView.findViewById<TextView>(R.id.tvBarValue).text = weekSum.toString()
-                
-                val bar = barView.findViewById<View>(R.id.viewBar)
-                val params = bar.layoutParams as LinearLayout.LayoutParams
-                params.height = (weekSum * 250 / (3500 * 7)).coerceAtMost(250).let { dpToPx(it) }
-                bar.layoutParams = params
-                
-                container.addView(barView)
+                val height = (weekSum * 250 / (3500 * 7)).toInt().coerceIn(2, 250)
+
+                barItems.add(BarItem(BarData(
+                    label = "Week $weekIndex",
+                    date = rangeFormatter.format(weekStart),
+                    valueDisplay = "%.0f".format(weekSum),
+                    heightPx = dpToPx(height),
+                    color = 0xFFEF5350.toInt(),
+                    backgroundRes = R.drawable.bg_calorie_bar
+                )))
                 weekIndex++
             }
-            
-            // Bold Month Separator
-            val divider = View(this).apply { 
-                layoutParams = LinearLayout.LayoutParams(dpToPx(4), dpToPx(200)).apply {
-                    setMargins(dpToPx(24), 0, dpToPx(24), dpToPx(40))
-                }
-                setBackgroundColor(0xFF263238.toInt()) 
-            }
-            container.addView(divider)
-            
-            // Calendar is already at the 1st of the next month due to the while loop
+            monthDataList.add(MonthData(monthName, yearName, barItems))
         }
-        
+
+        rv.adapter = MonthGraphAdapter(monthDataList)
+        rv.onFlingListener = null
+        androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
+
         val warning = findViewById<TextView>(R.id.tvMonthlyWarning)
         if (exceededWeekStrings.isNotEmpty()) {
             warning.visibility = View.VISIBLE

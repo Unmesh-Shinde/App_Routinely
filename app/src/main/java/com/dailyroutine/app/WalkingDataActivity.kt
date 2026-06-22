@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import java.text.SimpleDateFormat
@@ -138,64 +139,59 @@ class WalkingDataActivity : AppCompatActivity() {
     }
 
     private fun refreshMonthlyView() {
-        val container = findViewById<LinearLayout>(R.id.llMonthlyStepsGraph)
-        container.removeAllViews()
+        val rv = findViewById<RecyclerView>(R.id.rvMonthlySteps)
+        val monthDataList = mutableListOf<MonthData>()
         
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_MONTH, 1)
         calendar.add(Calendar.MONTH, -5)
 
-        val monthFormatter = SimpleDateFormat("MMMM yyyy", Locale.US)
+        val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
+        val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
         val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
+        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
         for (m in 0 until 6) {
-            val monthLabel = monthFormatter.format(calendar.time)
-            
-            val monthText = TextView(this).apply {
-                text = monthLabel
-                textSize = 14f
-                setTypeface(null, android.graphics.Typeface.BOLD)
-                setPadding(dpToPx(16), dpToPx(12), dpToPx(16), dpToPx(8))
-                setTextColor(0xFF009688.toInt())
-            }
-            container.addView(monthText)
-
+            val monthName = monthFormatter.format(calendar.time)
+            val year = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
+            
+            val barItems = mutableListOf<BarItem>()
             var weekIndex = 1
 
             while (calendar.get(Calendar.MONTH) == currentMonth) {
+                var weekSum = 0L
                 val weekStart = calendar.time
                 
                 var daysInThisWeek = 0
                 while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
+                    val dateKey = dateFormatter.format(calendar.time)
+                    weekSum += healthDataManager.getHistoricalSteps(dateKey)
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     daysInThisWeek++
                 }
-                val weekSum = 0
                 
-                val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-                barView.findViewById<TextView>(R.id.tvBarLabel).text = "Week $weekIndex"
-                barView.findViewById<TextView>(R.id.tvBarDate).text = "${rangeFormatter.format(weekStart)}"
-                barView.findViewById<TextView>(R.id.tvBarValue).text = (weekSum/1000).toString() + "k"
-                
-                val bar = barView.findViewById<View>(R.id.viewBar)
-                bar.setBackgroundResource(R.drawable.bg_step_bar)
-                val params = bar.layoutParams as LinearLayout.LayoutParams
-                params.height = (weekSum * 250 / 100000).coerceAtMost(250).let { dpToPx(it) }
-                bar.layoutParams = params
-                
-                container.addView(barView)
+                val displayVal = if (weekSum > 1000) "%.1fk".format(weekSum/1000.0) else weekSum.toString()
+                val height = (weekSum * 250 / 100000).toInt().coerceIn(2, 250)
+
+                barItems.add(BarItem(BarData(
+                    label = "Week $weekIndex",
+                    date = rangeFormatter.format(weekStart),
+                    valueDisplay = displayVal,
+                    heightPx = dpToPx(height),
+                    color = 0xFF009688.toInt(),
+                    backgroundRes = R.drawable.bg_step_bar
+                )))
                 weekIndex++
             }
             
-            val divider = View(this).apply { 
-                layoutParams = LinearLayout.LayoutParams(dpToPx(4), dpToPx(200)).apply {
-                    setMargins(dpToPx(24), 0, dpToPx(24), dpToPx(40))
-                }
-                setBackgroundColor(0xFF263238.toInt()) 
-            }
-            container.addView(divider)
+            monthDataList.add(MonthData(monthName, year, barItems))
         }
+
+        rv.adapter = MonthGraphAdapter(monthDataList)
+        // Add snapping
+        rv.onFlingListener = null
+        androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
     }
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()

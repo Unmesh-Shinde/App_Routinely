@@ -199,18 +199,14 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <HorizontalScrollView
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvMonthlyCalories"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:scrollbars="none">
-                    <LinearLayout
-                        android:id="@+id/llMonthlyGraph"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:gravity="bottom"/>
-                </HorizontalScrollView>
+                    android:layout_height="match_parent"
+                    android:paddingBottom="80dp"
+                    android:clipToPadding="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="horizontal"/>
 
                 <TextView
                     android:id="@+id/tvMonthlyWarning"
