@@ -47,8 +47,11 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun readSteps(startTime: Instant, endTime: Instant, filterPackage: String? = null): Long {
+        android.util.Log.d("DailyRoutineHealth", "readSteps: Querying from $startTime (Filter: $filterPackage)")
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
-        return try {
+
+        // 1. Try Aggregation (Standard)
+        try {
             val response = healthConnectClient.aggregate(
                 AggregateRequest(
                     metrics = setOf(StepsRecord.COUNT_TOTAL),
@@ -56,8 +59,31 @@ class HealthConnectManager(private val context: Context) {
                     dataOriginFilter = originFilter
                 )
             )
-            response[StepsRecord.COUNT_TOTAL] ?: 0L
+            val aggregated = response[StepsRecord.COUNT_TOTAL]
+            android.util.Log.d("DailyRoutineHealth", "readSteps: Aggregated Result = $aggregated")
+            if (aggregated != null) return aggregated
         } catch (e: Exception) { 
+            android.util.Log.e("DailyRoutineHealth", "readSteps: Aggregation Failed", e)
+        }
+
+        // 2. Deep Fallback: Manual Scan
+        return try {
+            val request = ReadRecordsRequest(
+                StepsRecord::class,
+                timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                dataOriginFilter = originFilter
+            )
+            val response = healthConnectClient.readRecords(request)
+            // Double-check origin manually to ensure no leakage from other apps
+            val filteredRecords = if (filterPackage != null) {
+                response.records.filter { it.metadata.dataOrigin.packageName == filterPackage }
+            } else {
+                response.records
+            }
+            val total = filteredRecords.sumOf { it.count }
+            android.util.Log.d("DailyRoutineHealth", "readSteps: Raw Total = $total")
+            total
+        } catch (e: Exception) {
             0L
         }
     }

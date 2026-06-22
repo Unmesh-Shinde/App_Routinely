@@ -32,6 +32,12 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
             if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.StepsRecord::class))) {
                 val steps = hcm.readSteps(startOfToday, now, appPkg)
                 editor.putString("steps_count", "%,d".format(steps))
+                
+                // 🟢 Sync Distance also for widget accuracy
+                if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.DistanceRecord::class))) {
+                    val dist = hcm.readDistanceMeters(startOfToday, now, appPkg) / 1000.0
+                    editor.putString("distance_val", "%.2f km".format(dist))
+                }
             }
 
             // 2. Sync Sleep (Sum of all sessions - including naps)
