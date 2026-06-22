@@ -103,25 +103,32 @@ class WalkingDataActivity : AppCompatActivity() {
         
         val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val calendar = Calendar.getInstance()
+        // Ensure week starts on Monday
+        calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        
+        // Go back 3 weeks + current week = 4 weeks total
         calendar.add(Calendar.WEEK_OF_YEAR, -3)
 
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
+        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
         for (w in 0 until 4) {
             for (i in 0 until 7) {
-                // Remove random mock data - strictly 0 unless today is matched (simulated logic for history can be added later if needed)
-                val dailySteps = 0
+                val dateStr = dateFormatter.format(calendar.time)
+                val dailySteps = healthDataManager.getHistoricalSteps(dateStr).toInt()
                 
                 val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = days[i]
                 barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarValue).text = dailySteps.toString()
+                barView.findViewById<TextView>(R.id.tvBarValue).text = if (dailySteps > 0) dailySteps.toString() else "-"
                 
                 val bar = barView.findViewById<View>(R.id.viewBar)
                 bar.setBackgroundResource(R.drawable.bg_step_bar)
                 val params = bar.layoutParams as LinearLayout.LayoutParams
-                params.height = (dailySteps * 250 / 15000).coerceAtMost(250).let { dpToPx(it) }
+                params.height = (dailySteps * 250 / 15000).coerceIn(2, 250).let { dpToPx(it) }
                 bar.layoutParams = params
                 
                 container.addView(barView)
@@ -143,8 +150,10 @@ class WalkingDataActivity : AppCompatActivity() {
         val monthDataList = mutableListOf<MonthData>()
         
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        // Start from 5 months ago
         calendar.add(Calendar.MONTH, -5)
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
 
         val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
         val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
@@ -153,17 +162,19 @@ class WalkingDataActivity : AppCompatActivity() {
 
         for (m in 0 until 6) {
             val monthName = monthFormatter.format(calendar.time)
-            val year = yearFormatter.format(calendar.time)
+            val yearName = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
             
             val barItems = mutableListOf<BarItem>()
             var weekIndex = 1
 
+            // Logic to chunk month into Monday-starting weeks
             while (calendar.get(Calendar.MONTH) == currentMonth) {
                 var weekSum = 0L
                 val weekStart = calendar.time
                 
                 var daysInThisWeek = 0
+                // Continue until 7 days OR month changes
                 while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
                     val dateKey = dateFormatter.format(calendar.time)
                     weekSum += healthDataManager.getHistoricalSteps(dateKey)
@@ -177,7 +188,7 @@ class WalkingDataActivity : AppCompatActivity() {
                 barItems.add(BarItem(BarData(
                     label = "Week $weekIndex",
                     date = rangeFormatter.format(weekStart),
-                    valueDisplay = displayVal,
+                    valueDisplay = if (weekSum > 0) displayVal else "-",
                     heightPx = dpToPx(height),
                     color = 0xFF009688.toInt(),
                     backgroundRes = R.drawable.bg_step_bar
@@ -185,11 +196,11 @@ class WalkingDataActivity : AppCompatActivity() {
                 weekIndex++
             }
             
-            monthDataList.add(MonthData(monthName, year, barItems))
+            monthDataList.add(MonthData(monthName, yearName, barItems))
+            // Calendar is automatically at start of next month here
         }
 
         rv.adapter = MonthGraphAdapter(monthDataList)
-        // Add snapping
         rv.onFlingListener = null
         androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
     }

@@ -261,8 +261,8 @@ class MainActivity : AppCompatActivity() {
                 editor.putString("calories_burnt", caloriesToday)
             }
 
-            // 2. Historical Backfill (Extended to 30 Days)
-            for (i in 1..30) {
+            // 2. Historical Backfill (Extended to 60 Days for Steps and Sleep)
+            for (i in 1..60) {
                 val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
                 val dayEnd = java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
                 val dateStr = java.time.LocalDate.now().minusDays(i.toLong()).toString()
@@ -275,7 +275,8 @@ class MainActivity : AppCompatActivity() {
                     val mins = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
                     healthDataManager.saveHistoricalSleep(dateStr, mins / 60.0)
                 }
-                if (granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
+                // Calories still 30 days (standard)
+                if (i <= 30 && granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
                     healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readTotalCalories(dayStart, dayEnd, appPkg))
                 }
             }
@@ -283,13 +284,8 @@ class MainActivity : AppCompatActivity() {
             editor.apply()
             updateDashboard()
             
-            val summary = StringBuilder("Sync complete from $appName!")
-            if (stepsToday > 0) summary.append("\nSteps Today: %,d".format(stepsToday))
-            if (moveMinsToday > 0) summary.append("\nMove: $moveMinsToday min")
-            if (caloriesToday.isNotEmpty() && caloriesToday != "0") summary.append("\nBurned Today: $caloriesToday kcal")
-            summary.append("\nPast 30 days also updated! ✅")
-            
-            Toast.makeText(this@MainActivity, summary.toString(), Toast.LENGTH_LONG).show()
+            val summary = "Sync complete from $appName! Today: $stepsToday steps. Past 60 days also updated! ✅"
+            Toast.makeText(this@MainActivity, summary, Toast.LENGTH_LONG).show()
         }
     }
 

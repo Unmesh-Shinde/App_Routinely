@@ -115,7 +115,11 @@ class SleepTrackingActivity : AppCompatActivity() {
         
         val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val calendar = Calendar.getInstance()
+        calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        
         calendar.add(Calendar.WEEK_OF_YEAR, -3) // Show last 4 weeks
 
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
@@ -129,7 +133,7 @@ class SleepTrackingActivity : AppCompatActivity() {
                 val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = days[i]
                 barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarValue).text = "%.1fh".format(sleepHours)
+                barView.findViewById<TextView>(R.id.tvBarValue).text = if (sleepHours > 0) "%.1fh".format(sleepHours) else "-"
                 
                 val bar = barView.findViewById<View>(R.id.viewBar)
                 bar.setBackgroundColor(0xFF5C6BC0.toInt())
@@ -156,8 +160,9 @@ class SleepTrackingActivity : AppCompatActivity() {
         val monthDataList = mutableListOf<MonthData>()
         
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.add(Calendar.MONTH, -5)
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
 
         val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
         val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
@@ -167,7 +172,7 @@ class SleepTrackingActivity : AppCompatActivity() {
 
         for (m in 0 until 6) {
             val monthName = monthFormatter.format(calendar.time)
-            val year = yearFormatter.format(calendar.time)
+            val yearName = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
             
             val barItems = mutableListOf<BarItem>()
@@ -185,7 +190,7 @@ class SleepTrackingActivity : AppCompatActivity() {
                     daysInThisWeek++
                 }
                 
-                if (weekSum < 56.0) {
+                if (weekSum < 56.0 && weekSum > 0) {
                     val endCal = calendar.clone() as Calendar
                     endCal.add(Calendar.DAY_OF_YEAR, -1)
                     deficitWeeks.add("${rangeFormatter.format(weekStart)} - ${rangeFormatter.format(endCal.time)}")
@@ -196,13 +201,13 @@ class SleepTrackingActivity : AppCompatActivity() {
                 barItems.add(BarItem(BarData(
                     label = "Week $weekIndex",
                     date = rangeFormatter.format(weekStart),
-                    valueDisplay = "%.0fh".format(weekSum),
+                    valueDisplay = if (weekSum > 0) "%.0fh".format(weekSum) else "-",
                     heightPx = dpToPx(height),
                     color = 0xFF5C6BC0.toInt()
                 )))
                 weekIndex++
             }
-            monthDataList.add(MonthData(monthName, year, barItems))
+            monthDataList.add(MonthData(monthName, yearName, barItems))
         }
 
         rv.adapter = MonthGraphAdapter(monthDataList)
