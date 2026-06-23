@@ -22,7 +22,6 @@ class HealthConnectManager(private val context: Context) {
         HealthPermission.getReadPermission(BasalMetabolicRateRecord::class),
         HealthPermission.getReadPermission(DistanceRecord::class),
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
-        HealthPermission.getReadPermission(HeartRateRecord::class),
         "android.permission.health.READ_HEALTH_DATA_HISTORY",
         "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"
     )
@@ -48,11 +47,8 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun readSteps(startTime: Instant, endTime: Instant, filterPackage: String? = null): Long {
-        android.util.Log.d("DailyRoutineHealth", "readSteps: Querying from $startTime (Filter: $filterPackage)")
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
-
-        // 1. Try Aggregation (Standard)
-        try {
+        return try {
             val response = healthConnectClient.aggregate(
                 AggregateRequest(
                     metrics = setOf(StepsRecord.COUNT_TOTAL),
@@ -60,39 +56,15 @@ class HealthConnectManager(private val context: Context) {
                     dataOriginFilter = originFilter
                 )
             )
-            val aggregated = response[StepsRecord.COUNT_TOTAL]
-            android.util.Log.d("DailyRoutineHealth", "readSteps: Aggregated Result = $aggregated")
-            if (aggregated != null) return aggregated
+            response[StepsRecord.COUNT_TOTAL] ?: 0L
         } catch (e: Exception) { 
-            android.util.Log.e("DailyRoutineHealth", "readSteps: Aggregation Failed", e)
-        }
-
-        // 2. Deep Fallback: Manual Scan
-        return try {
-            val request = ReadRecordsRequest(
-                StepsRecord::class,
-                timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
-                dataOriginFilter = originFilter
-            )
-            val response = healthConnectClient.readRecords(request)
-            // Double-check origin manually to ensure no leakage from other apps
-            val filteredRecords = if (filterPackage != null) {
-                response.records.filter { it.metadata.dataOrigin.packageName == filterPackage }
-            } else {
-                response.records
-            }
-            val total = filteredRecords.sumOf { it.count }
-            android.util.Log.d("DailyRoutineHealth", "readSteps: Raw Total = $total")
-            total
-        } catch (e: Exception) {
             0L
         }
     }
 
     suspend fun readDistanceMeters(startTime: Instant, endTime: Instant, filterPackage: String? = null): Double {
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
-        // 1. Try Aggregation (Official way)
-        try {
+        return try {
             val response = healthConnectClient.aggregate(
                 AggregateRequest(
                     metrics = setOf(DistanceRecord.DISTANCE_TOTAL),
@@ -100,24 +72,7 @@ class HealthConnectManager(private val context: Context) {
                     dataOriginFilter = originFilter
                 )
             )
-            val aggregated = response[DistanceRecord.DISTANCE_TOTAL]
-            if (aggregated != null) return aggregated.inMeters
-        } catch (e: Exception) { }
-
-        // 2. Manual Fallback Scan
-        return try {
-            val request = ReadRecordsRequest(
-                DistanceRecord::class,
-                timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
-                dataOriginFilter = originFilter
-            )
-            val response = healthConnectClient.readRecords(request)
-            val filteredRecords = if (filterPackage != null) {
-                response.records.filter { it.metadata.dataOrigin.packageName == filterPackage }
-            } else {
-                response.records
-            }
-            filteredRecords.sumOf { it.distance.inMeters }
+            response[DistanceRecord.DISTANCE_TOTAL]?.inMeters ?: 0.0
         } catch (e: Exception) {
             0.0
         }
@@ -168,23 +123,9 @@ class HealthConnectManager(private val context: Context) {
                     dataOriginFilter = originFilter
                 )
             )
-            response.records
+            return response.records
         } catch (e: Exception) {
             emptyList<SleepSessionRecord>()
-        }
-    }
-
-    suspend fun readAverageHeartRate(startTime: Instant, endTime: Instant): Int {
-        return try {
-            val response = healthConnectClient.aggregate(
-                AggregateRequest(
-                    metrics = setOf(HeartRateRecord.BPM_AVG),
-                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
-                )
-            )
-            response[HeartRateRecord.BPM_AVG]?.toInt() ?: 0
-        } catch (e: Exception) {
-            0
         }
     }
 }

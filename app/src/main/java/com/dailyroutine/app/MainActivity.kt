@@ -27,6 +27,7 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
@@ -227,7 +228,8 @@ class MainActivity : AppCompatActivity() {
     private fun fetchHealthData() {
         val appName = healthDataManager.getConnectedAppName()
         val appPkg = healthDataManager.getConnectedAppPackage()
-        
+        android.util.Log.d("DailyRoutineHealth", "Attempting to fetch data for: $appName ($appPkg)")
+
         lifecycleScope.launch {
             val now = Instant.now()
             val startOfToday = java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
@@ -237,17 +239,17 @@ class MainActivity : AppCompatActivity() {
             val granted = healthConnectManager.getGrantedPermissions()
 
             var stepsToday = 0L
-            var distanceToday = 0.0
             var moveMinsToday = 0
             var sleepToday = ""
             var caloriesToday = ""
 
+            // 1. Fetch Today's Data
             if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
                 stepsToday = healthConnectManager.readSteps(startOfToday, now, appPkg)
                 editor.putString("steps_count", "%,d".format(stepsToday))
             }
             if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
-                distanceToday = healthConnectManager.readDistanceMeters(startOfToday, now, appPkg) / 1000.0
+                val distanceToday = healthConnectManager.readDistanceMeters(startOfToday, now, appPkg) / 1000.0
                 editor.putString("distance_val", "%.2f km".format(distanceToday))
             }
             if (granted.contains(HealthPermission.getReadPermission(ExerciseSessionRecord::class))) {
@@ -268,6 +270,7 @@ class MainActivity : AppCompatActivity() {
                 editor.putString("calories_burnt", caloriesToday)
             }
 
+            // 2. Historical Backfill (Extended to 60 Days)
             for (i in 1..60) {
                 val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
                 val dayEnd = java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
@@ -307,12 +310,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        // 🔴 Day-Rollover Protection: Check if we need to finalize "Yesterday"
         val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
         val todayStr = java.time.LocalDate.now().toString()
         val lastFinalized = prefs.getString("last_finalized_day", "")
         
         if (lastFinalized != "" && lastFinalized != todayStr) {
-            fetchHealthData() 
+            // New day detected! Finalize yesterday's data before starting today
+            fetchHealthData() // This will backfill yesterday correctly
             prefs.edit().putString("last_finalized_day", todayStr).apply()
         }
 
