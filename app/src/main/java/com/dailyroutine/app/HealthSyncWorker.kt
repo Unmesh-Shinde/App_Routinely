@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -14,7 +15,7 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): ListenableWorker.Result = withContext(Dispatchers.IO) {
-        android.util.Log.d("DailyRoutineWorker", "doWork: Starting background sync...")
+        android.util.Log.d("DailyRoutineWorker", "doWork: Starting adaptive background sync...")
         val hdm = HealthDataManager(applicationContext)
         if (!hdm.isConnected()) return@withContext ListenableWorker.Result.success()
 
@@ -30,9 +31,9 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
             val prefs = applicationContext.getSharedPreferences("health_data_pref", Context.MODE_PRIVATE)
             val editor = prefs.edit()
 
-            // 🟢 CRITICAL: Sync both TODAY and YESTERDAY to ensure no data is lost during rollover
+            // 🟢 DOUBLE-DAY SAFETY: Always sync TODAY and YESTERDAY
             
-            // 1. TODAY'S SYNC
+            // 1. Sync TODAY'S DATA
             if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.StepsRecord::class))) {
                 val steps = hcm.readSteps(startOfToday, now, appPkg)
                 editor.putString("steps_count", "%,d".format(steps))
@@ -54,7 +55,7 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
                 if (burnedCals > 0) editor.putString("calories_burnt", "%.0f".format(burnedCals))
             }
 
-            // 2. YESTERDAY'S SYNC (Finalization)
+            // 2. Sync YESTERDAY'S DATA (Finalization/Audit)
             val dateYesterday = java.time.LocalDate.now().minusDays(1).toString()
             if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.StepsRecord::class))) {
                 hdm.saveHistoricalSteps(dateYesterday, hcm.readSteps(startOfYesterday, startOfToday, appPkg))
@@ -70,16 +71,16 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
 
             editor.apply()
             
-            // UI & Widget Update
+            // Record sync time for dashboard "Proof-of-Work"
+            val timestamp = SimpleDateFormat("hh:mm a, dd MMM", Locale.US).format(Date())
+            hdm.setLastSyncTime(timestamp)
+
+            // Update UI & Widget
             applicationContext.sendBroadcast(android.content.Intent("com.dailyroutine.app.DATA_UPDATED"))
             WellnessWidget.refresh(applicationContext)
 
-            android.util.Log.d("DailyRoutineWorker", "doWork: Background sync complete! ✅")
-
-            // Reschedule if it's a timed task (recursive)
-            if (tags.contains(TAG_SLEEP_SYNC)) {
-                scheduleAutoSync(applicationContext) 
-            }
+            // 📅 ADAPTIVE SCHEDULING: Chain the next sync
+            scheduleAutoSync(applicationContext)
 
             ListenableWorker.Result.success()
         } catch (e: Exception) {
@@ -88,28 +89,64 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
         }
     }
 
+    private fun showSyncNotification(context: Context, msg: String) {
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+        val channelId = "sync_channel"
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            val channel = android.app.NotificationChannel(channelId, "Health Sync", android.app.NotificationManager.IMPORTANCE_LOW)
+            nm.createNotificationChannel(channel)
+        }
+        val notif = androidx.core.app.NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_fitness_center)
+            .setContentTitle("Auto-Sync Active")
+            .setContentText(msg)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .build()
+        nm.notify(99, notif)
+    }
+
     companion object {
-        private const val TAG_STEP_SYNC = "step_sync_6h"
+        private const val TAG_STEP_SYNC = "step_sync_adaptive"
         private const val TAG_SLEEP_SYNC = "sleep_sync_scheduled"
 
         fun scheduleAutoSync(context: Context) {
-            val workManager = WorkManager.getInstance(context)
+            val now = Calendar.getInstance()
+            val dayOfWeek = now.get(Calendar.DAY_OF_WEEK)
+            val isWeekend = (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY)
+            
+            val currentHour = now.get(Calendar.HOUR_OF_DAY)
+            
+            // 😴 NIGHT MODE: 11:30 PM to 06:30 AM (Sleep deeply)
+            if (currentHour >= 23 || currentHour < 6) {
+                scheduleTimedSync(context, 6, 30) // Wake up at 06:30 AM
+                return
+            }
 
-            // A. Step Sync every 6 hours
-            val stepRequest = PeriodicWorkRequestBuilder<HealthSyncWorker>(6, TimeUnit.HOURS)
-                .addTag(TAG_STEP_SYNC)
-                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-                .build()
+            // 📅 ADAPTIVE DAY MODE
+            val intervalHours = if (isWeekend) 2 else 4
+            
+            val nextSync = (now.clone() as Calendar).apply { 
+                add(Calendar.HOUR_OF_DAY, intervalHours)
+            }
+            
+            // Safety: Ensure we don't skip 06:30 PM sleep sync if the interval jumps over it
+            if (currentHour < 18 && nextSync.get(Calendar.HOUR_OF_DAY) >= 19) {
+                scheduleTimedSync(context, 18, 30)
+            } else {
+                val delayMs = nextSync.timeInMillis - now.timeInMillis
+                val request = OneTimeWorkRequestBuilder<HealthSyncWorker>()
+                    .setInitialDelay(delayMs, TimeUnit.MILLISECONDS)
+                    .addTag(TAG_STEP_SYNC)
+                    .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                    .build()
 
-            workManager.enqueueUniquePeriodicWork(
-                "StepSync6H",
-                ExistingPeriodicWorkPolicy.UPDATE,
-                stepRequest
-            )
-
-            // B. Scheduled Sleep Syncs (approx logic for specific times)
-            scheduleTimedSync(context, 6, 30) // 06:30 AM
-            scheduleTimedSync(context, 18, 30) // 06:30 PM
+                WorkManager.getInstance(context).enqueueUniqueWork(
+                    "AdaptiveSync",
+                    ExistingWorkPolicy.REPLACE,
+                    request
+                )
+            }
         }
 
         private fun scheduleTimedSync(context: Context, hour: Int, min: Int) {

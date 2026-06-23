@@ -311,6 +311,17 @@
                     app:cornerRadius="10dp"/>
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/tvLastSync"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last Auto-Sync: Never"
+                android:textSize="10sp"
+                android:textColor="@color/textSecondary"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="8dp"
+                android:alpha="0.8"/>
+
             <!-- Wellness Tracking Grid (Restored 2x2 Orientation) -->
             <TextView
                 android:layout_width="wrap_content"

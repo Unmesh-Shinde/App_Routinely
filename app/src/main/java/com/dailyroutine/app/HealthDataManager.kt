@@ -19,7 +19,11 @@ class HealthDataManager(context: Context) {
         private const val KEY_SOURCE_APP = "connected_health_app_name"
         private const val KEY_SOURCE_PKG = "connected_health_app_package"
         private const val KEY_MOVE_MINS = "move_minutes_count"
+        private const val KEY_LAST_SYNC = "last_background_sync_time"
     }
+
+    fun getLastSyncTime(): String = prefs.getString(KEY_LAST_SYNC, "Never") ?: "Never"
+    fun setLastSyncTime(time: String) = prefs.edit().putString(KEY_LAST_SYNC, time).apply()
 
     fun getMoveMinutes(): Int = prefs.getInt(KEY_MOVE_MINS, 0)
     fun setMoveMinutes(mins: Int) = prefs.edit().putInt(KEY_MOVE_MINS, mins).apply()

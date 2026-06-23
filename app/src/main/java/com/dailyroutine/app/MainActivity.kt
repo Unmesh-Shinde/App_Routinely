@@ -18,6 +18,8 @@ import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.*
 import androidx.lifecycle.lifecycleScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -203,6 +205,11 @@ class MainActivity : AppCompatActivity() {
                 healthDataManager.setConnectedAppPackage(selectedApp.packageName)
                 checkHealthConnectPermissions()
             }
+            .setNeutralButton("Test Background Sync") { _, _ ->
+                val request = OneTimeWorkRequestBuilder<HealthSyncWorker>().build()
+                WorkManager.getInstance(this).enqueue(request)
+                Toast.makeText(this, "Forcing Background Worker... Check notifications! 🛠️", Toast.LENGTH_SHORT).show()
+            }
             .setNegativeButton("Cancel", null)
             .show()
     }
@@ -307,6 +314,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             editor.apply()
+            
+            val timestamp = java.text.SimpleDateFormat("hh:mm a, dd MMM", java.util.Locale.US).format(java.util.Date())
+            healthDataManager.setLastSyncTime(timestamp)
+
             updateDashboard()
             
             val summary = "Sync complete from $appName! Today: $stepsToday steps. Past 60 days also updated! ✅"
@@ -442,6 +453,9 @@ class MainActivity : AppCompatActivity() {
             .size * 0.25 
         
         findViewById<TextView>(R.id.tvValWater).text = "%.1f Liters".format(waterValManual + waterFromReminders)
+
+        // 🟢 Update "Last Sync" Time
+        findViewById<TextView>(R.id.tvLastSync).text = "Last Auto-Sync: ${healthDataManager.getLastSyncTime()}"
 
         val score = WellnessScoreManager.calculateDailyScore(this, stepsCount, sleepHours, doneHabits, totalHabits)
         findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(R.id.progressWellness).progress = score
