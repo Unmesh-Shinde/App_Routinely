@@ -22,6 +22,7 @@ class HealthConnectManager(private val context: Context) {
         HealthPermission.getReadPermission(BasalMetabolicRateRecord::class),
         HealthPermission.getReadPermission(DistanceRecord::class),
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getReadPermission(HeartRateRecord::class),
         "android.permission.health.READ_HEALTH_DATA_HISTORY",
         "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"
     )
@@ -170,6 +171,20 @@ class HealthConnectManager(private val context: Context) {
             response.records
         } catch (e: Exception) {
             emptyList<SleepSessionRecord>()
+        }
+    }
+
+    suspend fun readAverageHeartRate(startTime: Instant, endTime: Instant): Int {
+        return try {
+            val response = healthConnectClient.aggregate(
+                AggregateRequest(
+                    metrics = setOf(HeartRateRecord.BPM_AVG),
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+                )
+            )
+            response[HeartRateRecord.BPM_AVG]?.toInt() ?: 0
+        } catch (e: Exception) {
+            0
         }
     }
 }

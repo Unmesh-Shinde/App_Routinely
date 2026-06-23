@@ -42,6 +42,17 @@ object UserPreferencesStore {
     fun getUserGender(context: Context): String = getPrefs(context).getString(KEY_USER_GENDER, "Male") ?: "Male"
     fun setUserGender(context: Context, gender: String) = getPrefs(context).edit().putString(KEY_USER_GENDER, gender).apply()
 
+    fun getUnlockedBadges(context: Context): Set<String> {
+        return getPrefs(context).getStringSet("unlocked_badges", emptySet()) ?: emptySet()
+    }
+
+    fun unlockBadge(context: Context, badgeId: String) {
+        val current = getUnlockedBadges(context).toMutableSet()
+        if (current.add(badgeId)) {
+            getPrefs(context).edit().putStringSet("unlocked_badges", current).apply()
+        }
+    }
+
     fun getStreakCount(context: Context): Int {
         return getPrefs(context).getInt(KEY_STREAK_COUNT, 0)
     }
