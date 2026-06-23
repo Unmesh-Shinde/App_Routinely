@@ -154,35 +154,44 @@ class CaloriesActivity : AppCompatActivity() {
         container.removeAllViews()
         
         val calendar = Calendar.getInstance()
+        calendar.firstDayOfWeek = Calendar.MONDAY
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-        calendar.add(Calendar.WEEK_OF_YEAR, -3)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        
+        // Go back 7 weeks + current week = 8 weeks total (~60 days)
+        calendar.add(Calendar.WEEK_OF_YEAR, -7)
 
         val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
-        var currentWeekTotal = 0
+        var currentWeekTotal = 0.0
         val now = Calendar.getInstance()
 
-        for (w in 0 until 4) {
-            var weekSum = 0
+        for (w in 0 until 8) {
+            var weekSum = 0.0
             for (d in 0 until 7) {
                 val dateStr = dateFormatter.format(calendar.time)
+                
+                // Fetch actual meal data from PlanManager for this date
                 val meals = planManager.getMealsForDate(dateStr)
-                val dailyTotal = meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
+                val dailyTotal = meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }.toDouble()
                 weekSum += dailyTotal
                 
                 val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = days[d]
                 barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarValue).text = dailyTotal.toString()
+                barView.findViewById<TextView>(R.id.tvBarValue).text = if (dailyTotal > 0) dailyTotal.toInt().toString() else "-"
                 
                 val bar = barView.findViewById<View>(R.id.viewBar)
+                bar.setBackgroundResource(R.drawable.bg_calorie_bar)
                 val params = bar.layoutParams as LinearLayout.LayoutParams
-                params.height = (dailyTotal * 250 / 3500).coerceAtMost(250).let { dpToPx(it) }
+                params.height = (dailyTotal * 250 / 3500).coerceIn(2.0, 250.0).toInt().let { dpToPx(it) }
                 bar.layoutParams = params
                 
                 container.addView(barView)
                 
-                if (calendar.get(Calendar.WEEK_OF_YEAR) == now.get(Calendar.WEEK_OF_YEAR)) {
+                if (calendar.get(Calendar.WEEK_OF_YEAR) == now.get(Calendar.WEEK_OF_YEAR) && 
+                    calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR)) {
                     currentWeekTotal = weekSum
                 }
 
@@ -193,7 +202,7 @@ class CaloriesActivity : AppCompatActivity() {
                 layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
                     setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
                 }
-                setBackgroundColor(0xFF455A64.toInt()) // Bold charcoal grey
+                setBackgroundColor(0xFF455A64.toInt()) 
             }
             container.addView(divider)
         }
@@ -207,6 +216,7 @@ class CaloriesActivity : AppCompatActivity() {
         
         val calendar = Calendar.getInstance()
         calendar.firstDayOfWeek = Calendar.MONDAY
+        // Start from 5 months ago to fill history
         calendar.add(Calendar.MONTH, -5)
         calendar.set(Calendar.DAY_OF_MONTH, 1)
         
@@ -214,7 +224,6 @@ class CaloriesActivity : AppCompatActivity() {
         val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
         val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
         val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
-        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
         for (m in 0 until 6) {
             val monthName = monthFormatter.format(calendar.time)
@@ -231,7 +240,11 @@ class CaloriesActivity : AppCompatActivity() {
                 var isWeekOver = false
                 while (!isWeekOver) {
                     val dateStr = dateFormatter.format(calendar.time)
-                    weekSum += healthDataManager.getHistoricalCalories(dateStr)
+                    
+                    // Fetch actual meal data from PlanManager for accurate history
+                    // This ensures that if a meal is deleted, it is removed from analytics
+                    val meals = planManager.getMealsForDate(dateStr)
+                    weekSum += meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
                     
                     val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
                     val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
@@ -270,7 +283,7 @@ class CaloriesActivity : AppCompatActivity() {
         val warning = findViewById<TextView>(R.id.tvMonthlyWarning)
         if (exceededWeekStrings.isNotEmpty()) {
             warning.visibility = View.VISIBLE
-            warning.text = "⚠️ Limit exceeded in: ${exceededWeekStrings.joinToString(", ")}"
+            warning.text = "⚠️ Limit exceeded in: ${exceededWeekStrings.take(3).joinToString(", ")}..."
         } else {
             warning.visibility = View.GONE
         }

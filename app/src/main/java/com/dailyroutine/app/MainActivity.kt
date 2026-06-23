@@ -288,7 +288,7 @@ class MainActivity : AppCompatActivity() {
                 editor.putString("calories_burnt", caloriesToday)
             }
 
-            // 2. Historical Backfill (Extended to 60 Days for Steps and Sleep)
+            // 2. Historical Backfill (Extended to 60 Days for Steps, Sleep, and Calories)
             for (i in 1..60) {
                 val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
                 val dayEnd = java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
@@ -302,11 +302,10 @@ class MainActivity : AppCompatActivity() {
                     val mins = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
                     healthDataManager.saveHistoricalSleep(dateStr, mins / 60.0)
                 }
-                // Calories still 30 days (standard)
-                if (i <= 30 && granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
+                if (granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
                     healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readTotalCalories(dayStart, dayEnd, appPkg))
                 }
-                // 🟢 NEW: Distance Backfill for 100% History Parity
+                // Distance Backfill
                 if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
                     val distKm = healthConnectManager.readDistanceMeters(dayStart, dayEnd, appPkg) / 1000.0
                     prefs.edit().putString("hist_dist_$dateStr", "%.2f km".format(distKm)).apply()
