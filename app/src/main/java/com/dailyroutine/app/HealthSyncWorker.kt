@@ -14,6 +14,7 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): ListenableWorker.Result = withContext(Dispatchers.IO) {
+        android.util.Log.d("DailyRoutineWorker", "doWork: Starting background sync...")
         val hdm = HealthDataManager(applicationContext)
         if (!hdm.isConnected()) return@withContext ListenableWorker.Result.success()
 
@@ -22,39 +23,49 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
         
         val now = Instant.now()
         val startOfToday = java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+        val startOfYesterday = java.time.LocalDate.now().minusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
 
         try {
             val granted = hcm.getGrantedPermissions()
             val prefs = applicationContext.getSharedPreferences("health_data_pref", Context.MODE_PRIVATE)
             val editor = prefs.edit()
 
-            // 1. Sync Steps (Locked to Origin)
+            // 🟢 CRITICAL: Sync both TODAY and YESTERDAY to ensure no data is lost during rollover
+            
+            // 1. TODAY'S SYNC
             if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.StepsRecord::class))) {
                 val steps = hcm.readSteps(startOfToday, now, appPkg)
                 editor.putString("steps_count", "%,d".format(steps))
                 
-                // 🟢 Sync Distance also for widget accuracy
                 if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.DistanceRecord::class))) {
                     val dist = hcm.readDistanceMeters(startOfToday, now, appPkg) / 1000.0
                     editor.putString("distance_val", "%.2f km".format(dist))
                 }
             }
 
-            // 2. Sync Sleep (Sum of all sessions - including naps)
             if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.SleepSessionRecord::class))) {
                 val sessions = hcm.readSleepSessions(startOfToday, now, appPkg)
-                if (sessions.isNotEmpty()) {
-                    val totalDurationMin = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
-                    val h = totalDurationMin / 60
-                    val m = totalDurationMin % 60
-                    editor.putString("sleep_hours", "${h}h ${m}m")
-                }
+                val totalDurationMin = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
+                editor.putString("sleep_hours", "${totalDurationMin / 60}h ${totalDurationMin % 60}m")
             }
 
-            // 3. Sync Calories (Total Burn)
             if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.TotalCaloriesBurnedRecord::class))) {
                 val burnedCals = hcm.readTotalCalories(startOfToday, now, appPkg)
                 if (burnedCals > 0) editor.putString("calories_burnt", "%.0f".format(burnedCals))
+            }
+
+            // 2. YESTERDAY'S SYNC (Finalization)
+            val dateYesterday = java.time.LocalDate.now().minusDays(1).toString()
+            if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.StepsRecord::class))) {
+                hdm.saveHistoricalSteps(dateYesterday, hcm.readSteps(startOfYesterday, startOfToday, appPkg))
+            }
+            if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.SleepSessionRecord::class))) {
+                val sessions = hcm.readSleepSessions(startOfYesterday, startOfToday, appPkg)
+                val mins = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
+                hdm.saveHistoricalSleep(dateYesterday, mins / 60.0)
+            }
+            if (granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.TotalCaloriesBurnedRecord::class))) {
+                hdm.saveHistoricalCalories(dateYesterday, hcm.readTotalCalories(startOfYesterday, startOfToday, appPkg))
             }
 
             editor.apply()
@@ -63,13 +74,16 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
             applicationContext.sendBroadcast(android.content.Intent("com.dailyroutine.app.DATA_UPDATED"))
             WellnessWidget.refresh(applicationContext)
 
-            // Reschedule if it's a timed task (approx logic)
+            android.util.Log.d("DailyRoutineWorker", "doWork: Background sync complete! ✅")
+
+            // Reschedule if it's a timed task (recursive)
             if (tags.contains(TAG_SLEEP_SYNC)) {
                 scheduleAutoSync(applicationContext) 
             }
 
             ListenableWorker.Result.success()
         } catch (e: Exception) {
+            android.util.Log.e("DailyRoutineWorker", "doWork: Sync Failed", e)
             ListenableWorker.Result.retry()
         }
     }
@@ -89,7 +103,7 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
 
             workManager.enqueueUniquePeriodicWork(
                 "StepSync6H",
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 stepRequest
             )
 
