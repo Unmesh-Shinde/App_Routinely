@@ -20,7 +20,14 @@ class HealthDataManager(context: Context) {
         private const val KEY_SOURCE_PKG = "connected_health_app_package"
         private const val KEY_MOVE_MINS = "move_minutes_count"
         private const val KEY_LAST_SYNC = "last_background_sync_time"
+        private const val KEY_DISTANCE_VAL = "distance_val"
     }
+
+    fun getDistanceKm(): Double {
+        val s = prefs.getString(KEY_DISTANCE_VAL, "0.0 km") ?: "0.0"
+        return s.replace(" km", "").toDoubleOrNull() ?: 0.0
+    }
+    fun setDistanceVal(s: String) = prefs.edit().putString(KEY_DISTANCE_VAL, s).apply()
 
     fun getLastSyncTime(): String = prefs.getString(KEY_LAST_SYNC, "Never") ?: "Never"
     fun setLastSyncTime(time: String) = prefs.edit().putString(KEY_LAST_SYNC, time).apply()

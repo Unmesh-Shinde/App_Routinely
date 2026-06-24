@@ -115,7 +115,6 @@ class CaloriesActivity : AppCompatActivity() {
     private fun refreshTodayView() {
         val todayStr = dateFormatter.format(Date())
         val meals = planManager.getMealsForDate(todayStr)
-        val doneIds = RoutineProgressStore.getDoneIds(this)
         
         val tvAnalyzing = findViewById<TextView>(R.id.tvAnalyzing)
         if (meals.isNotEmpty()) {
@@ -130,16 +129,13 @@ class CaloriesActivity : AppCompatActivity() {
         
         adapter.submitList(meals)
         
-        val intakeTotal = meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
-        findViewById<View>(R.id.tvDailyWarning).visibility = if (intakeTotal > dailyGoal) View.VISIBLE else View.GONE
-
-        // Energy Balance Calculation
+        // 🟢 Use Master Wellness Engine for Energy Balance
+        val intakeTotal = WellnessEngine.calculateIntake(this)
         val stepsStr = healthDataManager.getSteps().replace(",", "")
         val steps = stepsStr.toIntOrNull() ?: 0
         val weight = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
         
-        val doneExercises = planManager.getExercisesForDate(todayStr).filter { it.id.toString() in doneIds }
-        val burnedTotal = CalorieSearchEngine.calculateActiveBurn(steps, weight, doneExercises)
+        val burnedTotal = WellnessEngine.calculateActiveBurn(this, steps, weight).toInt()
         val netBalance = intakeTotal - burnedTotal
 
         findViewById<TextView>(R.id.tvIntakeSum).text = intakeTotal.toString()

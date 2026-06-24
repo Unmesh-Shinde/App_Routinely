@@ -270,6 +270,11 @@ class MainActivity : AppCompatActivity() {
                 editor.putString("calories_burnt", caloriesToday)
             }
 
+            // 6. Basal Metabolic Rate (BMR)
+            if (granted.contains(HealthPermission.getReadPermission(BasalMetabolicRateRecord::class))) {
+                // We could fetch actual BMR from system if available
+            }
+
             // 2. Historical Backfill (Extended to 60 Days)
             for (i in 1..60) {
                 val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
@@ -415,17 +420,18 @@ class MainActivity : AppCompatActivity() {
             h + (m / 60.0)
         } catch(e: Exception) { 0.0 }
 
-        val meals = planManager.getMealsForDate(todayStr)
-        val intakeTotal = meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
         val weightValForBurn = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
         val doneIds = RoutineProgressStore.getDoneIds(this)
         val doneExercises = planManager.getExercisesForDate(todayStr).filter { it.id.toString() in doneIds }
-        val burnedTotal = CalorieSearchEngine.calculateActiveBurn(stepsCount, weightValForBurn, doneExercises)
-        val netBalance = intakeTotal - burnedTotal
+        
+        // 🟢 Use Master Wellness Engine for final counts
+        val intakeTotal = WellnessEngine.calculateIntake(this)
+        val burnedTotal = WellnessEngine.calculateActiveBurn(this, stepsCount, weightValForBurn)
+        val netBalance = intakeTotal - burnedTotal.toInt()
 
         findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected() && stepsCount > 0) healthDataManager.getSteps() else "0"
         findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected() && sleepHours > 0) healthDataManager.getSleep() else "0h"
-        findViewById<TextView>(R.id.tvValCalories).text = if (netBalance != 0) netBalance.toString() else "0"
+        findViewById<TextView>(R.id.tvValCalories).text = netBalance.toString()
         
         val weightVal = healthDataManager.getWeight(todayStr)
         findViewById<TextView>(R.id.tvValWeight).text = if (weightVal > 0) "$weightVal kg" else "Not Logged"

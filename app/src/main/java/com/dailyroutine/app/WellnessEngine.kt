@@ -7,7 +7,8 @@ import java.util.*
 object WellnessEngine {
 
     fun calculateBMR(context: Context): Double {
-        val weight = HealthDataManager(context).getWeight(SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date()))
+        val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val weight = HealthDataManager(context).getWeight(todayStr)
             .let { if (it > 0) it else 70.0 }
         val height = UserPreferencesStore.getUserHeight(context)
         val age = UserPreferencesStore.getUserAge(context)
@@ -22,14 +23,37 @@ object WellnessEngine {
 
     fun calculateActiveBurn(context: Context, steps: Int, weight: Double): Double {
         val userWeight = if (weight > 0) weight else 70.0
-        val walkingBurn = steps * userWeight * 0.00055
+        val hdm = HealthDataManager(context)
+
+        // 1. Walking/Distance Burn (Scientific: approx 0.72 kcal per km per kg)
+        // Using real distance from Health Connect
+        val distanceKm = hdm.getDistanceKm()
+        val walkingBurn = distanceKm * userWeight * 0.72
         
+        // 2. Workout Burn (Type, Reps, Intensity)
         val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
         val doneIds = RoutineProgressStore.getDoneIds(context)
         val doneExercises = PlanManager(context).getExercisesForDate(todayStr).filter { it.id.toString() in doneIds }
-        val workoutBurn = doneExercises.sumOf { (it.intensity * 2.5) }
         
-        return walkingBurn + workoutBurn
+        var workoutBurn = 0.0
+        doneExercises.forEach { ex ->
+            val totalReps = try {
+                val r = ex.reps.split("-").first().filter { it.isDigit() }.toIntOrNull() ?: 10
+                ex.sets * r
+            } catch(e: Exception) { ex.sets * 10 }
+            
+            // Formula: Reps * (Base + Intensity Scalar) * Weight Ratio
+            // Base 0.1 kcal/rep, Max 0.5 kcal/rep for intensity 100
+            val intensityScalar = (ex.intensity / 100.0) * 0.4
+            val burnPerRep = (0.1 + intensityScalar) * (userWeight / 70.0)
+            workoutBurn += (totalReps * burnPerRep)
+        }
+        
+        // 3. Heart Points (Active Minutes) - Bonus for sustained metabolic elevation
+        val moveMins = hdm.getMoveMinutes()
+        val intensityBonus = moveMins * 0.8 * (userWeight / 70.0) // 0.8 kcal per active min
+
+        return walkingBurn + workoutBurn + intensityBonus
     }
 
     fun calculateIntake(context: Context): Int {
@@ -40,13 +64,10 @@ object WellnessEngine {
 
     fun getMasterCalorieBalance(context: Context, steps: Int): Int {
         val intake = calculateIntake(context)
-        val bmr = calculateBMR(context)
         val weight = HealthDataManager(context).getWeight(SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date()))
         val activeBurn = calculateActiveBurn(context, steps, weight)
         
-        // Net Balance = Intake - (BMR + Active Burn)
-        // However, usually "Net" in trackers means Intake - Active Burn relative to goal
-        // We will show Intake - Active Burn as the primary metric
+        // Current dashboard logic: Net = Intake - Active Burn
         return intake - activeBurn.toInt()
     }
 
@@ -91,20 +112,21 @@ object WellnessEngine {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         val cal = Calendar.getInstance()
 
-        // 1. Century Walker (Total Steps)
+        // 1. Century Walker
         var totalSteps = 0L
+        val milestoneCal = Calendar.getInstance()
         for (i in 0 until 60) {
-            totalSteps += hdm.getHistoricalSteps(sdf.format(cal.time))
-            cal.add(Calendar.DAY_OF_YEAR, -1)
+            totalSteps += hdm.getHistoricalSteps(sdf.format(milestoneCal.time))
+            milestoneCal.add(Calendar.DAY_OF_YEAR, -1)
         }
         if (totalSteps >= 100_000) UserPreferencesStore.unlockBadge(context, "century_walker")
 
-        // 2. Hydration Hero (7-day streak)
-        cal.time = Date()
+        // 2. Hydration Hero
+        milestoneCal.time = Date()
         var waterStreak = 0
         for (i in 0 until 7) {
-            if (hdm.getWaterIntake(sdf.format(cal.time)) >= 2.0) waterStreak++ else break
-            cal.add(Calendar.DAY_OF_YEAR, -1)
+            if (hdm.getWaterIntake(sdf.format(milestoneCal.time)) >= 2.0) waterStreak++ else break
+            milestoneCal.add(Calendar.DAY_OF_YEAR, -1)
         }
         if (waterStreak >= 7) UserPreferencesStore.unlockBadge(context, "hydration_hero")
     }
