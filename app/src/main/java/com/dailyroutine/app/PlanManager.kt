@@ -72,6 +72,12 @@ class PlanManager(context: Context) {
         prefs.edit().putString("workout_calendar_data", gson.toJson(plan)).apply()
     }
 
+    fun addQuickIndianDiet(date: String) {
+        saveMealForDate(date, Meal(name = "Oats & Milk", mealType = "Breakfast", hour = 8, minute = 30))
+        saveMealForDate(date, Meal(name = "Roti & Sabzi", mealType = "Lunch", hour = 13, minute = 0))
+        saveMealForDate(date, Meal(name = "Dal & Rice", mealType = "Dinner", hour = 20, minute = 30))
+    }
+
     // Updated sync logic for date-based exercises
     fun syncExerciseReminder(context: Context, ex: Exercise, date: String) {
         val mgr = ReminderManager(context)

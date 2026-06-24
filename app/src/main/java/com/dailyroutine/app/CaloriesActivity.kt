@@ -129,20 +129,23 @@ class CaloriesActivity : AppCompatActivity() {
         
         adapter.submitList(meals)
         
-        // 🟢 Use Master Wellness Engine for Energy Balance
-        val intakeTotal = WellnessEngine.calculateIntake(this)
-        val stepsStr = healthDataManager.getSteps().replace(",", "")
-        val steps = stepsStr.toIntOrNull() ?: 0
-        val weight = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
-        
-        val burnedTotal = WellnessEngine.calculateActiveBurn(this, steps, weight).toInt()
-        val netBalance = intakeTotal - burnedTotal
+        // Use async Master Wellness Engine for Energy Balance
+        WellnessEngine.calculateIntakeForDate(this, todayStr) { intakeTotal ->
+            runOnUiThread {
+                val stepsStr = healthDataManager.getSteps().replace(",", "")
+                val steps = stepsStr.toIntOrNull() ?: 0
+                val weight = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
+                
+                val burnedTotal = WellnessEngine.calculateActiveBurn(this, steps, weight).toInt()
+                val netBalance = intakeTotal - burnedTotal
 
-        findViewById<TextView>(R.id.tvIntakeSum).text = intakeTotal.toString()
-        findViewById<TextView>(R.id.tvBurnedSum).text = burnedTotal.toString()
-        findViewById<TextView>(R.id.tvNetBalance).text = netBalance.toString()
-        
-        findViewById<TextView>(R.id.tvDailyWarning).visibility = if (netBalance > dailyGoal) View.VISIBLE else View.GONE
+                findViewById<TextView>(R.id.tvIntakeSum).text = intakeTotal.toString()
+                findViewById<TextView>(R.id.tvBurnedSum).text = burnedTotal.toString()
+                findViewById<TextView>(R.id.tvNetBalance).text = netBalance.toString()
+                
+                findViewById<TextView>(R.id.tvDailyWarning).visibility = if (netBalance > dailyGoal) View.VISIBLE else View.GONE
+            }
+        }
     }
 
     private fun refreshWeeklyView() {
@@ -155,55 +158,67 @@ class CaloriesActivity : AppCompatActivity() {
         calendar.set(Calendar.HOUR_OF_DAY, 0)
         calendar.set(Calendar.MINUTE, 0)
         
-        // Go back 7 weeks + current week = 8 weeks total (~60 days)
         calendar.add(Calendar.WEEK_OF_YEAR, -7)
 
         val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-        val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
         var currentWeekTotal = 0.0
         val now = Calendar.getInstance()
 
         for (w in 0 until 8) {
-            var weekSum = 0.0
+            val processedWeekDateStrs = mutableListOf<String>()
             for (d in 0 until 7) {
-                val dateStr = dateFormatter.format(calendar.time)
-                
-                // Fetch actual meal data from PlanManager for this date
-                val meals = planManager.getMealsForDate(dateStr)
-                val dailyTotal = meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }.toDouble()
-                weekSum += dailyTotal
-                
-                val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-                barView.findViewById<TextView>(R.id.tvBarLabel).text = days[d]
-                barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarValue).text = if (dailyTotal > 0) dailyTotal.toInt().toString() else "-"
-                
-                val bar = barView.findViewById<View>(R.id.viewBar)
-                bar.setBackgroundResource(R.drawable.bg_calorie_bar)
-                val params = bar.layoutParams as LinearLayout.LayoutParams
-                params.height = (dailyTotal * 250 / 3500).coerceIn(2.0, 250.0).toInt().let { dpToPx(it) }
-                bar.layoutParams = params
-                
-                container.addView(barView)
-                
-                if (calendar.get(Calendar.WEEK_OF_YEAR) == now.get(Calendar.WEEK_OF_YEAR) && 
-                    calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR)) {
-                    currentWeekTotal = weekSum
-                }
-
+                processedWeekDateStrs.add(dateFormatter.format(calendar.time))
                 calendar.add(Calendar.DAY_OF_YEAR, 1)
             }
-            // Week separator
-            val divider = View(this).apply { 
-                layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
-                    setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+            
+            val weekEnd = calendar.time
+            var weekSum = 0.0
+            var weekProcessedCount = 0
+            val weekMealsByDay = mutableMapOf<String, Int>()
+
+            processedWeekDateStrs.forEach { dateStr ->
+                WellnessEngine.calculateIntakeForDate(this, dateStr) { dailyTotal: Int ->
+                    weekMealsByDay[dateStr] = dailyTotal
+                    weekSum += dailyTotal
+                    weekProcessedCount++
+
+                    if (weekProcessedCount == 7) {
+                        runOnUiThread {
+                            val thisWeekStart = (now.clone() as Calendar).apply { set(Calendar.DAY_OF_WEEK, Calendar.MONDAY) }
+                            if (processedWeekDateStrs.contains(dateFormatter.format(thisWeekStart.time))) {
+                                currentWeekTotal = weekSum
+                                findViewById<View>(R.id.tvWeeklyWarning).visibility = if (currentWeekTotal > dailyGoal * 7) View.VISIBLE else View.GONE
+                            }
+
+                            processedWeekDateStrs.forEachIndexed { idx, dStr ->
+                                val dayVal = weekMealsByDay[dStr] ?: 0
+                                val barView = LayoutInflater.from(this@CaloriesActivity).inflate(R.layout.item_calorie_bar, container, false)
+                                barView.findViewById<TextView>(R.id.tvBarLabel).text = days[idx]
+                                barView.findViewById<TextView>(R.id.tvBarDate).text = dStr.split("-").last()
+                                barView.findViewById<TextView>(R.id.tvBarValue).text = if (dayVal > 0) dayVal.toString() else "-"
+                                
+                                val bar = barView.findViewById<View>(R.id.viewBar)
+                                bar.setBackgroundResource(R.drawable.bg_calorie_bar)
+                                val params = bar.layoutParams as LinearLayout.LayoutParams
+                                params.height = (dayVal * 250 / 3500).coerceIn(2, 250).let { dpToPx(it) }
+                                bar.layoutParams = params
+                                
+                                container.addView(barView)
+                            }
+                            
+                            val divider = View(this@CaloriesActivity).apply { 
+                                layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
+                                    setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+                                }
+                                setBackgroundColor(0xFF455A64.toInt()) 
+                            }
+                            container.addView(divider)
+                        }
+                    }
                 }
-                setBackgroundColor(0xFF455A64.toInt()) 
             }
-            container.addView(divider)
+            calendar.time = weekEnd
         }
-        
-        findViewById<View>(R.id.tvWeeklyWarning).visibility = if (currentWeekTotal > dailyGoal * 7) View.VISIBLE else View.GONE
     }
 
     private fun refreshMonthlyView() {
@@ -212,11 +227,9 @@ class CaloriesActivity : AppCompatActivity() {
         
         val calendar = Calendar.getInstance()
         calendar.firstDayOfWeek = Calendar.MONDAY
-        // Start from 5 months ago to fill history
         calendar.add(Calendar.MONTH, -5)
         calendar.set(Calendar.DAY_OF_MONTH, 1)
         
-        val exceededWeekStrings = mutableListOf<String>()
         val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
         val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
         val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
@@ -230,35 +243,24 @@ class CaloriesActivity : AppCompatActivity() {
             var weekIndex = 1
             
             while (calendar.get(Calendar.MONTH) == currentMonth) {
-                var weekSum = 0.0
                 val weekStart = calendar.time
+                val weekDates = mutableListOf<String>()
                 
                 var isWeekOver = false
                 while (!isWeekOver) {
-                    val dateStr = dateFormatter.format(calendar.time)
-                    
-                    // Fetch actual meal data from PlanManager for accurate history
-                    // This ensures that if a meal is deleted, it is removed from analytics
-                    val meals = planManager.getMealsForDate(dateStr)
-                    weekSum += meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
-                    
+                    weekDates.add(dateFormatter.format(calendar.time))
                     val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
                     val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
-                    
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
-                    
-                    if (isSunday || isNewMonth) {
-                        isWeekOver = true
-                    }
+                    if (isSunday || isNewMonth) isWeekOver = true
                 }
 
-                if (weekSum > dailyGoal * 7) {
-                    exceededWeekStrings.add("${rangeFormatter.format(weekStart)} - ${rangeFormatter.format(calendar.time)}")
-                }
+                // Using historical data for Monthly view for speed (it matches sync)
+                var weekSum = 0.0
+                weekDates.forEach { weekSum += healthDataManager.getHistoricalCalories(it) }
 
                 val height = (weekSum * 250 / (3500 * 7)).toInt().coerceIn(2, 250)
-
                 barItems.add(BarItem(BarData(
                     label = "Week $weekIndex",
                     date = rangeFormatter.format(weekStart),
@@ -275,14 +277,6 @@ class CaloriesActivity : AppCompatActivity() {
         rv.adapter = MonthGraphAdapter(monthDataList)
         rv.onFlingListener = null
         androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
-
-        val warning = findViewById<TextView>(R.id.tvMonthlyWarning)
-        if (exceededWeekStrings.isNotEmpty()) {
-            warning.visibility = View.VISIBLE
-            warning.text = "⚠️ Limit exceeded in: ${exceededWeekStrings.take(3).joinToString(", ")}..."
-        } else {
-            warning.visibility = View.GONE
-        }
     }
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
@@ -302,7 +296,11 @@ class CaloriesActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val m = items[position]
-            val cals = CalorieSearchEngine.getCalories("${m.name} ${m.description}")
+            CalorieSearchEngine.getCalories(holder.itemView.context, "${m.name} ${m.description}") { cals ->
+                holder.itemView.post {
+                    holder.tvTime.text = "$cals kcal"
+                }
+            }
             
             holder.tvEmoji.text = when (m.mealType) {
                 "Breakfast" -> "🍳"
@@ -311,8 +309,7 @@ class CaloriesActivity : AppCompatActivity() {
                 else -> "🍎"
             }
             holder.tvTitle.text = m.name
-            holder.tvSubtitle.text = "${m.mealType} • Calculated"
-            holder.tvTime.text = "$cals kcal"
+            holder.tvSubtitle.text = "${m.mealType} • AI Sync"
             
             holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
             holder.itemView.findViewById<View>(R.id.btnEdit).visibility = View.GONE

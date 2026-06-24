@@ -74,9 +74,8 @@ object WellnessEngine {
         return walkingBurn + workoutBurn
     }
 
-    fun calculateIntake(context: Context, onResult: (Int) -> Unit) {
-        val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-        val meals = PlanManager(context).getMealsForDate(todayStr)
+    fun calculateIntakeForDate(context: Context, date: String, onResult: (Int) -> Unit) {
+        val meals = PlanManager(context).getMealsForDate(date)
         if (meals.isEmpty()) {
             onResult(0)
             return

@@ -413,7 +413,7 @@ class MainActivity : AppCompatActivity() {
         } catch(e: Exception) { 0.0 }
 
         // 🟢 ASYNC INTAKE CALCULATION (Using Master Wellness Engine)
-        WellnessEngine.calculateIntake(this) { intakeTotal ->
+        WellnessEngine.calculateIntakeForDate(this, todayStr) { intakeTotal ->
             runOnUiThread {
                 val weightValForBurn = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
                 val burnedTotal = WellnessEngine.calculateActiveBurn(this, stepsCount, weightValForBurn)
