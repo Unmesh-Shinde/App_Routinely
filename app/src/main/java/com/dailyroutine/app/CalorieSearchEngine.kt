@@ -1,7 +1,6 @@
 package com.dailyroutine.app
 
 import android.content.Context
-import java.util.regex.Pattern
 
 object CalorieSearchEngine {
     
@@ -9,7 +8,7 @@ object CalorieSearchEngine {
 
     /**
      * Entry point for meal calories. 
-     * Uses a local cache first, then falls back to AI Web Sync.
+     * Strictly uses Local Cache (Already learned from AI) or Live AI Web Sync.
      */
     fun getCalories(context: Context, text: String, onResult: (Int) -> Unit) {
         val normalized = text.lowercase().trim()
@@ -18,7 +17,7 @@ object CalorieSearchEngine {
             return
         }
 
-        // 1. Check Local Cache
+        // 1. Check Local Cache (Already learned from AI)
         val cache = context.getSharedPreferences(PREFS_CACHE, Context.MODE_PRIVATE)
         val cachedValue = cache.getInt(normalized, -1)
         if (cachedValue != -1) {
@@ -26,17 +25,17 @@ object CalorieSearchEngine {
             return
         }
 
-        // 2. AI Web Sync (Nutritionix)
+        // 2. Strict AI Web Sync (Nutritionix)
         NutritionixClient.getCaloriesForMeal(normalized) { calories ->
-            // Save to Cache
             if (calories > 0) {
+                // Learn and Cache for next time
                 cache.edit().putInt(normalized, calories).apply()
             }
+            // If API fails or returns 0, we return 0 (no fallback)
             onResult(calories)
         }
     }
 
-    // This remains offline and instant
     fun calculateActiveBurn(context: Context, steps: Int, weight: Double): Double {
         return WellnessEngine.calculateActiveBurn(context, steps, weight)
     }

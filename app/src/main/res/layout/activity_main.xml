@@ -16,8 +16,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
-            android:paddingTop="64dp"
-            android:paddingBottom="24dp"
+            android:paddingTop="52dp"
+            android:paddingBottom="12dp"
             android:background="@drawable/bg_home_header">
 
             <LinearLayout
@@ -357,15 +357,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wellness Tracking"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/textPrimary"
-                android:layout_marginBottom="10dp"/>
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="6dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_weight="1.8"
                 android:orientation="vertical">
 
                 <LinearLayout

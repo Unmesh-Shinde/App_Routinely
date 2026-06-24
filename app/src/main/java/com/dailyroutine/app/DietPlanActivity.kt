@@ -89,10 +89,9 @@ class DietPlanActivity : AppCompatActivity() {
             val dateStr = dateFormatter.format(tempCal.time)
             val isSelected = dateStr == dateFormatter.format(calendar.time)
             
-            val dayView = LayoutInflater.from(this).inflate(R.layout.item_meal, llDays, false).apply {
-                val tv = findViewById<TextView>(R.id.tvTitle)
-                tv.text = SimpleDateFormat("EEE\ndd", Locale.US).format(tempCal.time)
-                tv.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            val dayView = LayoutInflater.from(this).inflate(R.layout.item_day_strip, llDays, false).apply {
+                findViewById<TextView>(R.id.tvDayName).text = SimpleDateFormat("EEE", Locale.US).format(tempCal.time)
+                findViewById<TextView>(R.id.tvDayNumber).text = SimpleDateFormat("dd", Locale.US).format(tempCal.time)
                 
                 alpha = if (isSelected) 1.0f else 0.5f
                 setOnClickListener {
