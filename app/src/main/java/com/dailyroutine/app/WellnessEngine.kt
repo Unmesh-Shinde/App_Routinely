@@ -21,16 +21,32 @@ object WellnessEngine {
         }
     }
 
+    // 🧪 Scientific MET Table (Metabolic Equivalent of Task)
+    private val MET_TABLE = mapOf(
+        "walking_slow" to 2.0, "walking_avg" to 3.5, "walking_brisk" to 5.0,
+        "running" to 10.0, "pushups" to 3.8, "squats" to 5.0, "yoga" to 2.5,
+        "weightlifting_light" to 3.0, "weightlifting_heavy" to 6.0, "hiit" to 8.0,
+        "cycling" to 7.5, "swimming" to 7.0, "plank" to 2.8, "jumping_jacks" to 8.0
+    )
+
     fun calculateActiveBurn(context: Context, steps: Int, weight: Double): Double {
         val userWeight = if (weight > 0) weight else 70.0
         val hdm = HealthDataManager(context)
 
-        // 1. Walking/Distance Burn (Scientific: approx 0.72 kcal per km per kg)
-        // Using real distance from Health Connect
+        // 1. 🚶 Scientific Walking Burn (MET-Based)
         val distanceKm = hdm.getDistanceKm()
-        val walkingBurn = distanceKm * userWeight * 0.72
+        val moveMins = hdm.getMoveMinutes()
         
-        // 2. Workout Burn (Type, Reps, Intensity)
+        val metWalking = when {
+            moveMins <= 0 -> 0.0
+            (distanceKm / (moveMins / 60.0)) > 6.0 -> MET_TABLE["walking_brisk"]!!
+            (distanceKm / (moveMins / 60.0)) > 4.0 -> MET_TABLE["walking_avg"]!!
+            else -> MET_TABLE["walking_slow"]!!
+        }
+        
+        val walkingBurn = (metWalking * 3.5 * userWeight / 200.0) * moveMins
+        
+        // 2. 💪 Scientific Workout Burn (MET + Intensity)
         val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
         val doneIds = RoutineProgressStore.getDoneIds(context)
         val doneExercises = PlanManager(context).getExercisesForDate(todayStr).filter { it.id.toString() in doneIds }
@@ -42,33 +58,41 @@ object WellnessEngine {
                 ex.sets * r
             } catch(e: Exception) { ex.sets * 10 }
             
-            // Formula: Reps * (Base + Intensity Scalar) * Weight Ratio
-            // Base 0.1 kcal/rep, Max 0.5 kcal/rep for intensity 100
-            val intensityScalar = (ex.intensity / 100.0) * 0.4
-            val burnPerRep = (0.1 + intensityScalar) * (userWeight / 70.0)
-            workoutBurn += (totalReps * burnPerRep)
+            val durationMins = (totalReps * 4) / 60.0
+            val baseMET = when {
+                ex.name.lowercase().contains("pushup") -> MET_TABLE["pushups"]!!
+                ex.name.lowercase().contains("squat") -> MET_TABLE["squats"]!!
+                ex.name.lowercase().contains("yoga") -> MET_TABLE["yoga"]!!
+                ex.intensity > 80 -> MET_TABLE["weightlifting_heavy"]!!
+                else -> MET_TABLE["weightlifting_light"]!!
+            }
+            
+            val adjustedMET = baseMET * (0.8 + (ex.intensity / 100.0) * 0.4)
+            workoutBurn += (adjustedMET * 3.5 * userWeight / 200.0) * durationMins
         }
         
-        // 3. Heart Points (Active Minutes) - Bonus for sustained metabolic elevation
-        val moveMins = hdm.getMoveMinutes()
-        val intensityBonus = moveMins * 0.8 * (userWeight / 70.0) // 0.8 kcal per active min
-
-        return walkingBurn + workoutBurn + intensityBonus
+        return walkingBurn + workoutBurn
     }
 
-    fun calculateIntake(context: Context): Int {
+    fun calculateIntake(context: Context, onResult: (Int) -> Unit) {
         val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
         val meals = PlanManager(context).getMealsForDate(todayStr)
-        return meals.sumOf { CalorieSearchEngine.getCalories("${it.name} ${it.description}") }
-    }
+        if (meals.isEmpty()) {
+            onResult(0)
+            return
+        }
 
-    fun getMasterCalorieBalance(context: Context, steps: Int): Int {
-        val intake = calculateIntake(context)
-        val weight = HealthDataManager(context).getWeight(SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date()))
-        val activeBurn = calculateActiveBurn(context, steps, weight)
-        
-        // Current dashboard logic: Net = Intake - Active Burn
-        return intake - activeBurn.toInt()
+        var total = 0
+        var processedCount = 0
+        meals.forEach { meal ->
+            CalorieSearchEngine.getCalories(context, "${meal.name} ${meal.description}") { cals ->
+                total += cals
+                processedCount++
+                if (processedCount == meals.size) {
+                    onResult(total)
+                }
+            }
+        }
     }
 
     fun getTrendInsight(context: Context): String {
@@ -110,18 +134,15 @@ object WellnessEngine {
     fun checkMilestones(context: Context) {
         val hdm = HealthDataManager(context)
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val cal = Calendar.getInstance()
-
-        // 1. Century Walker
-        var totalSteps = 0L
         val milestoneCal = Calendar.getInstance()
+
+        var totalSteps = 0L
         for (i in 0 until 60) {
             totalSteps += hdm.getHistoricalSteps(sdf.format(milestoneCal.time))
             milestoneCal.add(Calendar.DAY_OF_YEAR, -1)
         }
         if (totalSteps >= 100_000) UserPreferencesStore.unlockBadge(context, "century_walker")
 
-        // 2. Hydration Hero
         milestoneCal.time = Date()
         var waterStreak = 0
         for (i in 0 until 7) {

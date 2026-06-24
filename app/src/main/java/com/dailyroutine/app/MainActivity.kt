@@ -228,8 +228,7 @@ class MainActivity : AppCompatActivity() {
     private fun fetchHealthData() {
         val appName = healthDataManager.getConnectedAppName()
         val appPkg = healthDataManager.getConnectedAppPackage()
-        android.util.Log.d("DailyRoutineHealth", "Attempting to fetch data for: $appName ($appPkg)")
-
+        
         lifecycleScope.launch {
             val now = Instant.now()
             val startOfToday = java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
@@ -243,7 +242,6 @@ class MainActivity : AppCompatActivity() {
             var sleepToday = ""
             var caloriesToday = ""
 
-            // 1. Fetch Today's Data
             if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
                 stepsToday = healthConnectManager.readSteps(startOfToday, now, appPkg)
                 editor.putString("steps_count", "%,d".format(stepsToday))
@@ -270,12 +268,6 @@ class MainActivity : AppCompatActivity() {
                 editor.putString("calories_burnt", caloriesToday)
             }
 
-            // 6. Basal Metabolic Rate (BMR)
-            if (granted.contains(HealthPermission.getReadPermission(BasalMetabolicRateRecord::class))) {
-                // We could fetch actual BMR from system if available
-            }
-
-            // 2. Historical Backfill (Extended to 60 Days)
             for (i in 1..60) {
                 val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
                 val dayEnd = java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
@@ -420,23 +412,24 @@ class MainActivity : AppCompatActivity() {
             h + (m / 60.0)
         } catch(e: Exception) { 0.0 }
 
-        val weightValForBurn = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
-        val doneIds = RoutineProgressStore.getDoneIds(this)
-        val doneExercises = planManager.getExercisesForDate(todayStr).filter { it.id.toString() in doneIds }
-        
-        // 🟢 Use Master Wellness Engine for final counts
-        val intakeTotal = WellnessEngine.calculateIntake(this)
-        val burnedTotal = WellnessEngine.calculateActiveBurn(this, stepsCount, weightValForBurn)
-        val netBalance = intakeTotal - burnedTotal.toInt()
+        // 🟢 ASYNC INTAKE CALCULATION (Using Master Wellness Engine)
+        WellnessEngine.calculateIntake(this) { intakeTotal ->
+            runOnUiThread {
+                val weightValForBurn = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
+                val burnedTotal = WellnessEngine.calculateActiveBurn(this, stepsCount, weightValForBurn)
+                val netBalance = intakeTotal - burnedTotal.toInt()
 
-        findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected() && stepsCount > 0) healthDataManager.getSteps() else "0"
-        findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected() && sleepHours > 0) healthDataManager.getSleep() else "0h"
-        findViewById<TextView>(R.id.tvValCalories).text = netBalance.toString()
+                findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected() && stepsCount > 0) healthDataManager.getSteps() else "0"
+                findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected() && sleepHours > 0) healthDataManager.getSleep() else "0h"
+                findViewById<TextView>(R.id.tvValCalories).text = netBalance.toString()
+            }
+        }
         
         val weightVal = healthDataManager.getWeight(todayStr)
         findViewById<TextView>(R.id.tvValWeight).text = if (weightVal > 0) "$weightVal kg" else "Not Logged"
         
         val waterValManual = healthDataManager.getWaterIntake(todayStr)
+        val doneIds = RoutineProgressStore.getDoneIds(this)
         val waterFromReminders = allReminders
             .filter { it.type == ReminderType.HYDRATION && it.id.toString() in doneIds }
             .size * 0.25 
