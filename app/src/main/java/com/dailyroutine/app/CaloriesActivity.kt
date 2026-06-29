@@ -290,18 +290,12 @@ class CaloriesActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_meal, parent, false)
+            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_reminder, parent, false)
             return VH(v)
         }
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val m = items[position]
-            CalorieSearchEngine.getCalories(holder.itemView.context, "${m.name} ${m.description}") { cals ->
-                holder.itemView.post {
-                    holder.tvTime.text = "$cals kcal"
-                }
-            }
-            
             holder.tvEmoji.text = when (m.mealType) {
                 "Breakfast" -> "🍳"
                 "Lunch" -> "🥗"
@@ -309,7 +303,19 @@ class CaloriesActivity : AppCompatActivity() {
                 else -> "🍎"
             }
             holder.tvTitle.text = m.name
-            holder.tvSubtitle.text = "${m.mealType} • AI Sync"
+            holder.tvSubtitle.text = m.mealType
+            holder.tvSubtitle.setBackgroundResource(R.drawable.bg_chip)
+            holder.tvSubtitle.visibility = View.VISIBLE
+            
+            holder.tvTime.text = if (m.calories > 0) "${m.calories} kcal" else "AI Syncing..."
+
+            if (m.calories == 0) {
+                CalorieSearchEngine.getCalories(holder.itemView.context, "${m.name} ${m.description}") { cals ->
+                    holder.itemView.post {
+                        holder.tvTime.text = "$cals kcal"
+                    }
+                }
+            }
             
             holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
             holder.itemView.findViewById<View>(R.id.btnEdit).visibility = View.GONE

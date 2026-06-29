@@ -1,6 +1,7 @@
 package com.dailyroutine.app
 
 import android.content.Context
+import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,32 +34,43 @@ object WellnessEngine {
         val userWeight = if (weight > 0) weight else 70.0
         val hdm = HealthDataManager(context)
 
-        // 1. 🚶 Scientific Walking Burn (MET-Based)
+        // 1. 🚶 Scientific Walking Burn
         val distanceKm = hdm.getDistanceKm()
-        val moveMins = hdm.getMoveMinutes()
+        val moveMins = hdm.getMoveMinutes().toDouble()
         
-        val metWalking = when {
-            moveMins <= 0 -> 0.0
-            (distanceKm / (moveMins / 60.0)) > 6.0 -> MET_TABLE["walking_brisk"]!!
-            (distanceKm / (moveMins / 60.0)) > 4.0 -> MET_TABLE["walking_avg"]!!
-            else -> MET_TABLE["walking_slow"]!!
+        var walkingBurn = 0.0
+        if (moveMins > 0) {
+            val speed = distanceKm / (moveMins / 60.0)
+            val metWalking = when {
+                speed > 6.0 -> MET_TABLE["walking_brisk"]!!
+                speed > 4.0 -> MET_TABLE["walking_avg"]!!
+                else -> MET_TABLE["walking_slow"]!!
+            }
+            walkingBurn = (metWalking * 3.5 * userWeight / 200.0) * moveMins
+        } else if (steps > 0) {
+            // FALLBACK: Standard estimation ≈ 0.04 kcal per step
+            walkingBurn = steps * 0.04 * (userWeight / 70.0)
         }
         
-        val walkingBurn = (metWalking * 3.5 * userWeight / 200.0) * moveMins
-        
-        // 2. 💪 Scientific Workout Burn (MET + Intensity)
+        // 2. 💪 Scientific Workout Burn (Corrected Negation Logic)
         val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
         val doneIds = RoutineProgressStore.getDoneIds(context)
-        val doneExercises = PlanManager(context).getExercisesForDate(todayStr).filter { it.id.toString() in doneIds }
+        val planMgr = PlanManager(context)
+        val todayExercises = planMgr.getExercisesForDate(todayStr)
+        
+        // Only calculate for exercises marked as DONE
+        val doneExercises = todayExercises.filter { it.id.toString() in doneIds }
         
         var workoutBurn = 0.0
+        Log.d("WellnessEngine", "Negating ${doneExercises.size} completed workouts.")
+        
         doneExercises.forEach { ex ->
             val totalReps = try {
                 val r = ex.reps.split("-").first().filter { it.isDigit() }.toIntOrNull() ?: 10
                 ex.sets * r
             } catch(e: Exception) { ex.sets * 10 }
             
-            val durationMins = (totalReps * 4) / 60.0
+            val durationMins = (totalReps * 4.0) / 60.0
             val baseMET = when {
                 ex.name.lowercase().contains("pushup") -> MET_TABLE["pushups"]!!
                 ex.name.lowercase().contains("squat") -> MET_TABLE["squats"]!!
@@ -68,7 +80,9 @@ object WellnessEngine {
             }
             
             val adjustedMET = baseMET * (0.8 + (ex.intensity / 100.0) * 0.4)
-            workoutBurn += (adjustedMET * 3.5 * userWeight / 200.0) * durationMins
+            val burn = (adjustedMET * 3.5 * userWeight / 200.0) * durationMins
+            workoutBurn += burn
+            Log.d("WellnessEngine", "Workout: ${ex.name} | Burned: $burn")
         }
         
         return walkingBurn + workoutBurn
@@ -81,17 +95,10 @@ object WellnessEngine {
             return
         }
 
-        var total = 0
-        var processedCount = 0
-        meals.forEach { meal ->
-            CalorieSearchEngine.getCalories(context, "${meal.name} ${meal.description}") { cals ->
-                total += cals
-                processedCount++
-                if (processedCount == meals.size) {
-                    onResult(total)
-                }
-            }
-        }
+        // Return the sum of all meal calories stored in the database
+        val totalIntake = meals.sumOf { it.calories }
+        Log.d("WellnessEngine", "Today's Total Intake: $totalIntake kcal")
+        onResult(totalIntake)
     }
 
     fun getTrendInsight(context: Context): String {

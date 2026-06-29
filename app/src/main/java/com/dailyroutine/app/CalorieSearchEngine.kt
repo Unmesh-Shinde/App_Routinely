@@ -1,14 +1,19 @@
 package com.dailyroutine.app
 
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 object CalorieSearchEngine {
     
     private const val PREFS_CACHE = "calorie_cache_pref"
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     /**
      * Entry point for meal calories. 
-     * Strictly uses Local Cache (Already learned from AI) or Live AI Web Sync.
+     * Uses AI Cache -> Live AI (Gemini).
+     * STRICTLY Live AI based as requested. No local fallbacks.
      */
     fun getCalories(context: Context, text: String, onResult: (Int) -> Unit) {
         val normalized = text.lowercase().trim()
@@ -25,13 +30,12 @@ object CalorieSearchEngine {
             return
         }
 
-        // 2. Strict AI Web Sync (Nutritionix)
-        NutritionixClient.getCaloriesForMeal(normalized) { calories ->
+        // 2. Live AI Web Sync (Gemini)
+        scope.launch {
+            val calories = GeminiClient.getCaloriesForMeal(normalized)
             if (calories > 0) {
-                // Learn and Cache for next time
                 cache.edit().putInt(normalized, calories).apply()
             }
-            // If API fails or returns 0, we return 0 (no fallback)
             onResult(calories)
         }
     }

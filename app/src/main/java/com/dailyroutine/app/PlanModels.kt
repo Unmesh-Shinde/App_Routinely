@@ -17,7 +17,8 @@ data class Meal(
     val hour: Int = 12,
     val minute: Int = 0,
     val isReminderEnabled: Boolean = true,
-    val mealType: String = "Lunch" // Breakfast, Lunch, Dinner, Snack
+    val mealType: String = "Lunch", // Breakfast, Lunch, Dinner, Snack
+    val calories: Int = 0
 ) : Serializable {
     fun formatTime(): String {
         val h = if (hour == 0 || hour == 12) 12 else hour % 12

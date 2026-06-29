@@ -46,6 +46,9 @@ dependencies {
     // WorkManager
     implementation 'androidx.work:work-runtime-ktx:2.9.0'
     
-    // Networking
+    // Generative AI
+    implementation 'com.google.ai.client.generativeai:generativeai:0.9.0'
+    
+    // Networking (Re-added for direct AI calls)
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }

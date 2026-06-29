@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -418,6 +419,8 @@ class MainActivity : AppCompatActivity() {
                 val weightValForBurn = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
                 val burnedTotal = WellnessEngine.calculateActiveBurn(this, stepsCount, weightValForBurn)
                 val netBalance = intakeTotal - burnedTotal.toInt()
+                
+                Log.d("BurnEngine", "Intake: $intakeTotal | Steps: $stepsCount | Total Burned: $burnedTotal | Net: $netBalance")
 
                 findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected() && stepsCount > 0) healthDataManager.getSteps() else "0"
                 findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected() && sleepHours > 0) healthDataManager.getSleep() else "0h"

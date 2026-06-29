@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -82,26 +84,30 @@ class DietPlanActivity : AppCompatActivity() {
     private fun updateDaysStrip() {
         val llDays = findViewById<LinearLayout>(R.id.llDays)
         llDays.removeAllViews()
+        
         val tempCal = calendar.clone() as Calendar
         tempCal.add(Calendar.DAY_OF_YEAR, -3)
+
+        val stripDateFormatter = SimpleDateFormat("EEE\ndd", Locale.US)
 
         for (i in 0 until 7) {
             val dateStr = dateFormatter.format(tempCal.time)
             val isSelected = dateStr == dateFormatter.format(calendar.time)
             
-            val dayView = LayoutInflater.from(this).inflate(R.layout.item_day_strip, llDays, false).apply {
-                findViewById<TextView>(R.id.tvDayName).text = SimpleDateFormat("EEE", Locale.US).format(tempCal.time)
-                findViewById<TextView>(R.id.tvDayNumber).text = SimpleDateFormat("dd", Locale.US).format(tempCal.time)
-                
-                alpha = if (isSelected) 1.0f else 0.5f
+            val btn = Button(this, null, android.R.attr.buttonStyleSmall).apply {
+                text = stripDateFormatter.format(tempCal.time)
                 setOnClickListener {
-                    calendar.time = dateFormatter.parse(dateStr)!!
-                    findViewById<TextView>(R.id.tvSelectedDate).text = displayFormatter.format(calendar.time)
+                    val clickedCal = Calendar.getInstance()
+                    clickedCal.time = dateFormatter.parse(dateStr) ?: Date()
+                    calendar.time = clickedCal.time
+                    this@DietPlanActivity.findViewById<TextView>(R.id.tvSelectedDate).text = displayFormatter.format(calendar.time)
                     refreshMeals()
                     updateDaysStrip()
                 }
+                alpha = if (isSelected) 1f else 0.5f
+                if (isSelected) setBackgroundColor(0x33FFFFFF)
             }
-            llDays.addView(dayView)
+            llDays.addView(btn)
             tempCal.add(Calendar.DAY_OF_YEAR, 1)
         }
     }
@@ -152,26 +158,41 @@ class DietPlanActivity : AppCompatActivity() {
             .setTitle(if (meal == null) "Add Meal" else "Edit Meal")
             .setView(v)
             .setPositiveButton("Save") { _, _ ->
-                val newMeal = (meal ?: Meal()).copy(
-                    name = etName.text.toString(),
-                    description = etDesc.text.toString(),
-                    mealType = spinner.selectedItem.toString(),
-                    hour = h,
-                    minute = m
-                )
-                planManager.saveMealForDate(dateStr, newMeal)
-                refreshMeals()
+                val name = etName.text.toString().trim()
+                val desc = etDesc.text.toString().trim()
+                
+                val loading = Toast.makeText(this, "AI Calculating calories...", Toast.LENGTH_SHORT)
+                loading.show()
+                
+                lifecycleScope.launch {
+                    val cals = GeminiClient.getCaloriesForMeal("$name $desc")
+                    
+                    val newMeal = (meal ?: Meal()).copy(
+                        name = name,
+                        description = desc,
+                        mealType = spinner.selectedItem.toString(),
+                        hour = h,
+                        minute = m,
+                        calories = cals
+                    )
+                    planManager.saveMealForDate(dateStr, newMeal)
+                    refreshMeals()
+                    loading.cancel()
+                }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun deleteMeal(meal: Meal) {
+    private fun deleteMeal(mealId: Int) {
+        val dateStr = dateFormatter.format(calendar.time)
+        val meal = planManager.getMealsForDate(dateStr).find { it.id == mealId } ?: return
+        
         AlertDialog.Builder(this)
             .setTitle("Delete Meal?")
             .setMessage("Remove ${meal.name} from your plan?")
             .setPositiveButton("Delete") { _, _ ->
-                planManager.deleteMealForDate(dateFormatter.format(calendar.time), meal)
+                planManager.deleteMealForDate(dateStr, meal)
                 refreshMeals()
             }
             .setNegativeButton("Cancel", null)
@@ -180,7 +201,7 @@ class DietPlanActivity : AppCompatActivity() {
 
     inner class MealAdapter(
         private val onEdit: (Meal) -> Unit,
-        private val onDelete: (Meal) -> Unit
+        private val onDelete: (Int) -> Unit
     ) : RecyclerView.Adapter<MealAdapter.VH>() {
         private var items = listOf<Meal>()
 
@@ -190,7 +211,7 @@ class DietPlanActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_meal, parent, false)
+            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_reminder, parent, false)
             return VH(v)
         }
 
@@ -203,16 +224,28 @@ class DietPlanActivity : AppCompatActivity() {
                 else -> "🍎"
             }
             holder.tvTitle.text = m.name
-            holder.tvSubtitle.text = "${m.formatTime()} • ${m.mealType}"
+            holder.tvSubtitle.text = m.mealType
+            holder.tvSubtitle.setBackgroundResource(R.drawable.bg_chip)
+            holder.tvSubtitle.visibility = View.VISIBLE
             
-            CalorieSearchEngine.getCalories(holder.itemView.context, "${m.name} ${m.description}") { cals ->
-                holder.itemView.post {
-                    holder.tvTime.text = "$cals kcal"
-                }
+            if (m.calories > 0) {
+                holder.tvTime.text = "${m.formatTime()} • ${m.calories} kcal"
+            } else {
+                holder.tvTime.text = m.formatTime()
             }
 
             holder.itemView.setOnClickListener { onEdit(m) }
-            holder.itemView.setOnLongClickListener { onDelete(m); true }
+            
+            val btnDelete = holder.itemView.findViewById<View>(R.id.btnDelete)
+            btnDelete.visibility = View.VISIBLE
+            btnDelete.setOnClickListener { onDelete(m.id) }
+
+            val btnEdit = holder.itemView.findViewById<View>(R.id.btnEdit)
+            btnEdit.visibility = View.VISIBLE
+            btnEdit.setOnClickListener { onEdit(m) }
+            
+            // Hide switch as it's not used here
+            holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
         }
 
         override fun getItemCount() = items.size
