@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Daily Routine</string>
-    <string name="channel_name">Daily Routine Reminders</string>
+    <string name="app_name">Routinely</string>
+    <string name="widget_name">Routinely Widget</string>
+    <string name="widget_title">Routinely</string>
+    <string name="channel_name">Routinely Reminders</string>
     <string name="channel_desc">Timely notifications for meals, exercise, hydration, and more.</string>
 </resources>

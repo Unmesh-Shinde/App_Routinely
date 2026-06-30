@@ -20,6 +20,8 @@ class WalkingDataActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_walking_data)
+        InsetHelper.applyTopPadding(findViewById(R.id.appBar))
+        InsetHelper.applyBottomPadding(findViewById(R.id.contentRoot))
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -101,47 +103,42 @@ class WalkingDataActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.llWeeklyStepsGraph)
         container.removeAllViews()
         
-        val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val calendar = Calendar.getInstance()
-        // Ensure week starts on Monday
-        calendar.firstDayOfWeek = Calendar.MONDAY
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
         calendar.set(Calendar.HOUR_OF_DAY, 0)
         calendar.set(Calendar.MINUTE, 0)
-        
-        // Go back 3 weeks + current week = 4 weeks total
-        calendar.add(Calendar.WEEK_OF_YEAR, -3)
+        calendar.add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
 
+        val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-        for (w in 0 until 4) {
-            for (i in 0 until 7) {
-                val dateStr = dateFormatter.format(calendar.time)
-                val dailySteps = healthDataManager.getHistoricalSteps(dateStr).toInt()
-                
-                val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-                barView.findViewById<TextView>(R.id.tvBarLabel).text = days[i]
-                barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarValue).text = if (dailySteps > 0) dailySteps.toString() else "-"
-                
-                val bar = barView.findViewById<View>(R.id.viewBar)
-                bar.setBackgroundResource(R.drawable.bg_step_bar)
-                val params = bar.layoutParams as LinearLayout.LayoutParams
-                params.height = (dailySteps * 250 / 15000).coerceIn(2, 250).let { dpToPx(it) }
-                bar.layoutParams = params
-                
-                container.addView(barView)
-                calendar.add(Calendar.DAY_OF_YEAR, 1)
-            }
-            
-            val divider = View(this).apply { 
-                layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
-                    setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+        for (dayIndex in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
+            val dateStr = dateFormatter.format(calendar.time)
+            val dailySteps = healthDataManager.getHistoricalSteps(dateStr).toInt()
+
+            val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
+            barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
+            barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
+            barView.findViewById<TextView>(R.id.tvBarValue).text = if (dailySteps > 0) dailySteps.toString() else "-"
+
+            val bar = barView.findViewById<View>(R.id.viewBar)
+            bar.setBackgroundResource(R.drawable.bg_step_bar)
+            val params = bar.layoutParams as LinearLayout.LayoutParams
+            params.height = (dailySteps * 250 / 15000).coerceIn(2, 250).let { dpToPx(it) }
+            bar.layoutParams = params
+
+            container.addView(barView)
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+
+            if ((dayIndex + 1) % 7 == 0 && dayIndex != HealthDataManager.SYNC_HISTORY_DAYS - 1) {
+                val divider = View(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
+                        setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+                    }
+                    setBackgroundColor(0xFF455A64.toInt())
                 }
-                setBackgroundColor(0xFF455A64.toInt()) 
+                container.addView(divider)
             }
-            container.addView(divider)
         }
     }
 
@@ -149,10 +146,12 @@ class WalkingDataActivity : AppCompatActivity() {
         val rv = findViewById<RecyclerView>(R.id.rvMonthlySteps)
         val monthDataList = mutableListOf<MonthData>()
         
-        val calendar = Calendar.getInstance()
+        val today = Calendar.getInstance()
+        val oldestSyncedDay = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
+        }
+        val calendar = oldestSyncedDay.clone() as Calendar
         calendar.firstDayOfWeek = Calendar.MONDAY
-        // Start from 5 months ago
-        calendar.add(Calendar.MONTH, -5)
         calendar.set(Calendar.DAY_OF_MONTH, 1)
 
         val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
@@ -160,7 +159,7 @@ class WalkingDataActivity : AppCompatActivity() {
         val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-        for (m in 0 until 6) {
+        while (!calendar.after(today)) {
             val monthName = monthFormatter.format(calendar.time)
             val yearName = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
@@ -180,15 +179,18 @@ class WalkingDataActivity : AppCompatActivity() {
                 var isWeekOver = false
                 while (!isWeekOver) {
                     val dateKey = dateFormatter.format(calendar.time)
-                    weekSum += healthDataManager.getHistoricalSteps(dateKey)
+                    if (!calendar.before(oldestSyncedDay) && !calendar.after(today)) {
+                        weekSum += healthDataManager.getHistoricalSteps(dateKey)
+                    }
                     
                     val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
                     val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
                     
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
+                    val isAfterToday = calendar.after(today)
                     
-                    if (isSunday || isNewMonth) {
+                    if (isSunday || isNewMonth || isAfterToday) {
                         isWeekOver = true
                     }
                 }
@@ -206,8 +208,10 @@ class WalkingDataActivity : AppCompatActivity() {
                 )))
                 weekIndex++
             }
-            
-            monthDataList.add(MonthData(monthName, yearName, barItems))
+
+            if (barItems.isNotEmpty()) {
+                monthDataList.add(MonthData(monthName, yearName, barItems))
+            }
         }
 
         rv.adapter = MonthGraphAdapter(monthDataList)

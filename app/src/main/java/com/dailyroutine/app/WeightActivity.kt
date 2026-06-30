@@ -20,6 +20,8 @@ class WeightActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weight)
+        InsetHelper.applyTopPadding(findViewById(R.id.appBar))
+        InsetHelper.applyBottomPadding(findViewById(R.id.weightContentContainer))
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -92,41 +94,42 @@ class WeightActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.llWeeklyWeightGraph)
         container.removeAllViews()
         
-        val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-        calendar.add(Calendar.WEEK_OF_YEAR, -3)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
 
+        val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
 
-        for (w in 0 until 4) {
-            for (i in 0 until 7) {
-                val dateStr = dateFormatter.format(calendar.time)
-                val weight = healthDataManager.getWeight(dateStr)
-                
-                val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-                barView.findViewById<TextView>(R.id.tvBarLabel).text = days[i]
-                barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarValue).text = if (weight > 0) "%.0f".format(weight) else "-"
-                
-                val bar = barView.findViewById<View>(R.id.viewBar)
-                bar.setBackgroundColor(0xFF78909C.toInt()) // Weight color
-                val params = bar.layoutParams as LinearLayout.LayoutParams
-                // Max height is 250dp for 150kg
-                params.height = if (weight > 0) (weight * 250 / 150.0).toInt().let { dpToPx(it) } else 2
-                bar.layoutParams = params
-                
-                container.addView(barView)
-                calendar.add(Calendar.DAY_OF_YEAR, 1)
-            }
-            
-            val divider = View(this).apply { 
-                layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
-                    setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+        for (dayIndex in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
+            val dateStr = dateFormatter.format(calendar.time)
+            val weight = healthDataManager.getWeight(dateStr)
+
+            val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
+            barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
+            barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
+            barView.findViewById<TextView>(R.id.tvBarValue).text = if (weight > 0) "%.0f".format(weight) else "-"
+
+            val bar = barView.findViewById<View>(R.id.viewBar)
+            bar.setBackgroundColor(0xFF78909C.toInt()) // Weight color
+            val params = bar.layoutParams as LinearLayout.LayoutParams
+            // Max height is 250dp for 150kg
+            params.height = if (weight > 0) (weight * 250 / 150.0).toInt().let { dpToPx(it) } else 2
+            bar.layoutParams = params
+
+            container.addView(barView)
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+
+            if ((dayIndex + 1) % 7 == 0 && dayIndex != HealthDataManager.SYNC_HISTORY_DAYS - 1) {
+                val divider = View(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
+                        setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+                    }
+                    setBackgroundColor(0xFF455A64.toInt())
                 }
-                setBackgroundColor(0xFF455A64.toInt()) 
+                container.addView(divider)
             }
-            container.addView(divider)
         }
     }
 
@@ -134,16 +137,19 @@ class WeightActivity : AppCompatActivity() {
         val rv = findViewById<RecyclerView>(R.id.rvMonthlyWeight)
         val monthDataList = mutableListOf<MonthData>()
         
-        val calendar = Calendar.getInstance()
+        val today = Calendar.getInstance()
+        val oldestSyncedDay = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
+        }
+        val calendar = oldestSyncedDay.clone() as Calendar
         calendar.set(Calendar.DAY_OF_MONTH, 1)
-        calendar.add(Calendar.MONTH, -5)
 
         val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
         val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
         val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-        for (m in 0 until 6) {
+        while (!calendar.after(today)) {
             val monthName = monthFormatter.format(calendar.time)
             val year = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
@@ -159,13 +165,18 @@ class WeightActivity : AppCompatActivity() {
                 var daysInThisWeek = 0
                 while (daysInThisWeek < 7 && calendar.get(Calendar.MONTH) == currentMonth) {
                     val dateKey = dateFormatter.format(calendar.time)
-                    val w = healthDataManager.getWeight(dateKey)
-                    if (w > 0) {
-                        weekSum += w
-                        count++
+                    if (!calendar.before(oldestSyncedDay) && !calendar.after(today)) {
+                        val w = healthDataManager.getWeight(dateKey)
+                        if (w > 0) {
+                            weekSum += w
+                            count++
+                        }
                     }
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     daysInThisWeek++
+                    if (calendar.after(today)) {
+                        break
+                    }
                 }
                 
                 val avgWeight = if (count > 0) weekSum / count else 0.0
@@ -180,7 +191,9 @@ class WeightActivity : AppCompatActivity() {
                 )))
                 weekIndex++
             }
-            monthDataList.add(MonthData(monthName, year, barItems))
+            if (barItems.isNotEmpty()) {
+                monthDataList.add(MonthData(monthName, year, barItems))
+            }
         }
 
         rv.adapter = MonthGraphAdapter(monthDataList)

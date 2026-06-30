@@ -29,6 +29,10 @@ class DietPlanActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_diet_plan)
+        InsetHelper.applyTopPadding(findViewById(R.id.appBar))
+        InsetHelper.applyBottomPadding(findViewById(R.id.rvMeals))
+        InsetHelper.applyBottomMargin(findViewById(R.id.btnQuickRoutine))
+        InsetHelper.applyBottomMargin(findViewById(R.id.fabAddMeal))
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -139,18 +143,24 @@ class DietPlanActivity : AppCompatActivity() {
 
         var h = meal?.hour ?: 12
         var m = meal?.minute ?: 0
+        fun updateTimeLabel() {
+            val displayHour = if (h == 0 || h == 12) 12 else h % 12
+            val amPm = if (h < 12) "AM" else "PM"
+            tvTime.text = "%02d:%02d %s".format(displayHour, m, amPm)
+        }
+        updateTimeLabel()
         
         meal?.let {
             etName.setText(it.name)
             etDesc.setText(it.description)
             spinner.setSelection(types.indexOf(it.mealType).coerceAtLeast(0))
-            tvTime.text = String.format(Locale.US, "%02d:%02d", h, m)
+            updateTimeLabel()
         }
 
         v.findViewById<Button>(R.id.btnPickMealTime).setOnClickListener {
             android.app.TimePickerDialog(this, { _, sh, sm ->
                 h = sh; m = sm
-                tvTime.text = String.format(Locale.US, "%02d:%02d", h, m)
+                updateTimeLabel()
             }, h, m, false).show()
         }
 
@@ -160,13 +170,15 @@ class DietPlanActivity : AppCompatActivity() {
             .setPositiveButton("Save") { _, _ ->
                 val name = etName.text.toString().trim()
                 val desc = etDesc.text.toString().trim()
+                if (name.isEmpty()) {
+                    Toast.makeText(this, "Meal name is required", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
                 
-                val loading = Toast.makeText(this, "AI Calculating calories...", Toast.LENGTH_SHORT)
+                val loading = Toast.makeText(this, "Calculating calories...", Toast.LENGTH_SHORT)
                 loading.show()
                 
-                lifecycleScope.launch {
-                    val cals = GeminiClient.getCaloriesForMeal("$name $desc")
-                    
+                CalorieSearchEngine.getCalories(this, name, desc) { cals ->
                     val newMeal = (meal ?: Meal()).copy(
                         name = name,
                         description = desc,
@@ -176,6 +188,7 @@ class DietPlanActivity : AppCompatActivity() {
                         calories = cals
                     )
                     planManager.saveMealForDate(dateStr, newMeal)
+                    planManager.syncMealReminder(this@DietPlanActivity, newMeal, dateStr)
                     refreshMeals()
                     loading.cancel()
                 }
@@ -217,12 +230,8 @@ class DietPlanActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val m = items[position]
-            holder.tvEmoji.text = when (m.mealType) {
-                "Breakfast" -> "🍳"
-                "Lunch" -> "🥗"
-                "Dinner" -> "🍲"
-                else -> "🍎"
-            }
+            holder.ivIcon.setImageResource(RoutineIconMapper.iconForMealType(m.mealType))
+            holder.ivIcon.setBackgroundResource(RoutineIconMapper.badgeForMealType(m.mealType))
             holder.tvTitle.text = m.name
             holder.tvSubtitle.text = m.mealType
             holder.tvSubtitle.setBackgroundResource(R.drawable.bg_chip)
@@ -241,8 +250,8 @@ class DietPlanActivity : AppCompatActivity() {
             btnDelete.setOnClickListener { onDelete(m.id) }
 
             val btnEdit = holder.itemView.findViewById<View>(R.id.btnEdit)
-            btnEdit.visibility = View.VISIBLE
-            btnEdit.setOnClickListener { onEdit(m) }
+            btnEdit.visibility = View.GONE
+            btnEdit.setOnClickListener(null)
             
             // Hide switch as it's not used here
             holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
@@ -251,7 +260,7 @@ class DietPlanActivity : AppCompatActivity() {
         override fun getItemCount() = items.size
 
         inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-            val tvEmoji: TextView = v.findViewById(R.id.tvEmoji)
+            val ivIcon: ImageView = v.findViewById(R.id.tvEmoji)
             val tvTitle: TextView = v.findViewById(R.id.tvTitle)
             val tvSubtitle: TextView = v.findViewById(R.id.tvSubtitle)
             val tvTime: TextView = v.findViewById(R.id.tvTime)

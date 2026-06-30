@@ -17,14 +17,14 @@
         android:padding="10dp"
         android:gravity="center_vertical">
 
-        <!-- Emoji badge (shrunken) -->
-        <TextView
+        <ImageView
             android:id="@+id/tvEmoji"
             android:layout_width="38dp"
             android:layout_height="38dp"
-            android:gravity="center"
-            android:textSize="20sp"
-            android:background="@drawable/bg_emoji_badge"/>
+            android:background="@drawable/bg_emoji_badge"
+            android:contentDescription="Meal type"
+            android:padding="10dp"
+            app:srcCompat="@drawable/ic_meal"/>
 
         <!-- Text block -->
         <LinearLayout
@@ -70,9 +70,10 @@
             android:id="@+id/btnEdit"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@android:drawable/ic_menu_edit"
+            android:src="@drawable/ic_edit"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="6dp"
+            android:visibility="gone"
             android:contentDescription="Edit"/>
 
         <!-- Delete -->
@@ -80,7 +81,7 @@
             android:id="@+id/btnDelete"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@android:drawable/ic_menu_delete"
+            android:src="@drawable/ic_delete"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="6dp"
             android:contentDescription="Delete"/>

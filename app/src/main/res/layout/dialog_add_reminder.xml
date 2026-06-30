@@ -360,7 +360,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="10dp"
-                android:src="@android:drawable/ic_menu_agenda"
+                android:src="@drawable/ic_calendar"
                 android:background="@drawable/bg_circle_diet"
                 android:backgroundTint="@color/primary"
                 android:padding="10dp"

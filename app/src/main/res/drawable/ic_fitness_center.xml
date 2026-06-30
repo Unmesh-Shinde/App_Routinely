@@ -4,6 +4,6 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:fillColor="#FF000000"
+      android:fillColor="@color/iconWorkout"
       android:pathData="M7,5h2L9,3L7,3L7,5zM15,5h2L17,3h-2L15,5zM11,19h2v-2h-2L11,19zM19,19h2v-2h-2L19,19zM22,9h-4L18,7h-2L16,9L8,9L8,7L6,7L6,9L2,9L2,15h4L6,17h2L8,15h8L16,17h2L18,15h4L22,9z"/>
 </vector>

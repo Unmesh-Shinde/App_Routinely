@@ -22,6 +22,7 @@ class HealthConnectManager(private val context: Context) {
         HealthPermission.getReadPermission(BasalMetabolicRateRecord::class),
         HealthPermission.getReadPermission(DistanceRecord::class),
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getReadPermission(WeightRecord::class),
         "android.permission.health.READ_HEALTH_DATA_HISTORY",
         "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"
     )
@@ -126,6 +127,22 @@ class HealthConnectManager(private val context: Context) {
             return response.records
         } catch (e: Exception) {
             emptyList<SleepSessionRecord>()
+        }
+    }
+
+    suspend fun readWeightKg(startTime: Instant, endTime: Instant, filterPackage: String? = null): Double {
+        val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
+        return try {
+            val response = healthConnectClient.readRecords(
+                ReadRecordsRequest(
+                    WeightRecord::class,
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    dataOriginFilter = originFilter
+                )
+            )
+            response.records.maxByOrNull { it.time }?.weight?.inKilograms ?: 0.0
+        } catch (e: Exception) {
+            0.0
         }
     }
 }

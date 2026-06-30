@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -89,7 +90,8 @@ class HabitProgressActivity : AppCompatActivity() {
             val r = items[position]
             val isDone = r.id.toString() in doneIds
             
-            holder.tvEmoji.text = if (isDone) "✅" else r.type.emoji
+            holder.ivIcon.setImageResource(if (isDone) R.drawable.ic_check else RoutineIconMapper.iconForReminder(r.type))
+            holder.ivIcon.setBackgroundResource(if (isDone) R.drawable.bg_circle_walking else RoutineIconMapper.badgeForReminder(r.type))
             holder.tvTitle.text = r.title
             holder.tvSubtitle.text = r.type.label
             holder.tvTime.text = r.formatTime()
@@ -104,7 +106,7 @@ class HabitProgressActivity : AppCompatActivity() {
         override fun getItemCount() = items.size
 
         inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-            val tvEmoji: TextView = v.findViewById(R.id.tvEmoji)
+            val ivIcon: ImageView = v.findViewById(R.id.tvEmoji)
             val tvTitle: TextView = v.findViewById(R.id.tvTitle)
             val tvSubtitle: TextView = v.findViewById(R.id.tvSubtitle)
             val tvTime: TextView = v.findViewById(R.id.tvTime)

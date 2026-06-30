@@ -20,10 +20,11 @@ class WellnessWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == ACTION_ADD_WATER) {
+        if (intent.action == ACTION_ADD_WATER || intent.action == ACTION_REMOVE_WATER) {
             val hdm = HealthDataManager(context)
             val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-            hdm.addWaterIntake(today, 0.25)
+            val amount = if (intent.action == ACTION_ADD_WATER) 0.25 else -0.25
+            hdm.adjustWaterIntake(today, amount)
             
             // Refresh all widgets
             val manager = AppWidgetManager.getInstance(context)
@@ -31,12 +32,14 @@ class WellnessWidget : AppWidgetProvider() {
             onUpdate(context, manager, ids)
             
             // Also notify app if running (optional, but good for sync)
-            context.sendBroadcast(Intent("com.dailyroutine.app.DATA_UPDATED"))
+            context.sendBroadcast(Intent(ACTION_DATA_UPDATED).setPackage(context.packageName))
         }
     }
 
     companion object {
         const val ACTION_ADD_WATER = "com.dailyroutine.app.ACTION_ADD_WATER"
+        const val ACTION_REMOVE_WATER = "com.dailyroutine.app.ACTION_REMOVE_WATER"
+        const val ACTION_DATA_UPDATED = "com.dailyroutine.app.DATA_UPDATED"
 
         fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
             val views = RemoteViews(context.packageName, R.layout.widget_wellness)
@@ -46,7 +49,11 @@ class WellnessWidget : AppWidgetProvider() {
             
             // 1. Get Data
             val steps = hdm.getSteps()
-            val water = hdm.getWaterIntake(today)
+            val doneIds = RoutineProgressStore.getDoneIds(context)
+            val waterFromReminders = ReminderManager(context).getAllReminders()
+                .filter { it.isEnabled && it.type == ReminderType.HYDRATION && it.id.toString() in doneIds }
+                .size * 0.25
+            val water = hdm.getWaterIntake(today) + waterFromReminders
             val calories = hdm.getCalories()
             val stepsInt = steps.replace(",", "").toIntOrNull() ?: 0
             val distance = hdm.calculateDistanceKm(stepsInt)
@@ -57,7 +64,7 @@ class WellnessWidget : AppWidgetProvider() {
             views.setTextViewText(R.id.tvWidgetCalories, calories)
             views.setTextViewText(R.id.tvWidgetWater, "%.1fL".format(water))
 
-            // 4. Click Intent for Water
+            // 4. Click Intents for Water
             val waterIntent = Intent(context, WellnessWidget::class.java).apply {
                 action = ACTION_ADD_WATER
             }
@@ -66,6 +73,15 @@ class WellnessWidget : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             views.setOnClickPendingIntent(R.id.btnWidgetAddWater, waterPendingIntent)
+
+            val removeWaterIntent = Intent(context, WellnessWidget::class.java).apply {
+                action = ACTION_REMOVE_WATER
+            }
+            val removeWaterPendingIntent = PendingIntent.getBroadcast(
+                context, 1, removeWaterIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setOnClickPendingIntent(R.id.btnWidgetRemoveWater, removeWaterPendingIntent)
 
             // 5. Click Intent to open App
             val openIntent = Intent(context, MainActivity::class.java)

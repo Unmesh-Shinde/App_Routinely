@@ -38,7 +38,7 @@ object WellnessReportManager {
         val colWidth = 75f
 
         // 1. Title
-        canvas.drawText("Steps, Sleep and Calorie Data - Daily Routine App", margin, y, titlePaint)
+        canvas.drawText("Steps, Sleep and Calorie Data - Routinely", margin, y, titlePaint)
         y += 30f
         val userName = UserPreferencesStore.getUserName(context)
         canvas.drawText("User: $userName", margin, y, textPaint)

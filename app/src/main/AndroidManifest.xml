@@ -151,7 +151,7 @@
         <receiver
             android:name=".WellnessWidget"
             android:exported="true"
-            android:label="Daily Wellness Widget">
+            android:label="@string/widget_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.dailyroutine.app.ACTION_ADD_WATER" />

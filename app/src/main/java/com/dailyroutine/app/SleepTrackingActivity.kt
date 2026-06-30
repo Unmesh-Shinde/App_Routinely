@@ -20,6 +20,8 @@ class SleepTrackingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sleep_tracking)
+        InsetHelper.applyTopPadding(findViewById(R.id.appBar))
+        InsetHelper.applyBottomPadding(findViewById(R.id.sleepContentContainer))
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -112,45 +114,42 @@ class SleepTrackingActivity : AppCompatActivity() {
         val container = findViewById<LinearLayout>(R.id.llWeeklySleepGraph)
         container.removeAllViews()
         
-        val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         val calendar = Calendar.getInstance()
-        calendar.firstDayOfWeek = Calendar.MONDAY
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
         calendar.set(Calendar.HOUR_OF_DAY, 0)
         calendar.set(Calendar.MINUTE, 0)
-        
-        calendar.add(Calendar.WEEK_OF_YEAR, -3) // Show last 4 weeks
+        calendar.add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
 
+        val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-        for (w in 0 until 4) {
-            for (i in 0 until 7) {
-                val dateKey = dateFormatter.format(calendar.time)
-                val sleepHours = healthDataManager.getHistoricalSleep(dateKey)
+        for (dayIndex in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
+            val dateKey = dateFormatter.format(calendar.time)
+            val sleepHours = healthDataManager.getHistoricalSleep(dateKey)
 
-                val barView = android.view.LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-                barView.findViewById<TextView>(R.id.tvBarLabel).text = days[i]
-                barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarValue).text = if (sleepHours > 0) "%.1fh".format(sleepHours) else "-"
-                
-                val bar = barView.findViewById<View>(R.id.viewBar)
-                bar.setBackgroundColor(0xFF5C6BC0.toInt())
-                val params = bar.layoutParams as LinearLayout.LayoutParams
-                params.height = (sleepHours * 250 / 12.0).toInt().let { dpToPx(it) }.coerceAtLeast(2)
-                bar.layoutParams = params
-                
-                container.addView(barView)
-                calendar.add(Calendar.DAY_OF_YEAR, 1)
-            }
-            
-            val divider = View(this).apply { 
-                layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
-                    setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+            val barView = android.view.LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
+            barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
+            barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
+            barView.findViewById<TextView>(R.id.tvBarValue).text = if (sleepHours > 0) "%.1fh".format(sleepHours) else "-"
+
+            val bar = barView.findViewById<View>(R.id.viewBar)
+            bar.setBackgroundColor(0xFF5C6BC0.toInt())
+            val params = bar.layoutParams as LinearLayout.LayoutParams
+            params.height = (sleepHours * 250 / 12.0).toInt().let { dpToPx(it) }.coerceAtLeast(2)
+            bar.layoutParams = params
+
+            container.addView(barView)
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+
+            if ((dayIndex + 1) % 7 == 0 && dayIndex != HealthDataManager.SYNC_HISTORY_DAYS - 1) {
+                val divider = View(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
+                        setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+                    }
+                    setBackgroundColor(0xFF303F9F.toInt())
                 }
-                setBackgroundColor(0xFF303F9F.toInt()) 
+                container.addView(divider)
             }
-            container.addView(divider)
         }
     }
 
@@ -158,9 +157,12 @@ class SleepTrackingActivity : AppCompatActivity() {
         val rv = findViewById<RecyclerView>(R.id.rvMonthlySleep)
         val monthDataList = mutableListOf<MonthData>()
         
-        val calendar = Calendar.getInstance()
+        val today = Calendar.getInstance()
+        val oldestSyncedDay = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
+        }
+        val calendar = oldestSyncedDay.clone() as Calendar
         calendar.firstDayOfWeek = Calendar.MONDAY
-        calendar.add(Calendar.MONTH, -5)
         calendar.set(Calendar.DAY_OF_MONTH, 1)
 
         val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
@@ -169,7 +171,7 @@ class SleepTrackingActivity : AppCompatActivity() {
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         val deficitWeeks = mutableListOf<String>()
 
-        for (m in 0 until 6) {
+        while (!calendar.after(today)) {
             val monthName = monthFormatter.format(calendar.time)
             val year = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
@@ -184,15 +186,18 @@ class SleepTrackingActivity : AppCompatActivity() {
                 var isWeekOver = false
                 while (!isWeekOver) {
                     val dateKey = dateFormatter.format(calendar.time)
-                    weekSum += healthDataManager.getHistoricalSleep(dateKey)
+                    if (!calendar.before(oldestSyncedDay) && !calendar.after(today)) {
+                        weekSum += healthDataManager.getHistoricalSleep(dateKey)
+                    }
                     
                     val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
                     val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
                     
                     calendar.add(Calendar.DAY_OF_YEAR, 1)
                     val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
+                    val isAfterToday = calendar.after(today)
                     
-                    if (isSunday || isNewMonth) {
+                    if (isSunday || isNewMonth || isAfterToday) {
                         isWeekOver = true
                     }
                 }
@@ -214,7 +219,9 @@ class SleepTrackingActivity : AppCompatActivity() {
                 )))
                 weekIndex++
             }
-            monthDataList.add(MonthData(monthName, year, barItems))
+            if (barItems.isNotEmpty()) {
+                monthDataList.add(MonthData(monthName, year, barItems))
+            }
         }
 
         rv.adapter = MonthGraphAdapter(monthDataList)

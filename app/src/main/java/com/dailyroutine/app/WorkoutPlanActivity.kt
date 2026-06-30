@@ -28,6 +28,9 @@ class WorkoutPlanActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout_plan)
+        InsetHelper.applyTopPadding(findViewById(R.id.appBar))
+        InsetHelper.applyBottomPadding(findViewById(R.id.rvExercises))
+        InsetHelper.applyBottomMargin(findViewById(R.id.fabAddExercise))
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -170,9 +173,25 @@ class WorkoutPlanActivity : AppCompatActivity() {
             val dateStr = dateFormatter.format(selectedCalendar.time)
             planManager.saveExerciseForDate(dateStr, newEx)
             planManager.syncExerciseReminder(this@WorkoutPlanActivity, newEx, dateStr)
+            WorkoutMetSearchEngine.enrichIfNeeded(this@WorkoutPlanActivity, newEx) { enriched ->
+                val current = planManager.getExercisesForDate(dateStr).firstOrNull { it.id == newEx.id }
+                if (current != null && hasSameWorkoutInputs(current, newEx)) {
+                    planManager.saveExerciseForDate(dateStr, enriched)
+                    planManager.syncExerciseReminder(this@WorkoutPlanActivity, enriched, dateStr)
+                    refreshExercises()
+                }
+            }
             refreshExercises()
             dialog.dismiss()
         }
+    }
+
+    private fun hasSameWorkoutInputs(current: Exercise, saved: Exercise): Boolean {
+        return current.name == saved.name &&
+            current.sets == saved.sets &&
+            current.reps == saved.reps &&
+            current.targetArea == saved.targetArea &&
+            current.intensity == saved.intensity
     }
 
     private fun editExercise(ex: Exercise) {
@@ -188,33 +207,33 @@ class WorkoutPlanActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_reminder, parent, false)
+            val v = LayoutInflater.from(parent.context).inflate(R.layout.item_exercise, parent, false)
             return VH(v)
         }
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val ex = items[position]
-            val isDone = RoutineProgressStore.getDoneIds(this@WorkoutPlanActivity).contains(ex.id.toString())
+            val dateStr = dateFormatter.format(selectedCalendar.time)
+            val isDone = RoutineProgressStore.getDoneIds(this@WorkoutPlanActivity, dateStr).contains(ex.id.toString())
 
-            holder.tvEmoji.text = "💪"
+            holder.ivIcon.setImageResource(if (isDone) R.drawable.ic_check else R.drawable.ic_workout)
+            holder.ivIcon.setBackgroundResource(if (isDone) R.drawable.bg_circle_walking else R.drawable.bg_circle_workout)
             holder.tvTitle.text = ex.name
             holder.tvSubtitle.text = "${ex.sets}x${ex.reps} • ${ex.targetArea} (${ex.intensity}%)"
             holder.tvTime.text = ex.formatTime()
 
             holder.itemView.setOnClickListener { onEdit(ex) }
-            holder.itemView.findViewById<View>(R.id.btnEdit).setOnClickListener { onEdit(ex) }
             
             val switch = holder.itemView.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.switchEnabled)
             switch.visibility = View.VISIBLE
             switch.setOnCheckedChangeListener(null)
             switch.isChecked = isDone
             switch.setOnCheckedChangeListener { _, checked ->
-                RoutineProgressStore.setDoneStatus(this@WorkoutPlanActivity, ex.id, checked)
+                RoutineProgressStore.setDoneStatus(this@WorkoutPlanActivity, dateStr, ex.id, checked)
                 refreshExercises()
             }
 
             holder.itemView.findViewById<View>(R.id.btnDelete).setOnClickListener {
-                val dateStr = dateFormatter.format(selectedCalendar.time)
                 planManager.deleteExerciseForDate(dateStr, ex)
                 refreshExercises()
             }
@@ -223,7 +242,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
         override fun getItemCount() = items.size
 
         inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-            val tvEmoji: TextView = v.findViewById(R.id.tvEmoji)
+            val ivIcon: ImageView = v.findViewById(R.id.tvEmoji)
             val tvTitle: TextView = v.findViewById(R.id.tvTitle)
             val tvSubtitle: TextView = v.findViewById(R.id.tvSubtitle)
             val tvTime: TextView = v.findViewById(R.id.tvTime)

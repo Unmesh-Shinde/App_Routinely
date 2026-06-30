@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -36,7 +37,7 @@ class ReminderAdapter(
     override fun getItemCount() = items.size
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
-        private val tvEmoji: TextView = view.findViewById(R.id.tvEmoji)
+        private val ivIcon: ImageView = view.findViewById(R.id.tvEmoji)
         private val tvTitle: TextView = view.findViewById(R.id.tvTitle)
         private val tvSubtitle: TextView = view.findViewById(R.id.tvSubtitle)
         private val tvTime: TextView = view.findViewById(R.id.tvTime)
@@ -45,7 +46,8 @@ class ReminderAdapter(
         private val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
 
         fun bind(r: Reminder) {
-            tvEmoji.text = r.type.emoji
+            ivIcon.setImageResource(RoutineIconMapper.iconForReminder(r.type))
+            ivIcon.setBackgroundResource(RoutineIconMapper.badgeForReminder(r.type))
             tvTitle.text = r.title
             
             val sub = r.type.label
@@ -64,7 +66,8 @@ class ReminderAdapter(
             switchEnabled.isChecked = r.isEnabled
             switchEnabled.setOnCheckedChangeListener { _, _ -> listener.onToggle(r) }
 
-            btnEdit.setOnClickListener { listener.onEdit(r) }
+            btnEdit.visibility = View.GONE
+            btnEdit.setOnClickListener(null)
             btnDelete.setOnClickListener { listener.onDelete(r) }
             itemView.setOnClickListener { listener.onEdit(r) }
         }

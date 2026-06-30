@@ -5,7 +5,7 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="@android:color/white"
+        android:fillColor="@color/iconReminder"
         android:pathData="M12,22c1.1,0 2,-0.9 2,-2h-4c0,1.1 0.9,2 2,2z
                          M18,16v-5c0,-3.07 -1.64,-5.64 -4.5,-6.32
                          V4c0,-0.83 -0.67,-1.5 -1.5,-1.5

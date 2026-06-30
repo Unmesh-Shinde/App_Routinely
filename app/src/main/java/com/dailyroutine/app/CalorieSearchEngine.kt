@@ -11,9 +11,8 @@ object CalorieSearchEngine {
     private val scope = CoroutineScope(Dispatchers.Main)
 
     /**
-     * Entry point for meal calories. 
-     * Uses AI Cache -> Live AI (Gemini).
-     * STRICTLY Live AI based as requested. No local fallbacks.
+     * Entry point for meal calories.
+     * Uses cache -> Gemini -> local Indian DB -> generic estimate.
      */
     fun getCalories(context: Context, text: String, onResult: (Int) -> Unit) {
         val normalized = text.lowercase().trim()
@@ -22,19 +21,54 @@ object CalorieSearchEngine {
             return
         }
 
-        // 1. Check Local Cache (Already learned from AI)
+        getCaloriesForCacheKey(
+            context = context,
+            cacheKey = "v1|$normalized",
+            onResult = onResult
+        ) {
+            GeminiClient.getCaloriesForMeal(normalized, context.applicationContext)
+        }
+    }
+
+    fun getCalories(context: Context, title: String, description: String, onResult: (Int) -> Unit) {
+        val normalizedTitle = title.lowercase().trim()
+        val normalizedDescription = description.lowercase().trim()
+        if (normalizedTitle.isEmpty() && normalizedDescription.isEmpty()) {
+            onResult(0)
+            return
+        }
+
+        getCaloriesForCacheKey(
+            context = context,
+            cacheKey = "v2|title=$normalizedTitle|desc=$normalizedDescription",
+            onResult = onResult
+        ) {
+            GeminiClient.getCaloriesForMeal(
+                title = normalizedTitle,
+                description = normalizedDescription,
+                context = context.applicationContext
+            )
+        }
+    }
+
+    private fun getCaloriesForCacheKey(
+        context: Context,
+        cacheKey: String,
+        onResult: (Int) -> Unit,
+        calculate: suspend () -> Int
+    ) {
         val cache = context.getSharedPreferences(PREFS_CACHE, Context.MODE_PRIVATE)
-        val cachedValue = cache.getInt(normalized, -1)
+        val cachedValue = cache.getInt(cacheKey, -1)
         if (cachedValue != -1) {
             onResult(cachedValue)
             return
         }
 
-        // 2. Live AI Web Sync (Gemini)
+        // Gemini is primary. Local Indian DB is used only if Gemini fails.
         scope.launch {
-            val calories = GeminiClient.getCaloriesForMeal(normalized)
+            val calories = calculate()
             if (calories > 0) {
-                cache.edit().putInt(normalized, calories).apply()
+                cache.edit().putInt(cacheKey, calories).apply()
             }
             onResult(calories)
         }

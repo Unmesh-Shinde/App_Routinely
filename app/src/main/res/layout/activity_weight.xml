@@ -6,10 +6,10 @@
     android:background="@color/bgPage">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/healthWeight"
-        android:paddingTop="64dp">
+        android:background="@color/healthWeight">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -38,7 +38,7 @@
         android:id="@+id/weightContentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingBottom="80dp"
+        android:paddingBottom="24dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <!-- Today View -->
@@ -51,7 +51,7 @@
             android:padding="32dp"
             android:visibility="visible">
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⚖️" android:textSize="64sp"/>
+            <ImageView android:layout_width="72dp" android:layout_height="72dp" android:contentDescription="Weight" android:padding="10dp" app:srcCompat="@drawable/ic_weight" app:tint="@color/healthWeight"/>
             <TextView android:id="@+id/tvCurrentWeight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0.0 kg" android:textSize="32sp" android:textStyle="bold" android:textColor="@color/textPrimary" android:layout_marginTop="16dp"/>
 
             <com.google.android.material.button.MaterialButton

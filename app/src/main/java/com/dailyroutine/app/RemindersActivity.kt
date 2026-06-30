@@ -51,6 +51,7 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reminders)
+        InsetHelper.applyTopPadding(findViewById(R.id.appBar))
 
         setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -66,6 +67,9 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
         progressText = findViewById(R.id.tvProgress)
 
         rv.adapter = adapter
+        InsetHelper.applyBottomPadding(rv)
+        InsetHelper.applyBottomPadding(emptyGroup)
+        InsetHelper.applyBottomMargin(fab)
 
         fab.setOnClickListener { showDialog(null) }
 
@@ -109,16 +113,16 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
 
     private fun updateBanner(list: List<Reminder>) {
         if (list.isEmpty()) {
-            banner.text = "Keep your routine on track 💪"
+            banner.text = "Keep your routine on track"
             progressText.text = "No reminders set"
             return
         }
         val doneCount = RoutineProgressStore.getDoneCount(this)
         val total = list.size
         banner.text = when {
-            doneCount == 0 -> "Let's get started! 🚀"
-            doneCount < total -> "Great job! Keep going! ✨"
-            else -> "Perfect day! All done! 🎉"
+            doneCount == 0 -> "Let's get started!"
+            doneCount < total -> "Great job! Keep going!"
+            else -> "Perfect day! All done!"
         }
         progressText.text = "Today's progress: $doneCount/$total completed"
     }

@@ -1,21 +1,25 @@
 package com.dailyroutine.app
 
 import android.Manifest
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
@@ -38,6 +42,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var healthDataManager: HealthDataManager
     private lateinit var healthConnectManager: HealthConnectManager
     private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Set<String>>
+    private val dataUpdatedReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            updateDashboard()
+        }
+    }
     
     private val systemToneLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -67,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContentView(R.layout.activity_main)
+        applyHomeInsets()
 
         mgr = ReminderManager(this)
         planManager = PlanManager(this)
@@ -118,7 +128,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<View>(R.id.cardWater).setOnClickListener {
-            showWaterQuickAdd()
+            showWaterAdjustDialog()
+        }
+
+        findViewById<View>(R.id.btnWaterMinus).setOnClickListener {
+            adjustWaterToday(-0.25, "Removed 250 ml")
+        }
+
+        findViewById<View>(R.id.btnWaterPlus).setOnClickListener {
+            adjustWaterToday(0.25, "Added 250 ml")
         }
 
         findViewById<MaterialButton>(R.id.btnHealthSync).setOnClickListener {
@@ -171,6 +189,27 @@ class MainActivity : AppCompatActivity() {
             prefs.edit().putBoolean("is_first_run", false).apply()
             updateDashboard()
         }
+    }
+
+    private fun applyHomeInsets() {
+        val scroll = findViewById<View>(R.id.homeScroll)
+        val baseLeft = scroll.paddingLeft
+        val baseTop = scroll.paddingTop
+        val baseRight = scroll.paddingRight
+        val baseBottom = scroll.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(scroll) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+            view.setPadding(
+                baseLeft + maxOf(systemBars.left, cutout.left),
+                baseTop,
+                baseRight + maxOf(systemBars.right, cutout.right),
+                baseBottom + systemBars.bottom
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(scroll)
     }
 
     private fun startHealthAppScanning() {
@@ -242,6 +281,7 @@ class MainActivity : AppCompatActivity() {
             var moveMinsToday = 0
             var sleepToday = ""
             var caloriesToday = ""
+            var weightToday = 0.0
 
             if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
                 stepsToday = healthConnectManager.readSteps(startOfToday, now, appPkg)
@@ -268,10 +308,16 @@ class MainActivity : AppCompatActivity() {
                 caloriesToday = "%.0f".format(burnedCals)
                 editor.putString("calories_burnt", caloriesToday)
             }
+            if (granted.contains(HealthPermission.getReadPermission(WeightRecord::class))) {
+                weightToday = healthConnectManager.readWeightKg(startOfToday, now, appPkg)
+                if (weightToday > 0) {
+                    editor.putString("current_weight", "%.1f kg".format(weightToday))
+                }
+            }
 
-            for (i in 1..60) {
+            for (i in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
                 val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-                val dayEnd = java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+                val dayEnd = if (i == 0) now else java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
                 val dateStr = java.time.LocalDate.now().minusDays(i.toLong()).toString()
 
                 if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
@@ -289,6 +335,12 @@ class MainActivity : AppCompatActivity() {
                     val distKm = healthConnectManager.readDistanceMeters(dayStart, dayEnd, appPkg) / 1000.0
                     prefs.edit().putString("hist_dist_$dateStr", "%.2f km".format(distKm)).apply()
                 }
+                if (granted.contains(HealthPermission.getReadPermission(WeightRecord::class))) {
+                    val weightKg = healthConnectManager.readWeightKg(dayStart, dayEnd, appPkg)
+                    if (weightKg > 0) {
+                        healthDataManager.saveWeight(dateStr, weightKg)
+                    }
+                }
             }
 
             val timestamp = java.text.SimpleDateFormat("hh:mm a, dd MMM", java.util.Locale.US).format(java.util.Date())
@@ -301,6 +353,7 @@ class MainActivity : AppCompatActivity() {
             if (stepsToday > 0) summary.append("\nSteps Today: %,d".format(stepsToday))
             if (moveMinsToday > 0) summary.append("\nMove: $moveMinsToday min")
             if (caloriesToday.isNotEmpty() && caloriesToday != "0") summary.append("\nBurned Today: $caloriesToday kcal")
+            if (weightToday > 0) summary.append("\nWeight: %.1f kg".format(weightToday))
             
             Toast.makeText(this@MainActivity, summary.toString(), Toast.LENGTH_LONG).show()
         }
@@ -308,12 +361,18 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        ContextCompat.registerReceiver(
+            this,
+            dataUpdatedReceiver,
+            IntentFilter(WellnessWidget.ACTION_DATA_UPDATED),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         // 🔴 Day-Rollover Protection: Check if we need to finalize "Yesterday"
         val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
         val todayStr = java.time.LocalDate.now().toString()
         val lastFinalized = prefs.getString("last_finalized_day", "")
         
-        if (lastFinalized != "" && lastFinalized != todayStr) {
+        if (lastFinalized != todayStr) {
             // New day detected! Finalize yesterday's data before starting today
             fetchHealthData() // This will backfill yesterday correctly
             prefs.edit().putString("last_finalized_day", todayStr).apply()
@@ -321,6 +380,11 @@ class MainActivity : AppCompatActivity() {
 
         updateDashboard()
         updateStreak()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        runCatching { unregisterReceiver(dataUpdatedReceiver) }
     }
 
     private fun updateGreeting() {
@@ -359,7 +423,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val streak = UserPreferencesStore.getStreakCount(this)
-        findViewById<TextView>(R.id.tvStreak).text = "🔥 $streak Days"
+        findViewById<TextView>(R.id.tvStreak).text = "$streak Days"
     }
 
     private fun showWaterQuickAdd() {
@@ -378,6 +442,35 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Added $amount L! 💧", Toast.LENGTH_SHORT).show()
             }
             .show()
+    }
+
+    private fun showWaterAdjustDialog() {
+        val options = arrayOf("+250 ml", "+500 ml", "+1 Liter", "-250 ml", "-500 ml")
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Adjust Water Intake")
+            .setItems(options) { _, which ->
+                val amount = when (which) {
+                    0 -> 0.25
+                    1 -> 0.5
+                    2 -> 1.0
+                    3 -> -0.25
+                    else -> -0.5
+                }
+                val message = if (amount > 0) {
+                    "Added %.0f ml".format(amount * 1000)
+                } else {
+                    "Removed %.0f ml".format(kotlin.math.abs(amount) * 1000)
+                }
+                adjustWaterToday(amount, message)
+            }
+            .show()
+    }
+
+    private fun adjustWaterToday(amount: Double, message: String) {
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+        val updated = healthDataManager.adjustWaterIntake(today, amount)
+        updateDashboard()
+        Toast.makeText(this, "$message - %.1f L today".format(updated), Toast.LENGTH_SHORT).show()
     }
 
     private fun updateDashboard() {
@@ -440,7 +533,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvValWater).text = "%.1f Liters".format(waterValManual + waterFromReminders)
 
         findViewById<TextView>(R.id.tvLastSync).text = "Last Auto-Sync: ${healthDataManager.getLastSyncTime()}"
-        updateWellnessIntelligence()
+        WellnessEngine.checkMilestones(this)
 
         val score = WellnessScoreManager.calculateDailyScore(this, stepsCount, sleepHours, doneHabits, totalHabits)
         findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(R.id.progressWellness).progress = score
@@ -463,50 +556,12 @@ class MainActivity : AppCompatActivity() {
         if (upcoming != null) {
             findViewById<View>(R.id.cardUpcoming).visibility = View.VISIBLE
             val timePrefix = if ((upcoming.hour * 60 + upcoming.minute) <= currentMinutes) "Tomorrow at " else ""
-            findViewById<TextView>(R.id.tvUpcomingText).text = "${upcoming.type.emoji} ${upcoming.title.replace("Meal: ", "").replace("Exercise: ", "")} - $timePrefix${upcoming.formatTime()}"
+            findViewById<TextView>(R.id.tvUpcomingText).text = "${upcoming.title.replace("Meal: ", "").replace("Exercise: ", "")} - $timePrefix${upcoming.formatTime()}"
         } else {
             findViewById<View>(R.id.cardUpcoming).visibility = View.GONE
         }
         
         WellnessWidget.refresh(this)
-    }
-
-    private fun updateWellnessIntelligence() {
-        WellnessEngine.checkMilestones(this)
-        val insight = WellnessEngine.getTrendInsight(this)
-        findViewById<TextView>(R.id.tvTrendInsight).text = insight
-        
-        val container = findViewById<LinearLayout>(R.id.llTrophyStrip)
-        container.removeAllViews()
-        
-        val unlockedIds = UserPreferencesStore.getUnlockedBadges(this)
-        val achieved = WellnessEngine.milestones.filter { it.id in unlockedIds }
-        
-        if (achieved.isEmpty()) {
-            val emptyMsg = TextView(this).apply {
-                text = "Keep going to earn your first trophy! 🏃‍♂️"
-                textSize = 12f
-                setPadding(24, 0, 24, 0)
-                setTextColor(androidx.core.content.ContextCompat.getColor(this@MainActivity, R.color.textSecondary))
-            }
-            container.addView(emptyMsg)
-        } else {
-            achieved.forEach { trophy ->
-                val tv = TextView(this).apply {
-                    text = "${trophy.emoji} ${trophy.title}"
-                    textSize = 13f
-                    setTypeface(null, android.graphics.Typeface.BOLD)
-                    setPadding(24, 12, 24, 12)
-                    setBackgroundResource(R.drawable.bg_chip)
-                    backgroundTintList = android.content.res.ColorStateList.valueOf(androidx.core.content.ContextCompat.getColor(this@MainActivity, R.color.primaryLight))
-                    setTextColor(androidx.core.content.ContextCompat.getColor(this@MainActivity, R.color.primary))
-                    val lp = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                    lp.setMargins(0, 0, 16, 0)
-                    layoutParams = lp
-                }
-                container.addView(tv)
-            }
-        }
     }
 
     private fun showToneSourcePicker(currentUri: String?) {

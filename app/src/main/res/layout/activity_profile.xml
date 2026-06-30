@@ -125,7 +125,7 @@
                 android:textStyle="bold"
                 app:cornerRadius="16dp"
                 app:strokeColor="@color/primary"
-                app:icon="@android:drawable/ic_menu_save"
+                app:icon="@drawable/ic_save"
                 app:iconTint="@color/primary"/>
 
             <com.google.android.material.button.MaterialButton

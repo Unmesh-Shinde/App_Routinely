@@ -88,7 +88,7 @@ class ReminderReceiver : BroadcastReceiver() {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("${reminder.type.emoji} ${reminder.title}")
+            .setContentTitle(reminder.title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setAutoCancel(true)
@@ -97,8 +97,8 @@ class ReminderReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setContentIntent(openIntent)
-            .addAction(android.R.drawable.checkbox_on_background, "Done", doneIntent)
-            .addAction(android.R.drawable.ic_menu_recent_history, "Snooze 10m", snoozeIntent)
+            .addAction(R.drawable.ic_check, "Done", doneIntent)
+            .addAction(R.drawable.ic_snooze, "Snooze 10m", snoozeIntent)
             .build()
 
         nm.notify(reminder.id, notification)
@@ -110,10 +110,10 @@ class ReminderReceiver : BroadcastReceiver() {
 
             NotificationChannel(
                 CHANNEL_ID,
-                "Daily Routine Reminders",
+                "Routinely Reminders",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Notifications for your daily routine reminders"
+                description = "Notifications for your Routinely reminders"
                 setSound(null, null) // Allow builder to specify sound
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 200, 100, 200)

@@ -11,8 +11,12 @@ object RoutineProgressStore {
     private const val PREFIX = "done_"
 
     fun setDoneStatus(context: Context, id: Int, isDone: Boolean) {
+        setDoneStatus(context, todayStamp(), id, isDone)
+    }
+
+    fun setDoneStatus(context: Context, date: String, id: Int, isDone: Boolean) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val key = todayKey()
+        val key = keyForDate(date)
         val current = prefs.getStringSet(key, emptySet())?.toMutableSet() ?: mutableSetOf()
         if (isDone) current.add(id.toString()) else current.remove(id.toString())
         prefs.edit().putStringSet(key, current).apply()
@@ -28,8 +32,12 @@ object RoutineProgressStore {
     }
 
     fun getDoneIds(context: Context): Set<String> {
+        return getDoneIds(context, todayStamp())
+    }
+
+    fun getDoneIds(context: Context, date: String): Set<String> {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        return prefs.getStringSet(todayKey(), emptySet()) ?: emptySet()
+        return prefs.getStringSet(keyForDate(date), emptySet()) ?: emptySet()
     }
 
     fun clearToday(context: Context) {
@@ -40,7 +48,14 @@ object RoutineProgressStore {
     }
 
     private fun todayKey(): String {
-        val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
-        return PREFIX + stamp
+        return keyForDate(todayStamp())
+    }
+
+    private fun todayStamp(): String {
+        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+    }
+
+    private fun keyForDate(date: String): String {
+        return PREFIX + date
     }
 }

@@ -6,10 +6,10 @@
     android:background="@color/bgPage">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/healthWalking"
-        android:paddingTop="64dp">
+        android:background="@color/healthWalking">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -35,10 +35,11 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
+        android:id="@+id/contentRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingBottom="80dp"
+        android:paddingBottom="24dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <!-- Goal Header -->
@@ -54,7 +55,7 @@
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏆" android:textSize="24sp"/>
+                <ImageView android:layout_width="32dp" android:layout_height="32dp" android:contentDescription="Step goal" android:padding="4dp" app:srcCompat="@drawable/ic_trophy" app:tint="@color/healthWalking"/>
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="16dp" android:orientation="vertical">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Daily Step Goal" android:textSize="12sp" android:textStyle="bold" android:textColor="@color/textSecondary" android:textAllCaps="true"/>
                     <TextView android:id="@+id/tvStepGoal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="10,000 steps" android:textSize="18sp" android:textStyle="bold" android:textColor="@color/healthWalking"/>
@@ -168,7 +169,7 @@
                     android:id="@+id/rvMonthlySteps"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingBottom="80dp"
+                    android:paddingBottom="24dp"
                     android:clipToPadding="false"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:orientation="horizontal"/>

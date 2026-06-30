@@ -28,4 +28,38 @@
 
     <!-- Status bar / nav -->
     <color name="statusBar">#0B0E19</color>
+
+    <!-- Vivid icon colors -->
+    <color name="iconNutrition">#35E58C</color>
+    <color name="iconBreakfast">#FFB300</color>
+    <color name="iconLunch">#69F0AE</color>
+    <color name="iconDinner">#CE93D8</color>
+    <color name="iconSnack">#FF6FAE</color>
+    <color name="iconWorkout">#FFAB40</color>
+    <color name="iconHydration">#40C4FF</color>
+    <color name="iconSleep">#B388FF</color>
+    <color name="iconWalking">#1DE9B6</color>
+    <color name="iconWeight">#B0BEC5</color>
+    <color name="iconCalories">#FF4081</color>
+    <color name="iconReminder">#9FA8FF</color>
+    <color name="iconMeditation">#64FFDA</color>
+    <color name="iconTask">#82B1FF</color>
+    <color name="iconHome">#FFCC80</color>
+    <color name="iconCalendar">#EA80FC</color>
+    <color name="iconSuccess">#69F0AE</color>
+    <color name="iconDelete">#FF6E6E</color>
+
+    <!-- Icon badge backgrounds -->
+    <color name="badgeGeneric">#253057</color>
+    <color name="badgeNutrition">#143D2B</color>
+    <color name="badgeBreakfast">#4B3510</color>
+    <color name="badgeDinner">#3A2454</color>
+    <color name="badgeWorkout">#4A2D12</color>
+    <color name="badgeHydration">#123C55</color>
+    <color name="badgeSleep">#302557</color>
+    <color name="badgeWalking">#123F37</color>
+    <color name="badgeWeight">#26333B</color>
+    <color name="badgeCalories">#4A1D32</color>
+    <color name="badgeSnack">#4D1F35</color>
+    <color name="badgeReminder">#252B5E</color>
 </resources>

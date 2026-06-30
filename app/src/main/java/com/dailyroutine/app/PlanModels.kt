@@ -49,7 +49,9 @@ data class Exercise(
     val minute: Int = 0,
     val isReminderEnabled: Boolean = true,
     val targetArea: String = "Full Body",
-    val intensity: Int = 50 // 0..100
+    val intensity: Int = 50, // 0..100
+    val estimatedMet: Double = 0.0,
+    val metSource: String = "local"
 ) : Serializable {
     fun formatTime(): String {
         val h = if (hour == 0 || hour == 12) 12 else hour % 12

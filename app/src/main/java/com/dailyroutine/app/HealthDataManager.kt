@@ -7,6 +7,8 @@ class HealthDataManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("health_data_pref", Context.MODE_PRIVATE)
 
     companion object {
+        const val SYNC_HISTORY_DAYS = 180
+
         private const val KEY_IS_CONNECTED = "is_fitness_connected"
         private const val KEY_STEPS = "steps_count"
         private const val KEY_SLEEP = "sleep_hours"
@@ -59,8 +61,13 @@ class HealthDataManager(context: Context) {
 
     fun getWaterIntake(date: String): Double = prefs.getFloat(KEY_WATER_PREFIX + date, 0.0f).toDouble()
     fun addWaterIntake(date: String, amount: Double) {
-        val current = getWaterIntake(date)
-        prefs.edit().putFloat(KEY_WATER_PREFIX + date, (current + amount).toFloat()).apply()
+        adjustWaterIntake(date, amount)
+    }
+
+    fun adjustWaterIntake(date: String, amount: Double): Double {
+        val updated = (getWaterIntake(date) + amount).coerceAtLeast(0.0)
+        prefs.edit().putFloat(KEY_WATER_PREFIX + date, updated.toFloat()).apply()
+        return updated
     }
 
     fun getWeight(date: String): Double {

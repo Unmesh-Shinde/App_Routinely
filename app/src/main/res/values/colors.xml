@@ -37,4 +37,38 @@
     <color name="chipSleep">#9575CD</color>
     <color name="chipMeditation">#80CBC4</color>
     <color name="chipCustom">#BDBDBD</color>
+
+    <!-- Vivid icon colors -->
+    <color name="iconNutrition">#00A86B</color>
+    <color name="iconBreakfast">#F57C00</color>
+    <color name="iconLunch">#2E7D32</color>
+    <color name="iconDinner">#8E24AA</color>
+    <color name="iconSnack">#EC407A</color>
+    <color name="iconWorkout">#FF6D00</color>
+    <color name="iconHydration">#0091EA</color>
+    <color name="iconSleep">#5E35B1</color>
+    <color name="iconWalking">#00A896</color>
+    <color name="iconWeight">#455A64</color>
+    <color name="iconCalories">#D81B60</color>
+    <color name="iconReminder">#5B5FEF</color>
+    <color name="iconMeditation">#00897B</color>
+    <color name="iconTask">#3949AB</color>
+    <color name="iconHome">#EF6C00</color>
+    <color name="iconCalendar">#7B1FA2</color>
+    <color name="iconSuccess">#00C853</color>
+    <color name="iconDelete">#E53935</color>
+
+    <!-- Icon badge backgrounds -->
+    <color name="badgeGeneric">#EAF2FF</color>
+    <color name="badgeNutrition">#D9FBE8</color>
+    <color name="badgeBreakfast">#FFF2CC</color>
+    <color name="badgeDinner">#F2E4FF</color>
+    <color name="badgeWorkout">#FFF0D6</color>
+    <color name="badgeHydration">#DDF4FF</color>
+    <color name="badgeSleep">#EEE7FF</color>
+    <color name="badgeWalking">#D8FFF5</color>
+    <color name="badgeWeight">#ECEFF1</color>
+    <color name="badgeCalories">#FFE2EF</color>
+    <color name="badgeSnack">#FFE1EF</color>
+    <color name="badgeReminder">#E8EAFF</color>
 </resources>

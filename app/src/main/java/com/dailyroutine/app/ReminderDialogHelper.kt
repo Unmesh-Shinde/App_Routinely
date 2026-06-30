@@ -5,6 +5,7 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import com.google.android.material.snackbar.Snackbar
@@ -74,12 +75,7 @@ object ReminderDialogHelper {
         }
 
         val types = ReminderType.values().filter { it != ReminderType.MEAL && it != ReminderType.EXERCISE }
-        val adapter = ArrayAdapter(
-            context, R.layout.spinner_item,
-            types.map { "${it.emoji}  ${it.label}" }.toTypedArray()
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerType.adapter = adapter
+        spinnerType.adapter = ReminderTypeSpinnerAdapter(context, types)
 
         var selHour = existing?.hour ?: 8
         var selMin  = existing?.minute ?: 0
@@ -218,6 +214,36 @@ object ReminderDialogHelper {
             }
 
             saveAndFinish(mgr, existing, title, selectedType, selHour, selMin, isInterval, intervalMin, days, dishType, ingredients, selectedToneUri, isMonthly, dayOfMonth, onComplete, dialog, anchorView)
+        }
+    }
+
+    private class ReminderTypeSpinnerAdapter(
+        private val context: Context,
+        private val items: List<ReminderType>
+    ) : BaseAdapter(), SpinnerAdapter {
+
+        override fun getCount(): Int = items.size
+        override fun getItem(position: Int): ReminderType = items[position]
+        override fun getItemId(position: Int): Long = position.toLong()
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            return bindView(position, convertView, parent)
+        }
+
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            return bindView(position, convertView, parent)
+        }
+
+        private fun bindView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view = convertView ?: LayoutInflater.from(context)
+                .inflate(R.layout.spinner_item, parent, false)
+            val type = items[position]
+            view.findViewById<ImageView>(R.id.ivSpinnerIcon).apply {
+                setImageResource(RoutineIconMapper.iconForReminder(type))
+                setBackgroundResource(RoutineIconMapper.badgeForReminder(type))
+            }
+            view.findViewById<TextView>(android.R.id.text1).text = type.label
+            return view
         }
     }
 
