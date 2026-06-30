@@ -1,0 +1,9 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/iconReminder"
+        android:pathData="M12,22C13.1,22 14,21.1 14,20H10C10,21.1 10.9,22 12,22ZM18,16V11C18,8.2 16.5,5.8 14,5V4C14,2.9 13.1,2 12,2C10.9,2 10,2.9 10,4V5C7.5,5.8 6,8.2 6,11V16L4,18V19H20V18L18,16ZM10.8,13.9L8.8,11.9L10.2,10.5L11.4,11.7L14.4,8.7L15.8,10.1L11.4,14.5L10.8,13.9Z" />
+</vector>

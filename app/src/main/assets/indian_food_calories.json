@@ -1,0 +1,3662 @@
+{
+  "version": 1,
+  "source": "Comprehensive_Indian_Meals_List.xlsx Master List",
+  "entries": [
+    {
+      "name": "Poha",
+      "aliases": [
+        "poha"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "West/Central India",
+      "cookingMethod": "Tempered/Steamed",
+      "description": "Flattened rice cooked with onions, peanuts, mustard seeds, and turmeric.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Kanda Poha",
+      "aliases": [
+        "kanda poha"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Tempered",
+      "description": "Poha loaded with extra onions and garnished with fresh coriander and sev.",
+      "serving": "1 plate",
+      "servingGrams": 260,
+      "calories": 290,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Upma",
+      "aliases": [
+        "upma"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Boiled/Tempered",
+      "description": "Semolina (rava) cooked with vegetables, curry leaves, and urad dal.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Idli",
+      "aliases": [
+        "idli"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Steamed",
+      "description": "Soft, fluffy steamed cakes made from fermented rice and lentil batter.",
+      "serving": "1 piece",
+      "servingGrams": 40,
+      "calories": 60,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Masala Dosa",
+      "aliases": [
+        "masala dosa"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Pan-fried",
+      "description": "Thin, crispy crepe made from fermented batter, stuffed with spiced potato filling.",
+      "serving": "1 dosa",
+      "servingGrams": 220,
+      "calories": 330,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Neer Dosa",
+      "aliases": [
+        "neer dosa"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Karnataka",
+      "cookingMethod": "Pan-fried",
+      "description": "Lacy, soft, and thin crepes made from unfermented rice batter.",
+      "serving": "2 pieces",
+      "servingGrams": 120,
+      "calories": 120,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Appam",
+      "aliases": [
+        "appam"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Kerala",
+      "cookingMethod": "Pan-fried/Steamed",
+      "description": "Bowl-shaped thin pancakes made from fermented rice batter and coconut milk.",
+      "serving": "1 piece",
+      "servingGrams": 100,
+      "calories": 120,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Puttu",
+      "aliases": [
+        "puttu"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Kerala",
+      "cookingMethod": "Steamed",
+      "description": "Cylindrical steamed rice flour layered with grated coconut.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Aloo Paratha",
+      "aliases": [
+        "aloo paratha"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Pan-fried",
+      "description": "Whole wheat flatbread stuffed with spiced mashed potatoes, roasted with ghee.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Gobi Paratha",
+      "aliases": [
+        "gobi paratha"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Pan-fried",
+      "description": "Flatbread stuffed with spiced grated cauliflower.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Paneer Paratha",
+      "aliases": [
+        "paneer paratha"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Pan-fried",
+      "description": "Flatbread stuffed with spiced grated cottage cheese.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chole Bhature",
+      "aliases": [
+        "chole bhature"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Deep Fried/Curry",
+      "description": "Spicy chickpea curry served with deep-fried fluffy bread.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Puri Sabzi",
+      "aliases": [
+        "puri sabzi"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "North/East India",
+      "cookingMethod": "Deep Fried/Curry",
+      "description": "Deep-fried wheat bread served with a spiced potato curry.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Amaranth Bhaji",
+      "aliases": [
+        "amaranth bhaji",
+        "lal math bhaji",
+        "chaulai bhaji",
+        "math bhaji",
+        "bhaji"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Vegetable",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Sauteed",
+      "description": "Leafy amaranth greens cooked as a simple Maharashtrian bhaji.",
+      "serving": "150 grams",
+      "servingGrams": 150,
+      "calories": 130,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Misal Pav",
+      "aliases": [
+        "misal pav"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Curry/Toasted",
+      "description": "Spicy moth bean curry topped with farsan, served with soft bread rolls (pav).",
+      "serving": "1 plate",
+      "servingGrams": 350,
+      "calories": 520,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Dhokla",
+      "aliases": [
+        "dhokla"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Gujarat",
+      "cookingMethod": "Steamed",
+      "description": "Spongy, savory cake made from fermented gram flour batter, tempered with mustard seeds.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Thepla",
+      "aliases": [
+        "thepla"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Gujarat",
+      "cookingMethod": "Pan-fried",
+      "description": "Spiced flatbread made from whole wheat flour, gram flour, and fresh fenugreek leaves.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Fafda Jalebi",
+      "aliases": [
+        "fafda jalebi"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Gujarat",
+      "cookingMethod": "Deep Fried",
+      "description": "Crunchy besan snack (fafda) paired with sweet, syrupy jalebis.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Khandvi",
+      "aliases": [
+        "khandvi"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Gujarat",
+      "cookingMethod": "Steamed/Rolled",
+      "description": "Tightly rolled bite-sized savory snack made from gram flour and yogurt.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Luchi Alu Dum",
+      "aliases": [
+        "luchi alu dum"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Bengal/East India",
+      "cookingMethod": "Deep Fried/Curry",
+      "description": "Deep-fried refined flour bread served with slowly cooked spicy potatoes.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Pesarattu",
+      "aliases": [
+        "pesarattu"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Andhra Pradesh",
+      "cookingMethod": "Pan-fried",
+      "description": "Crepe made from green gram batter, often filled with upma.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Ven Pongal",
+      "aliases": [
+        "ven pongal"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "Tamil Nadu",
+      "cookingMethod": "Boiled/Tempered",
+      "description": "Savory porridge made of rice and moong dal, heavily tempered with black pepper, cumin, and ghee.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sabudana Khichdi",
+      "aliases": [
+        "sabudana khichdi"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "West/Central India",
+      "cookingMethod": "Tempered",
+      "description": "Tapioca pearls cooked with roasted peanuts, potatoes, and mild spices.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 430,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Besan Chilla",
+      "aliases": [
+        "besan chilla"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Pan-fried",
+      "description": "Savory pancake made from gram flour, veggies, and spices.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Moong Dal Chilla",
+      "aliases": [
+        "moong dal chilla"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Indian Traditional",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Pan-fried",
+      "description": "Protein-rich savory pancake made from soaked and ground yellow moong dal.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Boiled Egg",
+      "aliases": [
+        "boiled egg"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Universal",
+      "cookingMethod": "Boiled",
+      "description": "Simple hard or soft boiled eggs, often sprinkled with salt and pepper.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Egg Omelette",
+      "aliases": [
+        "egg omelette"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Universal",
+      "cookingMethod": "Pan-fried",
+      "description": "Beaten eggs cooked in a pan, often with chopped onions, green chilies, and coriander.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Masala Omelette",
+      "aliases": [
+        "masala omelette"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Indian",
+      "cookingMethod": "Pan-fried",
+      "description": "Spicy Indian style omelette loaded with turmeric, chili powder, onions, and tomatoes.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Half Fry (Sunny Side Up)",
+      "aliases": [
+        "half fry (sunny side up)",
+        "sunny side up",
+        "half fry"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Universal",
+      "cookingMethod": "Pan-fried",
+      "description": "Egg fried on one side, leaving the yolk runny.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Egg Bhurji",
+      "aliases": [
+        "egg bhurji"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Indian",
+      "cookingMethod": "Scrambled/Fried",
+      "description": "Indian-style scrambled eggs cooked with a heavy tempering of onions, tomatoes, and spices.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Boil Egg Bhurji",
+      "aliases": [
+        "boil egg bhurji"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Indian",
+      "cookingMethod": "Shallow Fried",
+      "description": "Mashed boiled eggs saut\u00e9ed with onions, tomatoes, and Indian masalas.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Egg Boil Fry",
+      "aliases": [
+        "egg boil fry"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Indian",
+      "cookingMethod": "Pan-fried",
+      "description": "Halved boiled eggs shallow fried with a coating of spicy masala.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Egg Sandwich",
+      "aliases": [
+        "egg sandwich"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Universal/Fusion",
+      "cookingMethod": "Assembled/Grilled",
+      "description": "Sliced boiled eggs or omelette stuffed between bread slices with mayo or chutney.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "French Toast (Sweet/Savory)",
+      "aliases": [
+        "french toast (sweet/savory)",
+        "french toast",
+        "savory",
+        "sweet"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Eggs",
+      "dietaryType": "Egg",
+      "origin": "Western/Fusion",
+      "cookingMethod": "Pan-fried",
+      "description": "Bread slices dipped in a beaten egg mixture and pan-fried. Indian versions are often savory and spicy.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Bread Butter",
+      "aliases": [
+        "bread butter"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Western/Fusion",
+      "dietaryType": "Veg",
+      "origin": "Universal",
+      "cookingMethod": "Assembled",
+      "description": "Slices of white or brown bread smeared with butter.",
+      "serving": "1 piece",
+      "servingGrams": 70,
+      "calories": 160,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Toast Jam",
+      "aliases": [
+        "toast jam"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Western/Fusion",
+      "dietaryType": "Veg",
+      "origin": "Universal",
+      "cookingMethod": "Toasted",
+      "description": "Toasted bread spread with fruit jam or marmalade.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Oats/Porridge",
+      "aliases": [
+        "oats/porridge",
+        "porridge",
+        "oats"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Western/Fusion",
+      "dietaryType": "Veg",
+      "origin": "Western",
+      "cookingMethod": "Boiled",
+      "description": "Rolled oats cooked in milk or water, topped with fruits and nuts.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Cornflakes with Milk",
+      "aliases": [
+        "cornflakes with milk"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Western/Fusion",
+      "dietaryType": "Veg",
+      "origin": "Western",
+      "cookingMethod": "Mixed",
+      "description": "Ready-to-eat cereal flakes served with hot or cold milk.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Muesli",
+      "aliases": [
+        "muesli"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Western/Fusion",
+      "dietaryType": "Veg",
+      "origin": "Western",
+      "cookingMethod": "Mixed",
+      "description": "Mix of oats, nuts, seeds, and dried fruits served with milk or yogurt.",
+      "serving": "1 plate",
+      "servingGrams": 250,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Pancakes",
+      "aliases": [
+        "pancakes"
+      ],
+      "category": "Breakfast",
+      "subCategory": "Western/Fusion",
+      "dietaryType": "Veg/Egg",
+      "origin": "Western",
+      "cookingMethod": "Pan-fried",
+      "description": "Flat sweet cakes served with honey or maple syrup.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Roti/Phulka",
+      "aliases": [
+        "roti/phulka",
+        "phulka",
+        "roti"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Roasted/Puffed",
+      "description": "Thin, unleavened whole wheat bread cooked on a tawa and puffed over an open flame.",
+      "serving": "1 piece",
+      "servingGrams": 45,
+      "calories": 105,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Chapati",
+      "aliases": [
+        "chapati"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Roasted",
+      "description": "Slightly thicker whole wheat flatbread cooked on a tawa.",
+      "serving": "1 piece",
+      "servingGrams": 50,
+      "calories": 120,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Plain Naan",
+      "aliases": [
+        "plain naan"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Tandoor Baked",
+      "description": "Leavened flatbread made from refined flour, baked in a tandoor.",
+      "serving": "1 piece",
+      "servingGrams": 100,
+      "calories": 260,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Butter Naan",
+      "aliases": [
+        "butter naan"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Tandoor Baked",
+      "description": "Naan brushed generously with butter after baking.",
+      "serving": "1 piece",
+      "servingGrams": 120,
+      "calories": 330,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Garlic Naan",
+      "aliases": [
+        "garlic naan"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Tandoor Baked",
+      "description": "Naan topped with minced garlic and coriander before baking.",
+      "serving": "1 piece",
+      "servingGrams": 110,
+      "calories": 310,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Tandoori Roti",
+      "aliases": [
+        "tandoori roti"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Tandoor Baked",
+      "description": "Whole wheat bread baked in a cylindrical clay oven.",
+      "serving": "1 piece",
+      "servingGrams": 70,
+      "calories": 150,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Missi Roti",
+      "aliases": [
+        "missi roti"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "North/West India",
+      "cookingMethod": "Roasted",
+      "description": "Savory flatbread made from a mix of whole wheat flour and gram flour (besan) with spices.",
+      "serving": "1 piece",
+      "servingGrams": 80,
+      "calories": 180,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Makki ki Roti",
+      "aliases": [
+        "makki ki roti"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "Punjab",
+      "cookingMethod": "Roasted",
+      "description": "Rustic flatbread made from cornmeal, typically paired with Sarson ka Saag.",
+      "serving": "1 piece",
+      "servingGrams": 70,
+      "calories": 160,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Bajra Bhakri",
+      "aliases": [
+        "bajra bhakri"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra/Gujarat",
+      "cookingMethod": "Roasted",
+      "description": "Thick, rustic flatbread made from pearl millet flour.",
+      "serving": "1 piece",
+      "servingGrams": 85,
+      "calories": 190,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Jowar Bhakri",
+      "aliases": [
+        "bhakri",
+        "jowar bhakri"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra/North Karnataka",
+      "cookingMethod": "Roasted",
+      "description": "Gluten-free flatbread made from sorghum flour.",
+      "serving": "1 piece",
+      "servingGrams": 80,
+      "calories": 170,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Rumali Roti",
+      "aliases": [
+        "rumali roti"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "Mughlai",
+      "cookingMethod": "Roasted",
+      "description": "Extremely thin, handkerchief-like bread cooked on a convex griddle.",
+      "serving": "1 piece",
+      "servingGrams": 70,
+      "calories": 160,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Parotta",
+      "aliases": [
+        "parotta"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Breads",
+      "dietaryType": "Veg",
+      "origin": "South India/Kerala",
+      "cookingMethod": "Pan-fried",
+      "description": "Flaky, layered flatbread made from refined flour.",
+      "serving": "1 piece",
+      "servingGrams": 70,
+      "calories": 160,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Steamed Rice",
+      "aliases": [
+        "steamed rice"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "Universal",
+      "cookingMethod": "Steamed/Boiled",
+      "description": "Plain white basmati or short-grain rice.",
+      "serving": "1 cup cooked",
+      "servingGrams": 160,
+      "calories": 205,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Jeera Rice",
+      "aliases": [
+        "jeera rice"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Tempered",
+      "description": "Basmati rice flavored with cumin seeds and whole spices.",
+      "serving": "1 cup",
+      "servingGrams": 180,
+      "calories": 260,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Veg Pulao",
+      "aliases": [
+        "veg pulao"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Boiled/Simmered",
+      "description": "One-pot rice dish cooked with mixed vegetables and mild spices.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Peas Pulao",
+      "aliases": [
+        "peas pulao"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Boiled/Simmered",
+      "description": "Rice cooked with sweet green peas and whole garam masala.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Veg Biryani",
+      "aliases": [
+        "veg biryani"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Dum (Slow Cooked)",
+      "description": "Aromatic layered rice and vegetable dish cooked with rich spices and herbs.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Biryani",
+      "aliases": [
+        "chicken biryani"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Non-Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Dum (Slow Cooked)",
+      "description": "Classic layered dish of basmati rice and marinated chicken cooked slowly.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mutton Biryani",
+      "aliases": [
+        "mutton biryani"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Non-Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Dum (Slow Cooked)",
+      "description": "Rich, deeply flavored biryani made with tender goat meat.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Egg Biryani",
+      "aliases": [
+        "egg biryani"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Egg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Dum (Slow Cooked)",
+      "description": "Spiced layered rice dish featuring boiled eggs.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Hyderabadi Biryani",
+      "aliases": [
+        "hyderabadi biryani"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Non-Veg",
+      "origin": "Telangana",
+      "cookingMethod": "Dum (Slow Cooked)",
+      "description": "Spicy, aromatic biryani famous for its raw meat slow-cooking technique (Kacchi Dum).",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kolkata Biryani",
+      "aliases": [
+        "kolkata biryani"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Non-Veg",
+      "origin": "Bengal",
+      "cookingMethod": "Dum (Slow Cooked)",
+      "description": "Subtly spiced biryani characterized by the inclusion of soft potatoes and boiled eggs.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Lucknowi Biryani",
+      "aliases": [
+        "lucknowi biryani"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Non-Veg",
+      "origin": "Awadh/UP",
+      "cookingMethod": "Dum (Slow Cooked)",
+      "description": "Mildly spiced, fragrant biryani cooked in a rich stock (Pukki style).",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Lemon Rice",
+      "aliases": [
+        "lemon rice"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Tempered",
+      "description": "Cooked rice tempered with mustard, curry leaves, peanuts, and freshly squeezed lemon juice.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Tamarind Rice",
+      "aliases": [
+        "tamarind rice"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Tempered",
+      "description": "Tangy and spicy rice dish flavored with tamarind paste and peanuts (Puliyogare).",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Curd Rice",
+      "aliases": [
+        "curd rice"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Mixed/Tempered",
+      "description": "Comforting mix of soft-cooked rice and yogurt, tempered with mustard and curry leaves.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Khichdi",
+      "aliases": [
+        "khichdi"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Boiled",
+      "description": "Comforting, mushy one-pot meal of rice and lentils cooked together with mild turmeric.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Bisi Bele Bath",
+      "aliases": [
+        "bisi bele bath"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Rice/Biryani",
+      "dietaryType": "Veg",
+      "origin": "Karnataka",
+      "cookingMethod": "Boiled/Simmered",
+      "description": "Spicy, tangy meal of rice, lentils, and vegetables cooked together with a special spice blend.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Dal Tadka",
+      "aliases": [
+        "dal tadka"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Dals",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Boiled/Tempered",
+      "description": "Yellow lentils cooked and finished with a sizzling tempering of ghee, cumin, garlic, and chilies.",
+      "serving": "1 bowl",
+      "servingGrams": 220,
+      "calories": 220,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Dal Makhani",
+      "aliases": [
+        "dal makhani"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Dals",
+      "dietaryType": "Veg",
+      "origin": "Punjab",
+      "cookingMethod": "Slow Cooked",
+      "description": "Rich, creamy slow-cooked black lentils and kidney beans prepared with butter and cream.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chana Dal",
+      "aliases": [
+        "chana dal"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Dals",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Boiled/Tempered",
+      "description": "Split chickpeas cooked with onions, tomatoes, and spices.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sambhar",
+      "aliases": [
+        "sambhar"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Dals",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Boiled/Simmered",
+      "description": "Tangy lentil and vegetable stew flavored with tamarind and a special spice powder.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Rasam",
+      "aliases": [
+        "rasam"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Dals",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Boiled/Tempered",
+      "description": "Thin, spicy, and tangy soup-like dish made with tamarind, tomatoes, black pepper, and cumin.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Rajma Masala",
+      "aliases": [
+        "rajma masala"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Dals",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Curry",
+      "description": "Red kidney beans cooked in a thick, flavorful onion-tomato gravy.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Pindi Chole",
+      "aliases": [
+        "pindi chole"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Dals",
+      "dietaryType": "Veg",
+      "origin": "Punjab",
+      "cookingMethod": "Curry",
+      "description": "Dark, spicy, and tangy chickpea curry flavored with tea leaves and amla.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kadhi Pakora",
+      "aliases": [
+        "kadhi pakora"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Dals",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Simmered",
+      "description": "Tangy yogurt and gram flour curry featuring deep-fried onion/besan fritters.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Aloo Gobi",
+      "aliases": [
+        "aloo gobi"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Stir Fried",
+      "description": "Classic dry curry made with potatoes and cauliflower florets with Indian spices.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Jeera Aloo",
+      "aliases": [
+        "jeera aloo"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Stir Fried",
+      "description": "Simple boiled potatoes saut\u00e9ed heavily with cumin seeds and green chilies.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Dum Aloo",
+      "aliases": [
+        "dum aloo"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "Kashmir/North India",
+      "cookingMethod": "Slow Cooked",
+      "description": "Baby potatoes deep-fried and slow-cooked in a rich, spiced yogurt or tomato gravy.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Bhindi Masala",
+      "aliases": [
+        "bhindi masala"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Stir Fried",
+      "description": "Okra stir-fried with onions, tomatoes, and tangy spices.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Baingan Bharta",
+      "aliases": [
+        "baingan bharta"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Roasted/Mashed",
+      "description": "Fire-roasted eggplant mashed and cooked with mustard oil, onions, tomatoes, and garlic.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Malai Kofta",
+      "aliases": [
+        "malai kofta"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Deep Fried/Curry",
+      "description": "Deep-fried potato and paneer dumplings served in a rich, creamy, sweet-savory gravy.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mix Veg Curry",
+      "aliases": [
+        "mix veg curry"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Curry",
+      "description": "Assorted vegetables cooked together in an onion-tomato gravy.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Paneer Butter Masala",
+      "aliases": [
+        "paneer butter masala"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Curry",
+      "description": "Cottage cheese cubes in a rich, creamy, mildly sweet tomato and butter gravy.",
+      "serving": "1 bowl",
+      "servingGrams": 250,
+      "calories": 430,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Kadai Paneer",
+      "aliases": [
+        "kadai paneer"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Stir Fried/Curry",
+      "description": "Paneer cooked with bell peppers, onions, and freshly ground kadai masala.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Palak Paneer",
+      "aliases": [
+        "palak paneer"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Curry",
+      "description": "Soft paneer cubes simmered in a smooth, spiced spinach puree.",
+      "serving": "1 bowl",
+      "servingGrams": 250,
+      "calories": 330,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Matar Paneer",
+      "aliases": [
+        "matar paneer"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Curry",
+      "description": "Paneer and green peas cooked in a traditional tomato-based gravy.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Gatte Ki Sabzi",
+      "aliases": [
+        "gatte ki sabzi"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "Rajasthan",
+      "cookingMethod": "Boiled/Curry",
+      "description": "Gram flour dumplings cooked in a spicy, tangy yogurt gravy.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Undhiyu",
+      "aliases": [
+        "undhiyu"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "Gujarat",
+      "cookingMethod": "Slow Cooked",
+      "description": "Traditional mixed vegetable dish cooked slowly, often with muthiyas (fenugreek dumplings).",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Avial",
+      "aliases": [
+        "avial"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "Kerala",
+      "cookingMethod": "Simmered",
+      "description": "Thick mixture of assorted vegetables, coconut, and yogurt, seasoned with coconut oil and curry leaves.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Cabbage Thoran",
+      "aliases": [
+        "cabbage thoran"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "Kerala",
+      "cookingMethod": "Stir Fried",
+      "description": "Finely chopped cabbage stir-fried with grated coconut, mustard seeds, and curry leaves.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Shukto",
+      "aliases": [
+        "shukto"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Veg Curries/Dry",
+      "dietaryType": "Veg",
+      "origin": "Bengal",
+      "cookingMethod": "Simmered",
+      "description": "A mildly bitter, mixed vegetable stew typically served at the beginning of a Bengali meal.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Butter Chicken",
+      "aliases": [
+        "butter chicken"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Punjab/Delhi",
+      "cookingMethod": "Curry",
+      "description": "Tandoori chicken pieces simmered in a rich, creamy tomato and butter gravy.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Tikka Masala",
+      "aliases": [
+        "chicken tikka masala"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Fusion/North India",
+      "cookingMethod": "Curry",
+      "description": "Roasted marinated chicken chunks in a spiced, creamy orange-colored curry.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kadai Chicken",
+      "aliases": [
+        "kadai chicken"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "North India",
+      "cookingMethod": "Stir Fried/Curry",
+      "description": "Spicy chicken cooked with bell peppers and freshly ground spices in a wok (kadai).",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Home Style Chicken Curry",
+      "aliases": [
+        "home style chicken curry"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Curry",
+      "description": "Thin, flavorful chicken curry made with onions, tomatoes, ginger, garlic, and whole spices.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mutton Rogan Josh",
+      "aliases": [
+        "mutton rogan josh"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Kashmir",
+      "cookingMethod": "Slow Cooked",
+      "description": "Aromatic lamb/mutton curry cooked with Kashmiri chilies, fennel, and ginger.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kosha Mangsho",
+      "aliases": [
+        "kosha mangsho"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Bengal",
+      "cookingMethod": "Slow Cooked",
+      "description": "Spicy, slow-cooked Bengali mutton curry with a dark, thick, intensely flavorful gravy.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Laal Maas",
+      "aliases": [
+        "laal maas"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Rajasthan",
+      "cookingMethod": "Curry",
+      "description": "Fiery Rajasthani mutton curry cooked with heavily spiced red mathania chilies and garlic.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chettinad Chicken",
+      "aliases": [
+        "chettinad chicken"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Tamil Nadu",
+      "cookingMethod": "Curry",
+      "description": "Highly spiced and aromatic chicken curry from the Chettinad region, using roasted coconut and spices.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Goan Fish Curry",
+      "aliases": [
+        "goan fish curry"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Goa",
+      "cookingMethod": "Curry",
+      "description": "Tangy and spicy fish curry made with coconut base and kokum or tamarind.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Macher Jhol",
+      "aliases": [
+        "macher jhol"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Bengal",
+      "cookingMethod": "Curry",
+      "description": "Traditional Bengali fish stew cooked with potatoes, mustard oil, and light spices.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Fish Fry",
+      "aliases": [
+        "fish fry"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Coastal India",
+      "cookingMethod": "Shallow/Deep Fried",
+      "description": "Fish slices or whole fish marinated in fiery spices and fried till crisp.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Prawn Masala",
+      "aliases": [
+        "prawn masala"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Non-Veg",
+      "origin": "Coastal India",
+      "cookingMethod": "Stir Fried/Curry",
+      "description": "Succulent prawns cooked in a thick, spicy onion-tomato masala base.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Egg Curry",
+      "aliases": [
+        "egg curry"
+      ],
+      "category": "Lunch/Dinner",
+      "subCategory": "Non-Veg Curries",
+      "dietaryType": "Egg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Curry",
+      "description": "Boiled and lightly fried eggs simmered in a spiced tomato-onion gravy.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Samosa",
+      "aliases": [
+        "samosa"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Deep Fried",
+      "description": "Triangular pastry filled with spiced potatoes and peas.",
+      "serving": "1 piece",
+      "servingGrams": 120,
+      "calories": 260,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Kachori",
+      "aliases": [
+        "kachori"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Deep Fried",
+      "description": "Round, flaky pastry filled with a spiced lentil or onion mixture.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 220,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Onion Pakora/Bhajiya",
+      "aliases": [
+        "onion pakora/bhajiya",
+        "kanda bhajiya",
+        "onion pakora",
+        "kanda bhaji",
+        "bhajiya"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Deep Fried",
+      "description": "Sliced onions coated in seasoned gram flour batter and deep-fried till crispy.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Paneer Pakora",
+      "aliases": [
+        "paneer pakora"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Deep Fried",
+      "description": "Cottage cheese slices dipped in besan batter and fried.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Vada Pav",
+      "aliases": [
+        "vada pav"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Deep Fried/Assembled",
+      "description": "Spicy potato fritter stuffed in a bun (pav) with dry garlic and green chutneys.",
+      "serving": "1 piece",
+      "servingGrams": 170,
+      "calories": 300,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Dabeli",
+      "aliases": [
+        "dabeli"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "Gujarat",
+      "cookingMethod": "Assembled/Toasted",
+      "description": "Sweet and spicy potato mixture stuffed in a bun, topped with pomegranate, peanuts, and sev.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Pani Puri / Golgappa / Puchka",
+      "aliases": [
+        "pani puri / golgappa / puchka",
+        "pani puri",
+        "golgappa",
+        "puchka"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Assembled",
+      "description": "Hollow, crispy puris filled with flavored spicy water, tamarind chutney, and potato/chickpea mash.",
+      "serving": "6 pieces",
+      "servingGrams": 150,
+      "calories": 180,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Bhel Puri",
+      "aliases": [
+        "bhel puri"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Mixed",
+      "description": "Puffed rice mixed with sev, chopped onions, potatoes, and sweet/tangy/spicy chutneys.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sev Puri",
+      "aliases": [
+        "sev puri"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Assembled",
+      "description": "Flat crispy puris topped with diced potatoes, onions, three chutneys, and copious amounts of sev.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Aloo Tikki Chaat",
+      "aliases": [
+        "aloo tikki chaat"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Shallow Fried/Assembled",
+      "description": "Crispy potato patties smashed and topped with yogurt, chutneys, spices, and sev.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Samosa Chaat",
+      "aliases": [
+        "samosa chaat"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Assembled",
+      "description": "Crushed samosas topped with chole (chickpea curry), yogurt, and chutneys.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 260,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kathi Roll",
+      "aliases": [
+        "kathi roll"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Non-Veg/Veg",
+      "origin": "Bengal/Universal",
+      "cookingMethod": "Pan-fried/Assembled",
+      "description": "Skewer-roasted kebab (chicken/paneer) wrapped in a paratha flatbread.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Egg Roll",
+      "aliases": [
+        "egg roll"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Egg",
+      "origin": "Bengal/Universal",
+      "cookingMethod": "Pan-fried/Assembled",
+      "description": "Paratha layered with a beaten egg, cooked, and filled with onions, sauces, and spices.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Roll",
+      "aliases": [
+        "chicken roll"
+      ],
+      "category": "Snacks",
+      "subCategory": "Street Food",
+      "dietaryType": "Non-Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Pan-fried/Assembled",
+      "description": "Paratha or wrap filled with spicy chicken chunks, onions, and sauces.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Veg Hakka Noodles",
+      "aliases": [
+        "veg hakka noodles"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Veg",
+      "origin": "Indo-Chinese",
+      "cookingMethod": "Stir Fried",
+      "description": "Boiled noodles tossed with shredded cabbage, carrots, bell peppers, soy sauce, and vinegar.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Hakka Noodles",
+      "aliases": [
+        "chicken hakka noodles"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Non-Veg",
+      "origin": "Indo-Chinese",
+      "cookingMethod": "Stir Fried",
+      "description": "Noodles stir-fried with chicken strips, veggies, and Chinese sauces.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Schezwan Fried Rice",
+      "aliases": [
+        "schezwan fried rice"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Veg/Non-Veg",
+      "origin": "Indo-Chinese",
+      "cookingMethod": "Stir Fried",
+      "description": "Spicy fried rice tossed in a fiery red Schezwan pepper sauce.",
+      "serving": "1 plate",
+      "servingGrams": 300,
+      "calories": 380,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Gobi Manchurian",
+      "aliases": [
+        "gobi manchurian"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Veg",
+      "origin": "Indo-Chinese",
+      "cookingMethod": "Deep Fried/Tossed",
+      "description": "Crispy fried cauliflower florets tossed in a dark, soy-based sweet and spicy sauce.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Paneer Chilli",
+      "aliases": [
+        "paneer chilli"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Veg",
+      "origin": "Indo-Chinese",
+      "cookingMethod": "Deep Fried/Tossed",
+      "description": "Fried paneer cubes tossed with diced onions, bell peppers, green chilies, and soy sauce.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Chilli",
+      "aliases": [
+        "chicken chilli"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Non-Veg",
+      "origin": "Indo-Chinese",
+      "cookingMethod": "Deep Fried/Tossed",
+      "description": "Batter-fried chicken pieces tossed in a spicy, garlicky soy sauce with peppers.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Veg Momos",
+      "aliases": [
+        "veg momos"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Veg",
+      "origin": "Tibet/NE India",
+      "cookingMethod": "Steamed/Fried",
+      "description": "Dumplings stuffed with finely chopped cabbage, carrots, and onions, served with spicy red chutney.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Momos",
+      "aliases": [
+        "chicken momos"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Non-Veg",
+      "origin": "Tibet/NE India",
+      "cookingMethod": "Steamed/Fried",
+      "description": "Dumplings filled with minced seasoned chicken.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Spring Roll",
+      "aliases": [
+        "spring roll"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Desi Chinese",
+      "dietaryType": "Veg/Non-Veg",
+      "origin": "Indo-Chinese",
+      "cookingMethod": "Deep Fried",
+      "description": "Thin pastry wrappers filled with julienned vegetables/chicken and fried till crisp.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Margherita Pizza",
+      "aliases": [
+        "margherita pizza"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Italian/Global",
+      "cookingMethod": "Baked",
+      "description": "Classic pizza topped with tomato sauce, mozzarella cheese, and basil.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Veggie Supreme Pizza",
+      "aliases": [
+        "veggie supreme pizza"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Baked",
+      "description": "Pizza loaded with onions, bell peppers, mushrooms, corn, and olives.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Paneer Tikka Pizza",
+      "aliases": [
+        "paneer tikka pizza"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Fusion",
+      "cookingMethod": "Baked",
+      "description": "Pizza topped with tandoori paneer cubes, onions, and capsicum.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Tikka Pizza",
+      "aliases": [
+        "chicken tikka pizza"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Non-Veg",
+      "origin": "Fusion",
+      "cookingMethod": "Baked",
+      "description": "Pizza topped with spicy marinated chicken chunks.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Red Sauce Pasta (Arrabbiata)",
+      "aliases": [
+        "red sauce pasta (arrabbiata)",
+        "red sauce pasta",
+        "arrabbiata"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Italian/Global",
+      "cookingMethod": "Simmered",
+      "description": "Penne or macaroni cooked in a tangy, spicy tomato and garlic sauce.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "White Sauce Pasta (Alfredo)",
+      "aliases": [
+        "white sauce pasta (alfredo)",
+        "white sauce pasta",
+        "alfredo"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Italian/Global",
+      "cookingMethod": "Simmered",
+      "description": "Pasta cooked in a creamy, cheesy bechamel sauce with garlic and herbs.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mac & Cheese",
+      "aliases": [
+        "mac & cheese"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "American",
+      "cookingMethod": "Baked/Simmered",
+      "description": "Macaroni pasta cooked in a rich, gooey cheddar cheese sauce.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Veg Burger",
+      "aliases": [
+        "veg burger"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Assembled",
+      "description": "Burger bun filled with a mixed vegetable patty, lettuce, tomato, and mayo.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Aloo Tikki Burger",
+      "aliases": [
+        "aloo tikki burger"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Fusion",
+      "cookingMethod": "Assembled",
+      "description": "Indian-style burger featuring a crispy, spiced potato patty.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Burger",
+      "aliases": [
+        "chicken burger"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Non-Veg",
+      "origin": "Global",
+      "cookingMethod": "Assembled",
+      "description": "Burger featuring a fried or grilled chicken patty.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "French Fries",
+      "aliases": [
+        "french fries"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Deep Fried",
+      "description": "Classic salted, deep-fried potato batons.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Peri Peri Fries",
+      "aliases": [
+        "peri peri fries"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Deep Fried/Tossed",
+      "description": "French fries tossed in a spicy, tangy African-style peri peri seasoning.",
+      "serving": "1 serving",
+      "servingGrams": 150,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Potato Wedges",
+      "aliases": [
+        "potato wedges"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Baked/Fried",
+      "description": "Thick-cut, seasoned potato wedges, often served with sour cream or mayo.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Bombay Veg Sandwich",
+      "aliases": [
+        "bombay veg sandwich"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Fusion",
+      "cookingMethod": "Assembled",
+      "description": "Slices of bread layered with butter, green chutney, and thin slices of cucumber, tomato, onion, and boiled potato.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Grilled Cheese Sandwich",
+      "aliases": [
+        "grilled cheese sandwich"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Grilled",
+      "description": "Bread slices stuffed with cheese and grilled until golden and melting.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 300,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Mayo Sandwich",
+      "aliases": [
+        "chicken mayo sandwich"
+      ],
+      "category": "Foreign/Fast Food",
+      "subCategory": "Western",
+      "dietaryType": "Non-Veg",
+      "origin": "Global",
+      "cookingMethod": "Assembled/Grilled",
+      "description": "Sandwich filled with a mixture of shredded boiled chicken, mayonnaise, and black pepper.",
+      "serving": "1 serving",
+      "servingGrams": 250,
+      "calories": 360,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Veg Puff",
+      "aliases": [
+        "veg puff"
+      ],
+      "category": "Bakery",
+      "subCategory": "Savory/Puff",
+      "dietaryType": "Veg",
+      "origin": "Indian Bakery",
+      "cookingMethod": "Baked",
+      "description": "Flaky puff pastry stuffed with a mildly spiced mixed vegetable or potato filling.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Egg Puff",
+      "aliases": [
+        "egg puff"
+      ],
+      "category": "Bakery",
+      "subCategory": "Savory/Puff",
+      "dietaryType": "Egg",
+      "origin": "Indian Bakery",
+      "cookingMethod": "Baked",
+      "description": "Puff pastry enclosing half a boiled egg wrapped in a spicy onion masala.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chicken Puff",
+      "aliases": [
+        "chicken puff"
+      ],
+      "category": "Bakery",
+      "subCategory": "Savory/Puff",
+      "dietaryType": "Non-Veg",
+      "origin": "Indian Bakery",
+      "cookingMethod": "Baked",
+      "description": "Puff pastry stuffed with minced or shredded spicy chicken.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Khari Biscuit",
+      "aliases": [
+        "khari biscuit"
+      ],
+      "category": "Bakery",
+      "subCategory": "Biscuits",
+      "dietaryType": "Veg",
+      "origin": "Indian Bakery",
+      "cookingMethod": "Baked",
+      "description": "Light, airy, flaky, and salty puff pastry biscuits, often dipped in tea.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Rusk / Toast",
+      "aliases": [
+        "rusk / toast",
+        "toast",
+        "rusk"
+      ],
+      "category": "Bakery",
+      "subCategory": "Biscuits",
+      "dietaryType": "Veg",
+      "origin": "Indian Bakery",
+      "cookingMethod": "Baked",
+      "description": "Twice-baked, hard, and crisp bread, commonly eaten with chai.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Shrewsbury Biscuit",
+      "aliases": [
+        "shrewsbury biscuit"
+      ],
+      "category": "Bakery",
+      "subCategory": "Biscuits",
+      "dietaryType": "Veg",
+      "origin": "Pune/Bakery",
+      "cookingMethod": "Baked",
+      "description": "Rich, buttery, melt-in-mouth sweet biscuits famous in Pune bakeries.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Nankhatai",
+      "aliases": [
+        "nankhatai"
+      ],
+      "category": "Bakery",
+      "subCategory": "Biscuits",
+      "dietaryType": "Veg",
+      "origin": "Indian Bakery",
+      "cookingMethod": "Baked",
+      "description": "Traditional Indian shortbread cookies made from all-purpose flour, besan, and ghee.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Plum Cake",
+      "aliases": [
+        "plum cake"
+      ],
+      "category": "Bakery",
+      "subCategory": "Cakes/Pastries",
+      "dietaryType": "Veg/Egg",
+      "origin": "Global/Bakery",
+      "cookingMethod": "Baked",
+      "description": "Dense cake loaded with dry fruits and nuts, especially popular around Christmas.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Black Forest Cake",
+      "aliases": [
+        "black forest cake"
+      ],
+      "category": "Bakery",
+      "subCategory": "Cakes/Pastries",
+      "dietaryType": "Veg/Egg",
+      "origin": "Global",
+      "cookingMethod": "Baked",
+      "description": "Chocolate sponge cake layered with whipped cream and cherries.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Pineapple Pastry",
+      "aliases": [
+        "pineapple pastry"
+      ],
+      "category": "Bakery",
+      "subCategory": "Cakes/Pastries",
+      "dietaryType": "Veg/Egg",
+      "origin": "Indian Bakery",
+      "cookingMethod": "Baked",
+      "description": "Soft vanilla sponge layered with whipped cream and chopped pineapple pieces.",
+      "serving": "1 piece",
+      "servingGrams": 90,
+      "calories": 240,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Gulab Jamun",
+      "aliases": [
+        "gulab jamun"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Deep Fried/Soaked",
+      "description": "Deep-fried dough balls made of milk solids (khoya) soaked in a fragrant sugar syrup.",
+      "serving": "1 piece",
+      "servingGrams": 50,
+      "calories": 150,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Rasgulla",
+      "aliases": [
+        "rasgulla"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Bengal",
+      "cookingMethod": "Boiled/Soaked",
+      "description": "Spongy, white dumplings made of chhena (cottage cheese) cooked in light sugar syrup.",
+      "serving": "1 piece",
+      "servingGrams": 55,
+      "calories": 125,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Rasmalai",
+      "aliases": [
+        "rasmalai"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Bengal",
+      "cookingMethod": "Boiled/Soaked",
+      "description": "Flattened chhena discs soaked in a rich, saffron and cardamom flavored sweetened milk.",
+      "serving": "1 piece",
+      "servingGrams": 80,
+      "calories": 180,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Rice Kheer / Payasam",
+      "aliases": [
+        "rice kheer / payasam",
+        "rice kheer",
+        "payasam",
+        "kheer"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Simmered",
+      "description": "Creamy pudding made by slowly boiling rice, milk, and sugar, garnished with nuts.",
+      "serving": "1 bowl",
+      "servingGrams": 180,
+      "calories": 280,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Gajar Ka Halwa",
+      "aliases": [
+        "gajar ka halwa"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Simmered",
+      "description": "Rich dessert made from grated carrots slow-cooked in milk, ghee, and sugar.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Moong Dal Halwa",
+      "aliases": [
+        "moong dal halwa"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Rajasthan",
+      "cookingMethod": "Roasted/Simmered",
+      "description": "Dense, ghee-rich sweet dish made from yellow split moong dal.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sooji Halwa",
+      "aliases": [
+        "sooji halwa",
+        "suji halwa",
+        "sheera"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Roasted/Simmered",
+      "description": "Semolina roasted in ghee and cooked with water/milk and sugar (also known as Sheera).",
+      "serving": "1 bowl",
+      "servingGrams": 180,
+      "calories": 320,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Kaju Katli",
+      "aliases": [
+        "kaju katli"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Cooked/Rolled",
+      "description": "Diamond-shaped, fudgy sweet made purely from cashew nuts, sugar, and ghee.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Besan Ladoo",
+      "aliases": [
+        "besan ladoo"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Roasted/Formed",
+      "description": "Round sweet balls made from roasted gram flour, powdered sugar, and ghee.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Motichoor Ladoo",
+      "aliases": [
+        "motichoor ladoo"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Deep Fried/Formed",
+      "description": "Soft laddos made from tiny, fine droplets of deep-fried besan mixed in sugar syrup.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Jalebi",
+      "aliases": [
+        "jalebi"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Deep Fried/Soaked",
+      "description": "Spiral-shaped, crispy, deep-fried batter soaked in saffron sugar syrup.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Imarti",
+      "aliases": [
+        "imarti"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Deep Fried/Soaked",
+      "description": "Similar to Jalebi but made from urad dal batter, featuring a more intricate floral shape.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Ghevar",
+      "aliases": [
+        "ghevar"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Rajasthan",
+      "cookingMethod": "Deep Fried",
+      "description": "Disc-shaped sweet with a honeycomb-like texture, popular during monsoon festivals (Teej/Rakhi).",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Ukadiche Modak",
+      "aliases": [
+        "ukadiche modak"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Festive Special",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Steamed",
+      "description": "Steamed rice-flour dumplings stuffed with a sweet mixture of freshly grated coconut and jaggery. (Ganesh Chaturthi special)",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Fried Modak",
+      "aliases": [
+        "fried modak"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Festive Special",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Deep Fried",
+      "description": "Wheat or refined flour outer covering, stuffed with coconut-jaggery and deep-fried.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Gujiya / Karanji",
+      "aliases": [
+        "gujiya / karanji",
+        "karanji",
+        "gujiya"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Festive Special",
+      "dietaryType": "Veg",
+      "origin": "North/West India",
+      "cookingMethod": "Deep Fried",
+      "description": "Crescent-shaped, deep-fried pastry stuffed with sweet khoya, coconut, and dry fruits. (Holi/Diwali special)",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Puran Poli",
+      "aliases": [
+        "puran poli"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Festive Special",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra",
+      "cookingMethod": "Roasted",
+      "description": "Sweet flatbread stuffed with a smooth, cooked mixture of chana dal, jaggery, and cardamom. (Holi/Gudi Padwa special)",
+      "serving": "1 piece",
+      "servingGrams": 120,
+      "calories": 300,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Shrikhand",
+      "aliases": [
+        "shrikhand"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "West India",
+      "cookingMethod": "Mixed",
+      "description": "Thick, creamy, and sweet dessert made from strained yogurt, flavored with saffron and cardamom.",
+      "serving": "1 bowl",
+      "servingGrams": 150,
+      "calories": 260,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Mishti Doi",
+      "aliases": [
+        "mishti doi"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Bengal",
+      "cookingMethod": "Fermented",
+      "description": "Classic Bengali dessert made by fermenting thick milk mixed with caramelized sugar/jaggery.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mysore Pak",
+      "aliases": [
+        "mysore pak"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Karnataka",
+      "cookingMethod": "Roasted",
+      "description": "Rich, crumbly, and melt-in-mouth sweet block made generously with ghee, besan, and sugar.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Qubani Ka Meetha",
+      "aliases": [
+        "qubani ka meetha"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "Hyderabad",
+      "cookingMethod": "Stewed",
+      "description": "Hyderabadi dessert made from dried apricots stewed to a jam-like consistency, served with cream/ice cream.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Phirni",
+      "aliases": [
+        "phirni"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Mithai",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Simmered",
+      "description": "Thick, creamy dessert made from coarsely ground rice, set in earthen pots.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kulfi",
+      "aliases": [
+        "kulfi"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Ice Cream",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Frozen",
+      "description": "Traditional Indian ice cream, denser and creamier than Western ice creams, flavored with malai, pista, or mango.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Falooda",
+      "aliases": [
+        "falooda"
+      ],
+      "category": "Festive/Sweet",
+      "subCategory": "Ice Cream",
+      "dietaryType": "Veg",
+      "origin": "Indian Traditional",
+      "cookingMethod": "Assembled",
+      "description": "Rich layered dessert drink containing rose syrup, vermicelli, sweet basil seeds (sabja), milk, and topped with ice cream.",
+      "serving": "1 serving",
+      "servingGrams": 120,
+      "calories": 250,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mint Coriander Chutney",
+      "aliases": [
+        "mint coriander chutney"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Chutney",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Blended",
+      "description": "Spicy, tangy green chutney made from fresh mint, coriander, green chilies, and lemon juice.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Tamarind Date Chutney (Meethi)",
+      "aliases": [
+        "tamarind date chutney (meethi)",
+        "tamarind date chutney",
+        "meethi"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Chutney",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Simmered",
+      "description": "Sweet and sour dark brown chutney essential for chaats, made from tamarind, jaggery, and dates.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Coconut Chutney",
+      "aliases": [
+        "coconut chutney"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Chutney",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Blended/Tempered",
+      "description": "White chutney made from grated coconut, roasted chana dal, and green chilies, tempered with mustard leaves.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Tomato Chutney",
+      "aliases": [
+        "tomato chutney"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Chutney",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Cooked/Blended",
+      "description": "Tangy and slightly spicy red chutney made by cooking tomatoes with onions and red chilies.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Peanut Chutney",
+      "aliases": [
+        "peanut chutney"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Chutney",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra/South",
+      "cookingMethod": "Blended",
+      "description": "Thick, earthy chutney made from roasted peanuts, garlic, and chilies.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Garlic Chutney (Lehsan)",
+      "aliases": [
+        "garlic chutney (lehsan)",
+        "garlic chutney",
+        "lehsan"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Chutney",
+      "dietaryType": "Veg",
+      "origin": "West/North India",
+      "cookingMethod": "Pounded/Blended",
+      "description": "Fiery red chutney made from fresh garlic cloves, red chili powder, and oil.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mango Pickle (Aam Ka Achar)",
+      "aliases": [
+        "mango pickle (aam ka achar)",
+        "mango pickle",
+        "aam ka achar"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Pickle (Achar)",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Sun-dried/Preserved",
+      "description": "Raw green mangoes cured in mustard oil, salt, and strong pickling spices like fenugreek and fennel.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 45,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Lime Pickle (Nimbu Ka Achar)",
+      "aliases": [
+        "lime pickle (nimbu ka achar)",
+        "nimbu ka achar",
+        "lime pickle"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Pickle (Achar)",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Sun-dried/Preserved",
+      "description": "Lemons preserved in a sweet or spicy mix, heavily salted to soften the rind over time.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 45,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mixed Veg Pickle",
+      "aliases": [
+        "mixed veg pickle"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Pickle (Achar)",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Preserved",
+      "description": "Carrots, cauliflower, green chilies, and sometimes turnips pickled in oil and spices.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 45,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Green Chilli Pickle",
+      "aliases": [
+        "green chilli pickle"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Pickle (Achar)",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Preserved",
+      "description": "Slit green chilies stuffed or coated with mustard seeds, salt, and oil.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 45,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Boondi Raita",
+      "aliases": [
+        "boondi raita"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sides",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Mixed",
+      "description": "Whisked yogurt mixed with tiny, crisp deep-fried besan balls (boondi), seasoned with roasted cumin powder.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Cucumber Raita",
+      "aliases": [
+        "cucumber raita"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sides",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Mixed",
+      "description": "Cooling side dish of yogurt mixed with grated or finely chopped cucumber.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mix Veg Raita",
+      "aliases": [
+        "mix veg raita"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sides",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Mixed",
+      "description": "Yogurt blended with finely chopped onions, tomatoes, and cucumbers.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Papad (Roasted/Fried)",
+      "aliases": [
+        "papad (roasted/fried)",
+        "roasted",
+        "papad",
+        "fried"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sides",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Roasted/Fried",
+      "description": "Thin, crisp disc-shaped food made from lentil, chickpea, or rice flour.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Masala Papad",
+      "aliases": [
+        "masala papad"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sides",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Assembled",
+      "description": "Fried or roasted papad generously topped with chopped onions, tomatoes, coriander, and chaat masala.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kachumber Salad",
+      "aliases": [
+        "kachumber salad"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sides",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Mixed",
+      "description": "Simple fresh salad of chopped onions, tomatoes, cucumbers, tossed with lemon juice and salt.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Tomato Ketchup",
+      "aliases": [
+        "tomato ketchup"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sauces/Dips",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Blended",
+      "description": "Sweet and tangy tomato sauce, eaten with snacks and fast food.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Green Chilli Sauce",
+      "aliases": [
+        "green chilli sauce"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sauces/Dips",
+      "dietaryType": "Veg",
+      "origin": "Global/Chinese",
+      "cookingMethod": "Blended",
+      "description": "Spicy sauce made from pureed green chilies and vinegar.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Soy Sauce",
+      "aliases": [
+        "soy sauce"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sauces/Dips",
+      "dietaryType": "Veg",
+      "origin": "Global/Chinese",
+      "cookingMethod": "Fermented",
+      "description": "Dark, salty liquid condiment used heavily in Desi Chinese preparations.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Vinegar (Sirka)",
+      "aliases": [
+        "vinegar (sirka)",
+        "vinegar",
+        "sirka"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sauces/Dips",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Fermented",
+      "description": "Sour acidic liquid. Often used to soak onions (Sirke wale Pyaaz) in North Indian restaurants.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Schezwan Chutney",
+      "aliases": [
+        "schezwan chutney"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sauces/Dips",
+      "dietaryType": "Veg",
+      "origin": "Indo-Chinese",
+      "cookingMethod": "Cooked",
+      "description": "Fiery red, garlicky sauce packed with dried red chilies and Sichuan peppercorns.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mayonnaise",
+      "aliases": [
+        "mayonnaise"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sauces/Dips",
+      "dietaryType": "Veg/Egg",
+      "origin": "Global",
+      "cookingMethod": "Emulsified",
+      "description": "Thick, creamy sauce used in sandwiches, burgers, and rolls.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mint Mayo",
+      "aliases": [
+        "mint mayo"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sauces/Dips",
+      "dietaryType": "Veg/Egg",
+      "origin": "Fusion",
+      "cookingMethod": "Mixed",
+      "description": "Mayonnaise blended with mint and coriander chutney, popular with tandoori snacks.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kasundi (Mustard)",
+      "aliases": [
+        "kasundi (mustard)",
+        "mustard",
+        "kasundi"
+      ],
+      "category": "Condiments/Sides",
+      "subCategory": "Sauces/Dips",
+      "dietaryType": "Veg",
+      "origin": "Bengal",
+      "cookingMethod": "Blended",
+      "description": "Pungent, highly flavored Bengali mustard sauce, excellent with fried fish or chops.",
+      "serving": "1 small serving",
+      "servingGrams": 30,
+      "calories": 80,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Masala Chai",
+      "aliases": [
+        "masala chai"
+      ],
+      "category": "Beverage",
+      "subCategory": "Hot Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Boiled",
+      "description": "Indian tea brewed with milk, sugar, and warming spices like cardamom, ginger, cloves, and black pepper.",
+      "serving": "1 cup",
+      "servingGrams": 180,
+      "calories": 100,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Adrak Chai (Ginger Tea)",
+      "aliases": [
+        "adrak chai (ginger tea)",
+        "ginger tea",
+        "adrak chai"
+      ],
+      "category": "Beverage",
+      "subCategory": "Hot Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Boiled",
+      "description": "Tea brewed robustly with fresh grated ginger.",
+      "serving": "1 cup",
+      "servingGrams": 180,
+      "calories": 100,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Filter Coffee",
+      "aliases": [
+        "filter coffee"
+      ],
+      "category": "Beverage",
+      "subCategory": "Hot Beverage",
+      "dietaryType": "Veg",
+      "origin": "South India",
+      "cookingMethod": "Brewed",
+      "description": "Strong, frothy coffee made by mixing frothed and boiled milk with the decoction obtained by brewing finely ground coffee powder in a traditional Indian filter.",
+      "serving": "1 cup",
+      "servingGrams": 180,
+      "calories": 120,
+      "confidence": "curated-estimate"
+    },
+    {
+      "name": "Instant Coffee",
+      "aliases": [
+        "instant coffee"
+      ],
+      "category": "Beverage",
+      "subCategory": "Hot Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal",
+      "cookingMethod": "Mixed",
+      "description": "Quick coffee made by mixing instant coffee powder, hot milk, and sugar.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Kashmiri Kahwa",
+      "aliases": [
+        "kashmiri kahwa"
+      ],
+      "category": "Beverage",
+      "subCategory": "Hot Beverage",
+      "dietaryType": "Veg",
+      "origin": "Kashmir",
+      "cookingMethod": "Brewed",
+      "description": "Traditional green tea preparation infused with saffron, cinnamon, cardamom, and almond slivers.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Haldi Doodh (Turmeric Milk)",
+      "aliases": [
+        "haldi doodh (turmeric milk)",
+        "turmeric milk",
+        "haldi doodh"
+      ],
+      "category": "Beverage",
+      "subCategory": "Hot Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Boiled",
+      "description": "Warm milk mixed with turmeric powder and sometimes black pepper, known for immunity.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Hot Chocolate",
+      "aliases": [
+        "hot chocolate"
+      ],
+      "category": "Beverage",
+      "subCategory": "Hot Beverage",
+      "dietaryType": "Veg",
+      "origin": "Global",
+      "cookingMethod": "Boiled",
+      "description": "Rich beverage made from cocoa powder, hot milk, and sugar.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sweet Lassi",
+      "aliases": [
+        "sweet lassi"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Punjab/North India",
+      "cookingMethod": "Blended",
+      "description": "Thick, creamy, yogurt-based sweet drink, often flavored with cardamom or rose water.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Mango Lassi",
+      "aliases": [
+        "mango lassi"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal",
+      "cookingMethod": "Blended",
+      "description": "Sweet lassi blended with fresh mango pulp.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Chaas (Buttermilk)",
+      "aliases": [
+        "chaas (buttermilk)",
+        "buttermilk",
+        "chaas"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Blended",
+      "description": "Thin, savory yogurt-based drink, often spiced with roasted cumin, green chilies, and salt. Extremely cooling.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Thandai",
+      "aliases": [
+        "thandai"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Blended",
+      "description": "Cold milk beverage prepared with a mixture of almonds, fennel seeds, watermelon kernels, rose petals, pepper, vetiver, cardamom, and saffron. (Holi/Maha Shivaratri special)",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Rooh Afza (Rose Milk/Water)",
+      "aliases": [
+        "rooh afza (rose milk/water)",
+        "rose milk",
+        "rooh afza",
+        "water"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Mixed",
+      "description": "Cooling drink made by mixing a concentrated sweet herbal/rose syrup with water or milk.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Shikanji (Nimbu Pani)",
+      "aliases": [
+        "shikanji (nimbu pani)",
+        "nimbu pani",
+        "shikanji"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Mixed",
+      "description": "Indian-style spiced lemonade made with cold water, lemon juice, sugar, black salt, and roasted cumin powder.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Jaljeera",
+      "aliases": [
+        "jaljeera"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "North India",
+      "cookingMethod": "Mixed",
+      "description": "Tangy, spicy, and refreshing drink made with water and a special spice mix featuring cumin, mint, and black salt.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Aam Panna",
+      "aliases": [
+        "aam panna"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "North/West India",
+      "cookingMethod": "Boiled/Mixed",
+      "description": "Tangy summer cooler made from boiled raw green mangoes, sugar/jaggery, mint, and cumin.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sol Kadhi",
+      "aliases": [
+        "sol kadhi"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Maharashtra/Goa",
+      "cookingMethod": "Mixed",
+      "description": "Pink-colored savory, tangy digestive drink made from kokum juice and fresh coconut milk.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sugarcane Juice (Ganne ka Ras)",
+      "aliases": [
+        "sugarcane juice (ganne ka ras)",
+        "sugarcane juice",
+        "ganne ka ras"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Extracted",
+      "description": "Freshly pressed juice from sugarcane, often flavored with a hint of ginger, lemon, and mint.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sweet Lime Juice (Mosambi)",
+      "aliases": [
+        "sweet lime juice (mosambi)",
+        "sweet lime juice",
+        "mosambi"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal Indian",
+      "cookingMethod": "Extracted",
+      "description": "Fresh citrus juice, mildly sweet and sour, often served with a dash of black salt/chaat masala.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Tender Coconut Water",
+      "aliases": [
+        "tender coconut water"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Coastal/Universal",
+      "cookingMethod": "Natural",
+      "description": "Natural, refreshing clear water inside young, green coconuts.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Cold Coffee",
+      "aliases": [
+        "cold coffee"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal",
+      "cookingMethod": "Blended",
+      "description": "Thick, frothy, cold blended drink made with milk, instant coffee, sugar, and ice.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Milkshakes (Mango, Chikoo, Chocolate)",
+      "aliases": [
+        "milkshakes (mango, chikoo, chocolate)",
+        "milkshakes",
+        "chocolate",
+        "chikoo",
+        "mango"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Universal",
+      "cookingMethod": "Blended",
+      "description": "Sweet, cold beverage made by blending milk, ice cream, and fruit/syrup flavors.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    },
+    {
+      "name": "Sodas (Cola, Limca, Thums Up)",
+      "aliases": [
+        "sodas (cola, limca, thums up)",
+        "thums up",
+        "sodas",
+        "limca",
+        "cola"
+      ],
+      "category": "Beverage",
+      "subCategory": "Cold Beverage",
+      "dietaryType": "Veg",
+      "origin": "Global/Indian",
+      "cookingMethod": "Carbonated",
+      "description": "Ready-to-drink fizzy, sweetened carbonated beverages.",
+      "serving": "1 cup/glass",
+      "servingGrams": 200,
+      "calories": 120,
+      "confidence": "category-estimate"
+    }
+  ]
+}
