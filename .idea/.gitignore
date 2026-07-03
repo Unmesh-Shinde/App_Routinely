@@ -1,3 +1,11 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+# Machine-specific / personal IDE files
+/appInsightsSettings.xml
+/deploymentTargetSelector.xml
+/deviceManager.xml
+/markdown.xml
+/migrations.xml
+/planningMode.xml
+/studiobot.xml
