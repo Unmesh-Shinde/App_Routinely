@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.health.READ_BASAL_METABOLIC_RATE"/>
     <uses-permission android:name="android.permission.health.READ_DISTANCE"/>
     <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
+    <uses-permission android:name="android.permission.health.READ_WEIGHT"/>
     <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_HISTORY"/>
     <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"/>
 
@@ -114,10 +115,11 @@
             android:exported="false"
             android:label="Calories Tracking"/>
 
+
         <activity
-            android:name=".HabitProgressActivity"
+            android:name=".WellnessScoreActivity"
             android:exported="false"
-            android:label="Daily Progress"/>
+            android:label="Score Customization"/>
 
         <activity
             android:name=".ProfileActivity"

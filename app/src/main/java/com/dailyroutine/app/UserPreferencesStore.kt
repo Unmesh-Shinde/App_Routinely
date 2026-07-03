@@ -8,10 +8,15 @@ object UserPreferencesStore {
     private const val KEY_USER_NAME = "user_name"
     private const val KEY_USER_AGE = "user_age"
     private const val KEY_USER_HEIGHT = "user_height"
+    private const val KEY_USER_WEIGHT = "user_weight"
     private const val KEY_USER_GENDER = "user_gender"
     private const val KEY_IS_SIGNED_UP = "is_signed_up"
-    private const val KEY_STREAK_COUNT = "streak_count"
-    private const val KEY_LAST_STREAK_UPDATE = "last_streak_update"
+
+    // Wellness Score Weights
+    private const val KEY_WEIGHT_SLEEP = "weight_sleep"
+    private const val KEY_WEIGHT_WORKOUT = "weight_workout"
+    private const val KEY_WEIGHT_NUTRITION = "weight_nutrition"
+    private const val KEY_WEIGHT_STEPS = "weight_steps"
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -39,33 +44,23 @@ object UserPreferencesStore {
     fun getUserHeight(context: Context): Int = getPrefs(context).getInt(KEY_USER_HEIGHT, 170)
     fun setUserHeight(context: Context, height: Int) = getPrefs(context).edit().putInt(KEY_USER_HEIGHT, height).apply()
 
+    fun getUserWeight(context: Context): Double = getPrefs(context).getFloat(KEY_USER_WEIGHT, 70.0f).toDouble()
+    fun setUserWeight(context: Context, weight: Double) = getPrefs(context).edit().putFloat(KEY_USER_WEIGHT, weight.toFloat()).apply()
+
     fun getUserGender(context: Context): String = getPrefs(context).getString(KEY_USER_GENDER, "Male") ?: "Male"
     fun setUserGender(context: Context, gender: String) = getPrefs(context).edit().putString(KEY_USER_GENDER, gender).apply()
 
-    fun getUnlockedBadges(context: Context): Set<String> {
-        return getPrefs(context).getStringSet("unlocked_badges", emptySet()) ?: emptySet()
-    }
 
-    fun unlockBadge(context: Context, badgeId: String) {
-        val current = getUnlockedBadges(context).toMutableSet()
-        if (current.add(badgeId)) {
-            getPrefs(context).edit().putStringSet("unlocked_badges", current).apply()
-        }
-    }
+    // Wellness Score Weight Accessors
+    fun getSleepWeight(context: Context): Int = getPrefs(context).getInt(KEY_WEIGHT_SLEEP, 35)
+    fun setSleepWeight(context: Context, weight: Int) = getPrefs(context).edit().putInt(KEY_WEIGHT_SLEEP, weight).apply()
 
-    fun getStreakCount(context: Context): Int {
-        return getPrefs(context).getInt(KEY_STREAK_COUNT, 0)
-    }
+    fun getWorkoutWeight(context: Context): Int = getPrefs(context).getInt(KEY_WEIGHT_WORKOUT, 25)
+    fun setWorkoutWeight(context: Context, weight: Int) = getPrefs(context).edit().putInt(KEY_WEIGHT_WORKOUT, weight).apply()
 
-    fun setStreakCount(context: Context, count: Int) {
-        getPrefs(context).edit().putInt(KEY_STREAK_COUNT, count).apply()
-    }
+    fun getNutritionWeight(context: Context): Int = getPrefs(context).getInt(KEY_WEIGHT_NUTRITION, 25)
+    fun setNutritionWeight(context: Context, weight: Int) = getPrefs(context).edit().putInt(KEY_WEIGHT_NUTRITION, weight).apply()
 
-    fun getLastStreakUpdate(context: Context): String {
-        return getPrefs(context).getString(KEY_LAST_STREAK_UPDATE, "") ?: ""
-    }
-
-    fun setLastStreakUpdate(context: Context, date: String) {
-        getPrefs(context).edit().putString(KEY_LAST_STREAK_UPDATE, date).apply()
-    }
+    fun getStepsWeight(context: Context): Int = getPrefs(context).getInt(KEY_WEIGHT_STEPS, 15)
+    fun setStepsWeight(context: Context, weight: Int) = getPrefs(context).edit().putInt(KEY_WEIGHT_STEPS, weight).apply()
 }

@@ -30,6 +30,7 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
         if (!hdm.isConnected()) return@withContext ListenableWorker.Result.success()
 
         val hcm = HealthConnectManager(applicationContext)
+        val gfit = GoogleFitHeartPointsManager(applicationContext)
         val appPkg = hdm.getConnectedAppPackage()
         val syncMode = inputData.getString(KEY_SYNC_MODE) ?: SYNC_MODE_ALL
         val shouldSyncHistory = syncMode == SYNC_MODE_ALL || syncMode == SYNC_MODE_HISTORY
@@ -40,6 +41,7 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
         val todayDate = LocalDate.now()
         val zoneId = ZoneId.systemDefault()
         val startOfToday = todayDate.atStartOfDay(zoneId).toInstant()
+        var heartPointsByDate = emptyMap<String, Double>()
 
         try {
             val granted = hcm.getGrantedPermissions()
@@ -66,9 +68,30 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
                 val burnedCals = hcm.readTotalCalories(startOfToday, now, appPkg)
                 if (burnedCals > 0) editor.putString("calories_burnt", "%.0f".format(burnedCals))
             }
-            if (shouldSyncSteps && granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.WeightRecord::class))) {
-                val weightKg = hcm.readWeightKg(startOfToday, now, appPkg)
-                if (weightKg > 0) editor.putString("current_weight", "%.1f kg".format(weightKg))
+             if (shouldSyncSteps && granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.WeightRecord::class))) {
+                 val weightKg = hcm.readWeightKg(startOfToday, now, appPkg)
+                 if (weightKg > 0) editor.putString("current_weight", "%.1f kg".format(weightKg))
+             }
+
+            val canReadGoogleFitHeartPoints = appPkg == GoogleFitHeartPointsManager.GOOGLE_FIT_PACKAGE && gfit.hasReadPermission()
+
+            // Heart Points are synced only from Google Fit direct API (no local calculation).
+            if (canReadGoogleFitHeartPoints) {
+                try {
+                    val oldestDate = if (shouldSyncHistory) {
+                        todayDate.minusDays((HealthDataManager.SYNC_HISTORY_DAYS - 1).toLong())
+                    } else {
+                        todayDate.minusDays(1)
+                    }
+                    heartPointsByDate = gfit.readDailyHeartPoints(oldestDate, now, zoneId)
+                    val heartPoints = heartPointsByDate[todayDate.toString()] ?: gfit.readHeartPoints(startOfToday, now)
+                    hdm.setHeartPoints(heartPoints.toInt())
+                    android.util.Log.d("HealthSyncWorker", "Google Fit Heart Points synced for today: $heartPoints")
+                } catch (e: Exception) {
+                    android.util.Log.e("HealthSyncWorker", "Failed to sync Google Fit heart points: ${e.message}")
+                }
+            } else {
+                hdm.setHeartPoints(0)
             }
 
             val historyRange = if (shouldSyncHistory) {
@@ -94,9 +117,23 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
                 if (shouldSyncSteps && granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.TotalCaloriesBurnedRecord::class))) {
                     hdm.saveHistoricalCalories(dateKey, hcm.readTotalCalories(dayStart, dayEnd, appPkg))
                 }
-                if (shouldSyncSteps && granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.WeightRecord::class))) {
-                    val weightKg = hcm.readWeightKg(dayStart, dayEnd, appPkg)
-                    if (weightKg > 0) hdm.saveWeight(dateKey, weightKg)
+                 if (shouldSyncSteps && granted.contains(androidx.health.connect.client.permission.HealthPermission.getReadPermission(androidx.health.connect.client.records.WeightRecord::class))) {
+                     val weightKg = hcm.readWeightKg(dayStart, dayEnd, appPkg)
+                     if (weightKg > 0) hdm.saveWeight(dateKey, weightKg)
+                 }
+
+                if (canReadGoogleFitHeartPoints) {
+                    try {
+                        val pts = heartPointsByDate[dateKey] ?: 0.0
+                        hdm.saveHistoricalHeartPoints(dateKey, pts)
+                        if (pts > 0) {
+                            android.util.Log.d("HealthSyncWorker", "Google Fit Heart Points for $dateKey: $pts")
+                        }
+                    } catch (e: Exception) {
+                        android.util.Log.e("HealthSyncWorker", "Failed to sync Google Fit heart points for $dateKey: ${e.message}")
+                    }
+                } else {
+                    hdm.saveHistoricalHeartPoints(dateKey, 0.0)
                 }
             }
             if (shouldSyncSteps) {
@@ -149,34 +186,29 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
 
         fun scheduleAutoSync(context: Context) {
             scheduleNextStepSync(context)
-            scheduleSleepSync(context, 6, 30, "SleepSyncMorning")
-            scheduleSleepSync(context, 18, 30, "SleepSyncEvening")
+            scheduleSleepSync(context, 7, 0, "SleepSyncMorning")
+            scheduleSleepSync(context, 19, 0, "SleepSyncEvening")
             scheduleHistorySync(context)
         }
 
         private fun scheduleNextStepSync(context: Context) {
             val now = Calendar.getInstance()
-            val dayOfWeek = now.get(Calendar.DAY_OF_WEEK)
-            val isWeekend = dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY
             val currentHour = now.get(Calendar.HOUR_OF_DAY)
+            val currentMinute = now.get(Calendar.MINUTE)
 
-            if (currentHour >= 23 || currentHour < 6) {
-                scheduleStepSyncAt(context, 3, 0)
-                return
-            }
+            // Fixed Slots: 12 AM (0), 6 AM, 9 AM, 12 PM (12), 3 PM (15), 6 PM (18), 9 PM (21)
+            // Note: 3 AM is skipped for StepSync because Deep History Sync runs at 3:15 AM.
+            val slots = listOf(0, 6, 9, 12, 15, 18, 21)
 
-            val intervalHours = if (isWeekend) 2 else 4
-            val nextSync = (now.clone() as Calendar).apply {
-                add(Calendar.HOUR_OF_DAY, intervalHours)
-            }
+            // Find the next slot after the current time
+            val nextHour = slots.firstOrNull { it > currentHour || (it == currentHour && currentMinute < 1) } ?: 6 // Default to 6 AM (tomorrow) if all passed
 
-            val nextHour = nextSync.get(Calendar.HOUR_OF_DAY)
-            val delayMs = if (nextHour >= 23 || nextHour < 6) {
-                delayUntil(3, 0)
-            } else {
-                nextSync.timeInMillis - now.timeInMillis
-            }
+            // If the next slot is 0, it means we are at 9 PM and looking for 12 AM tomorrow.
+            // Our delayUntil helper handles the day-wrap automatically.
 
+            android.util.Log.d("HealthSync", "Scheduling next StepSync. Current Hour: $currentHour. Next Slot: $nextHour")
+
+            val delayMs = delayUntil(nextHour, 0)
             enqueueUniqueSync(context, "StepSync", TAG_STEP_SYNC, delayMs, SYNC_MODE_STEPS)
         }
 
@@ -200,6 +232,7 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }
+            // If the target is in the past (today), add 1 day to target tomorrow at that hour.
             if (target.before(now)) target.add(Calendar.DAY_OF_YEAR, 1)
             return target.timeInMillis - now.timeInMillis
         }
@@ -212,9 +245,11 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .build()
 
+            // policy = KEEP: Ensures that if a sync is already scheduled for a fixed hour,
+            // opening the app (which calls scheduleAutoSync) does not cancel it and restart the delay.
             WorkManager.getInstance(context).enqueueUniqueWork(
                 uniqueName,
-                ExistingWorkPolicy.REPLACE,
+                ExistingWorkPolicy.KEEP,
                 request
             )
         }

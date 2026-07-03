@@ -30,13 +30,9 @@ class HealthConnectManager(private val context: Context) {
     suspend fun getGrantedPermissions(): Set<String> {
         return try {
             healthConnectClient.permissionController.getGrantedPermissions()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptySet()
         }
-    }
-
-    suspend fun hasPermission(permission: String): Boolean {
-        return getGrantedPermissions().contains(permission)
     }
 
     suspend fun hasAnyPermission(): Boolean {
@@ -58,7 +54,7 @@ class HealthConnectManager(private val context: Context) {
                 )
             )
             response[StepsRecord.COUNT_TOTAL] ?: 0L
-        } catch (e: Exception) { 
+        } catch (_: Exception) {
             0L
         }
     }
@@ -74,7 +70,7 @@ class HealthConnectManager(private val context: Context) {
                 )
             )
             response[DistanceRecord.DISTANCE_TOTAL]?.inMeters ?: 0.0
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0.0
         }
     }
@@ -90,7 +86,7 @@ class HealthConnectManager(private val context: Context) {
                 )
             )
             response[TotalCaloriesBurnedRecord.ENERGY_TOTAL]?.inKilocalories ?: 0.0
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0.0
         }
     }
@@ -109,7 +105,7 @@ class HealthConnectManager(private val context: Context) {
                 java.time.Duration.between(it.startTime, it.endTime).toMinutes()
             }
             totalMins.toInt()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0
         }
     }
@@ -125,7 +121,7 @@ class HealthConnectManager(private val context: Context) {
                 )
             )
             return response.records
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList<SleepSessionRecord>()
         }
     }
@@ -141,8 +137,9 @@ class HealthConnectManager(private val context: Context) {
                 )
             )
             response.records.maxByOrNull { it.time }?.weight?.inKilograms ?: 0.0
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0.0
         }
     }
+
 }

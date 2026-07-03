@@ -6,7 +6,15 @@ import java.io.Serializable
 
 enum class PlanDuration(val label: String, val totalDays: Int) {
     WEEKLY("Weekly", 7),
+    TEN_DAYS("10 Days", 10),
     BI_WEEKLY("Bi-Weekly", 14),
+    MONTHLY("Monthly", 30)
+}
+
+enum class TemplateDuration(val label: String, val totalDays: Int) {
+    WEEKLY("Weekly", 7),
+    TEN_DAYS("10 Days", 10),
+    FORTNIGHT("Fortnight", 14),
     MONTHLY("Monthly", 30)
 }
 
@@ -29,6 +37,20 @@ data class Meal(
 
 data class DietPlan(
     val dailyMeals: MutableMap<String, MutableList<Meal>> = mutableMapOf() // Date (yyyy-MM-dd) -> List of meals
+) : Serializable
+
+data class MealTemplate(
+    val id: String,
+    val name: String,
+    val durationDays: Int,
+    val mealsByDayOffset: MutableMap<Int, MutableList<Meal>> = mutableMapOf()
+) : Serializable
+
+data class AppliedTemplateRange(
+    val templateId: String,
+    val templateName: String,
+    val startDate: String,
+    val endDate: String
 ) : Serializable
 
 // --- Workout Plan Models ---
@@ -62,4 +84,11 @@ data class Exercise(
 
 data class WorkoutPlan(
     val dailyExercises: MutableMap<String, MutableList<Exercise>> = mutableMapOf() // Date (yyyy-MM-dd) -> List of exercises
+) : Serializable
+
+data class WorkoutTemplate(
+    val id: String,
+    val name: String,
+    val durationDays: Int,
+    val exercisesByDayOffset: MutableMap<Int, MutableList<Exercise>> = mutableMapOf()
 ) : Serializable

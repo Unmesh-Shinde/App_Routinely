@@ -29,12 +29,22 @@
             android:alpha="0.7"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/llWeeksContainer"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:orientation="horizontal"
-        android:gravity="bottom"
-        android:weightSum="5"/>
+        android:layout_height="250dp">
+
+        <com.dailyroutine.app.GoalLineOverlayView
+            android:id="@+id/monthGoalOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/llWeeksContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:weightSum="5"/>
+    </FrameLayout>
 
 </LinearLayout>

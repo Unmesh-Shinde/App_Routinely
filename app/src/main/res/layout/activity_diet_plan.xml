@@ -46,6 +46,16 @@
                 android:textColor="@android:color/white"
                 app:icon="@drawable/ic_calendar"
                 app:iconTint="@android:color/white"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnTemplatesDiet"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Templates"
+                android:textColor="@android:color/white"
+                app:icon="@drawable/ic_reminder"
+                app:iconTint="@android:color/white"/>
         </LinearLayout>
 
         <HorizontalScrollView
@@ -60,6 +70,45 @@
                 android:orientation="horizontal"
                 android:padding="8dp"/>
         </HorizontalScrollView>
+
+        <LinearLayout
+            android:id="@+id/llMealTemplateLegend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFCDD2"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="6dp">
+
+            <View
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:background="#D50000" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Template applied"
+                android:textColor="#5D0000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="16dp"
+                android:background="#D32F2F" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Meals added"
+                android:textColor="#5D0000"
+                android:textSize="11sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

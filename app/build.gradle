@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.dailyroutine.app'
-    compileSdk 35
+    compileSdk 37
 
     defaultConfig {
         applicationId "com.dailyroutine.app"
         minSdk 26
-        targetSdk 34
+        targetSdk 37
         versionCode 2
         versionName "1.1"
 
@@ -42,8 +42,12 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
     
     // Health Connect
-    implementation 'androidx.health.connect:connect-client:1.1.0-alpha11'
-    
+    implementation 'androidx.health.connect:connect-client:1.1.0'
+
+    // Google Fit (direct Heart Points)
+    implementation 'com.google.android.gms:play-services-fitness:21.2.0'
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
+
     // WorkManager
     implementation 'androidx.work:work-runtime-ktx:2.9.0'
     

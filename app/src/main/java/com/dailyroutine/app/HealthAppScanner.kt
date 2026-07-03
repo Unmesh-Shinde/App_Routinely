@@ -13,6 +13,7 @@ object HealthAppScanner {
         FitnessApp("Garmin Connect", "com.garmin.android.apps.connectmobile", null),
         FitnessApp("Xiaomi Mi Fitness", "com.xiaomi.wearable", null),
         FitnessApp("Xiaomi Zepp Life", "com.xiaomi.hm.health", null),
+        FitnessApp("Cult.fit (Cult Connect)", "com.curefit.android", null),
         FitnessApp("Zepp (Amazfit)", "com.huami.watch.hmwatchmanager", null),
         FitnessApp("NoiseFit", "com.noisefit", null),
         FitnessApp("boAt Crest", "com.coveiot.boat", null),

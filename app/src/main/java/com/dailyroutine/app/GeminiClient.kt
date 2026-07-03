@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 
 object GeminiClient {
     // Gemini API key. If this key is invalid or restricted, the local estimator is used.
-    private const val API_KEY = "AQ.Ab8RN6Lv8YtdcHcdGzW7oWoyRt4ubKM2dxTW5kGzhHyuO9tJkA"
+    private const val API_KEY = "AQ.Ab8RN6LJjFAWqVv8-aNwNe5ozESBGbVNxIrPIxKNZ0c-5Ckicg"
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)

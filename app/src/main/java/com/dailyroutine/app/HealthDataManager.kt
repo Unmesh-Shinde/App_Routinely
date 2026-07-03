@@ -21,6 +21,7 @@ class HealthDataManager(context: Context) {
         private const val KEY_SOURCE_APP = "connected_health_app_name"
         private const val KEY_SOURCE_PKG = "connected_health_app_package"
         private const val KEY_MOVE_MINS = "move_minutes_count"
+        private const val KEY_HEART_POINTS = "heart_points_count"
         private const val KEY_LAST_SYNC = "last_background_sync_time"
         private const val KEY_DISTANCE_VAL = "distance_val"
     }
@@ -36,6 +37,9 @@ class HealthDataManager(context: Context) {
 
     fun getMoveMinutes(): Int = prefs.getInt(KEY_MOVE_MINS, 0)
     fun setMoveMinutes(mins: Int) = prefs.edit().putInt(KEY_MOVE_MINS, mins).apply()
+
+    fun getHeartPoints(): Int = prefs.getInt(KEY_HEART_POINTS, 0)
+    fun setHeartPoints(points: Int) = prefs.edit().putInt(KEY_HEART_POINTS, points).apply()
 
     fun getConnectedAppName(): String = prefs.getString(KEY_SOURCE_APP, "None") ?: "None"
     fun setConnectedAppName(name: String) = prefs.edit().putString(KEY_SOURCE_APP, name).apply()
@@ -117,4 +121,9 @@ class HealthDataManager(context: Context) {
         prefs.edit().putFloat("hist_cals_$date", cals.toFloat()).apply()
     }
     fun getHistoricalCalories(date: String): Double = prefs.getFloat("hist_cals_$date", 0.0f).toDouble()
+
+    fun saveHistoricalHeartPoints(date: String, pts: Double) {
+        prefs.edit().putFloat("hist_heart_pts_$date", pts.toFloat()).apply()
+    }
+    fun getHistoricalHeartPoints(date: String): Double = prefs.getFloat("hist_heart_pts_$date", 0.0f).toDouble()
 }

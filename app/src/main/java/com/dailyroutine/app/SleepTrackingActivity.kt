@@ -16,6 +16,7 @@ class SleepTrackingActivity : AppCompatActivity() {
 
     private lateinit var healthDataManager: HealthDataManager
     private var isConnected = false
+    private val sleepBarColor = 0xFF5C6BC0.toInt()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,35 +114,40 @@ class SleepTrackingActivity : AppCompatActivity() {
     private fun refreshWeeklyView() {
         val container = findViewById<LinearLayout>(R.id.llWeeklySleepGraph)
         container.removeAllViews()
-        
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
+        val goalOverlay = findViewById<GoalLineOverlayView>(R.id.weeklySleepGoalOverlay)
+        goalOverlay.setGoalLines(
+            listOf(
+                GoalLineSpec(7.0, 12.0, "7h", sleepBarColor),
+                GoalLineSpec(8.0, 12.0, "8h goal", sleepBarColor)
+            )
+        )
+
+        val weekGroups = HistoryDateOrder.monthBoundedWeeklyGroups(HealthDataManager.SYNC_HISTORY_DAYS)
 
         val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
-        for (dayIndex in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
-            val dateKey = dateFormatter.format(calendar.time)
-            val sleepHours = healthDataManager.getHistoricalSleep(dateKey)
+        weekGroups.forEachIndexed { weekIndex, weekDates ->
+            weekDates.forEach { calendar ->
+                val dateKey = dateFormatter.format(calendar.time)
+                val sleepHours = healthDataManager.getHistoricalSleep(dateKey)
 
-            val barView = android.view.LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-            barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
-            barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-            barView.findViewById<TextView>(R.id.tvBarValue).text = if (sleepHours > 0) "%.1fh".format(sleepHours) else "-"
+                val barView = android.view.LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
+                barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
+                barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
+                barView.findViewById<TextView>(R.id.tvBarValue).text = if (sleepHours > 0) "%.1fh".format(sleepHours) else "-"
 
-            val bar = barView.findViewById<View>(R.id.viewBar)
-            bar.setBackgroundColor(0xFF5C6BC0.toInt())
-            val params = bar.layoutParams as LinearLayout.LayoutParams
-            params.height = (sleepHours * 250 / 12.0).toInt().let { dpToPx(it) }.coerceAtLeast(2)
-            bar.layoutParams = params
+                val bar = barView.findViewById<View>(R.id.viewBar)
+                bar.setBackgroundColor(sleepBarColor)
+                val params = bar.layoutParams as LinearLayout.LayoutParams
+                params.height = (sleepHours * 250 / 12.0).toInt().let { dpToPx(it) }.coerceAtLeast(2)
+                bar.layoutParams = params
 
-            container.addView(barView)
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
+                container.addView(barView)
+            }
 
-            if ((dayIndex + 1) % 7 == 0 && dayIndex != HealthDataManager.SYNC_HISTORY_DAYS - 1) {
+            if (weekIndex != weekGroups.lastIndex) {
                 val divider = View(this).apply {
                     layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
                         setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
@@ -149,6 +155,15 @@ class SleepTrackingActivity : AppCompatActivity() {
                     setBackgroundColor(0xFF303F9F.toInt())
                 }
                 container.addView(divider)
+            }
+        }
+
+        container.post {
+            val targetWidth = maxOf(container.width, container.measuredWidth, dpToPx(2000))
+            val params = goalOverlay.layoutParams
+            if (params.width != targetWidth) {
+                params.width = targetWidth
+                goalOverlay.layoutParams = params
             }
         }
     }
@@ -175,9 +190,46 @@ class SleepTrackingActivity : AppCompatActivity() {
             val monthName = monthFormatter.format(calendar.time)
             val year = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
+            val isCurrentMonth = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) && currentMonth == today.get(Calendar.MONTH)
             
             val barItems = mutableListOf<BarItem>()
             var weekIndex = 1
+
+            if (isCurrentMonth) {
+                HistoryDateOrder.monthWeeksForMonthlyView(calendar, today).forEach { week ->
+                    var weekSum = 0.0
+
+                    if (week.isComplete) {
+                        week.dates.forEach { day ->
+                            val dateKey = dateFormatter.format(day.time)
+                            if (!day.before(oldestSyncedDay) && !day.after(today)) {
+                                weekSum += healthDataManager.getHistoricalSleep(dateKey)
+                            }
+                        }
+                    }
+
+                    if (week.isComplete && weekSum < 56.0 && weekSum > 0) {
+                        deficitWeeks.add("${rangeFormatter.format(week.start.time)} - ${rangeFormatter.format(week.end.time)}")
+                    }
+
+                    val height = (weekSum * 250 / 70.0).toInt().coerceIn(if (weekSum > 0) 2 else 0, 250)
+                    barItems.add(BarItem(BarData(
+                        label = "Week $weekIndex",
+                        date = rangeFormatter.format(week.start.time),
+                        valueDisplay = if (weekSum > 0) "%.0fh".format(weekSum) else "-",
+                        heightPx = dpToPx(height),
+                        color = sleepBarColor
+                    )))
+                    weekIndex++
+                }
+
+                calendar.add(Calendar.MONTH, 1)
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                if (barItems.isNotEmpty()) {
+                    monthDataList.add(MonthData(monthName, year, barItems, monthlySleepGoalLines()))
+                }
+                continue
+            }
 
             while (calendar.get(Calendar.MONTH) == currentMonth) {
                 var weekSum = 0.0
@@ -215,27 +267,34 @@ class SleepTrackingActivity : AppCompatActivity() {
                     date = rangeFormatter.format(weekStart),
                     valueDisplay = if (weekSum > 0) "%.0fh".format(weekSum) else "-",
                     heightPx = dpToPx(height),
-                    color = 0xFF5C6BC0.toInt()
+                    color = sleepBarColor
                 )))
                 weekIndex++
             }
             if (barItems.isNotEmpty()) {
-                monthDataList.add(MonthData(monthName, year, barItems))
+                monthDataList.add(MonthData(monthName, year, barItems, monthlySleepGoalLines()))
             }
         }
 
-        rv.adapter = MonthGraphAdapter(monthDataList)
+        rv.adapter = MonthGraphAdapter(monthDataList.asReversed())
         rv.onFlingListener = null
         androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
 
         val warning = findViewById<TextView>(R.id.tvMonthlySleepWarning)
         if (deficitWeeks.isNotEmpty()) {
             warning.visibility = View.VISIBLE
-            warning.text = "⚠️ Target sleep (56h) not met in: ${deficitWeeks.take(3).joinToString(", ")}..."
+            warning.text = "⚠️ Target sleep (56h) not met in: ${deficitWeeks.asReversed().take(3).joinToString(", ")}..."
         } else {
             warning.visibility = View.GONE
         }
     }
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
+
+    private fun monthlySleepGoalLines(): List<GoalLineSpec> {
+        return listOf(
+            GoalLineSpec(49.0, 70.0, "49h", sleepBarColor),
+            GoalLineSpec(56.0, 70.0, "56h goal", sleepBarColor)
+        )
+    }
 }

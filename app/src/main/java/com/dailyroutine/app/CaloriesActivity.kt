@@ -51,6 +51,11 @@ class CaloriesActivity : AppCompatActivity() {
         refreshTodayView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateIdealCaloriesMessage()
+    }
+
     private fun showGoalDialog() {
         val input = EditText(this).apply {
             hint = "e.g. 2000"
@@ -121,6 +126,7 @@ class CaloriesActivity : AppCompatActivity() {
     private fun refreshTodayView() {
         val todayStr = dateFormatter.format(Date())
         val meals = planManager.getMealsForDate(todayStr)
+        updateIdealCaloriesMessage()
         
         val tvAnalyzing = findViewById<TextView>(R.id.tvAnalyzing)
         if (meals.isNotEmpty()) {
@@ -154,14 +160,21 @@ class CaloriesActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateIdealCaloriesMessage() {
+        val tv = findViewById<TextView>(R.id.tvIdealCaloriesMessage)
+        val metrics = ProfileHealthMetricsCalculator.calculate(this)
+        if (metrics == null) {
+            tv.text = "Complete age, height, weight, and gender in Profile to calculate your ideal calorie intake."
+            return
+        }
+        tv.text = "Ideal Calorie Intake: ${metrics.idealCalories} kcal/day according to your profile."
+    }
+
     private fun refreshWeeklyView() {
         val container = findViewById<LinearLayout>(R.id.llWeeklyGraph)
         container.removeAllViews()
         
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
+        val weekGroups = HistoryDateOrder.monthBoundedWeeklyGroups(HealthDataManager.SYNC_HISTORY_DAYS)
 
         val now = Calendar.getInstance()
         val currentWeekStart = (now.clone() as Calendar).apply {
@@ -176,27 +189,28 @@ class CaloriesActivity : AppCompatActivity() {
         val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
         val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
 
-        for (dayIndex in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
-            val dayVal = getMealCaloriesForDate(dateFormatter.format(calendar.time))
-            if (!calendar.before(currentWeekStart) && !calendar.after(now)) {
-                currentWeekTotal += dayVal
+        weekGroups.forEachIndexed { weekIndex, weekDates ->
+            weekDates.forEach { calendar ->
+                val dayVal = getMealCaloriesForDate(dateFormatter.format(calendar.time))
+                if (!calendar.before(currentWeekStart) && !calendar.after(now)) {
+                    currentWeekTotal += dayVal
+                }
+
+                val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
+                barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
+                barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
+                barView.findViewById<TextView>(R.id.tvBarValue).text = if (dayVal > 0) dayVal.toString() else "-"
+
+                val bar = barView.findViewById<View>(R.id.viewBar)
+                bar.setBackgroundResource(R.drawable.bg_calorie_bar)
+                val params = bar.layoutParams as LinearLayout.LayoutParams
+                params.height = (dayVal * 250 / 3500).coerceIn(2, 250).let { dpToPx(it) }
+                bar.layoutParams = params
+
+                container.addView(barView)
             }
 
-            val barView = LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-            barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
-            barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-            barView.findViewById<TextView>(R.id.tvBarValue).text = if (dayVal > 0) dayVal.toString() else "-"
-
-            val bar = barView.findViewById<View>(R.id.viewBar)
-            bar.setBackgroundResource(R.drawable.bg_calorie_bar)
-            val params = bar.layoutParams as LinearLayout.LayoutParams
-            params.height = (dayVal * 250 / 3500).coerceIn(2, 250).let { dpToPx(it) }
-            bar.layoutParams = params
-
-            container.addView(barView)
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
-
-            if ((dayIndex + 1) % 7 == 0 && dayIndex != HealthDataManager.SYNC_HISTORY_DAYS - 1) {
+            if (weekIndex != weekGroups.lastIndex) {
                 val divider = View(this).apply {
                     layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
                         setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
@@ -230,10 +244,44 @@ class CaloriesActivity : AppCompatActivity() {
             val monthName = monthFormatter.format(calendar.time)
             val yearName = yearFormatter.format(calendar.time)
             val currentMonth = calendar.get(Calendar.MONTH)
-            
+            val isCurrentMonth = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) && currentMonth == today.get(Calendar.MONTH)
+
             val barItems = mutableListOf<BarItem>()
             var weekIndex = 1
-            
+
+            if (isCurrentMonth) {
+                HistoryDateOrder.monthWeeksForMonthlyView(calendar, today).forEach { week ->
+                    var weekSum = 0.0
+
+                    if (week.isComplete) {
+                        week.dates.forEach { day ->
+                            val dateKey = dateFormatter.format(day.time)
+                            if (!day.before(oldestSyncedDay) && !day.after(today)) {
+                                weekSum += getMealCaloriesForDate(dateKey)
+                            }
+                        }
+                    }
+
+                    val height = (weekSum * 250 / (3500 * 7)).toInt().coerceIn(if (weekSum > 0) 2 else 0, 250)
+                    barItems.add(BarItem(BarData(
+                        label = "Week $weekIndex",
+                        date = rangeFormatter.format(week.start.time),
+                        valueDisplay = if (weekSum > 0) "%.0f".format(weekSum) else "-",
+                        heightPx = dpToPx(height),
+                        color = 0xFFEF5350.toInt(),
+                        backgroundRes = R.drawable.bg_calorie_bar
+                    )))
+                    weekIndex++
+                }
+
+                calendar.add(Calendar.MONTH, 1)
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                if (barItems.isNotEmpty()) {
+                    monthDataList.add(MonthData(monthName, yearName, barItems))
+                }
+                continue
+            }
+
             while (calendar.get(Calendar.MONTH) == currentMonth) {
                 val weekStart = calendar.time
                 val weekDates = mutableListOf<String>()
@@ -270,7 +318,7 @@ class CaloriesActivity : AppCompatActivity() {
             }
         }
 
-        rv.adapter = MonthGraphAdapter(monthDataList)
+        rv.adapter = MonthGraphAdapter(monthDataList.asReversed())
         rv.onFlingListener = null
         androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
     }

@@ -59,7 +59,7 @@ object WellnessEngine {
         val userWeight = if (weight > 0) weight else 70.0
         val hdm = HealthDataManager(context)
 
-        val walkingBurn = calculateWalkingBurn(hdm, steps, userWeight)
+        val walkingBurn = calculateWalkingBurn(hdm, date, steps, userWeight)
         val workoutBurn = calculateWorkoutBurn(context, date, userWeight)
 
         return walkingBurn + workoutBurn
@@ -77,11 +77,25 @@ object WellnessEngine {
         onResult(totalIntake)
     }
 
-    private fun calculateWalkingBurn(hdm: HealthDataManager, steps: Int, weightKg: Double): Double {
-        val distanceKm = hdm.getDistanceKm()
-        val moveMins = hdm.getMoveMinutes().toDouble()
+    private fun calculateWalkingBurn(hdm: HealthDataManager, date: String, steps: Int, weightKg: Double): Double {
+        val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        val isToday = date == todayStr
 
-        return if (moveMins > 0 && distanceKm > 0.0) {
+        val distanceKm = if (isToday) hdm.getDistanceKm() else {
+            // Fetch historical distance if we have a key, otherwise calculate from steps
+            // HealthDataManager currently doesn't store hist_dist conveniently but we can estimate
+            hdm.calculateDistanceKm(steps)
+        }
+
+        val moveMins = if (isToday) hdm.getMoveMinutes().toDouble() else {
+            hdm.calculateDurationMin(steps).toDouble()
+        }
+
+        val heartPoints = if (isToday) hdm.getHeartPoints().toDouble() else {
+            hdm.getHistoricalHeartPoints(date)
+        }
+
+        val baseBurn = if (moveMins > 0 && distanceKm > 0.0) {
             val speed = distanceKm / (moveMins / 60.0)
             caloriesFromMet(walkingMetForSpeed(speed), weightKg, moveMins)
         } else if (steps > 0) {
@@ -92,6 +106,12 @@ object WellnessEngine {
         } else {
             0.0
         }
+
+        // Heart Points Bonus: Each point roughly represents ~5-10 kcal depending on weight and intensity.
+        // We use a formula: points * (weightKg / 70.0) * 4.0 (avg kcal per minute of moderate activity)
+        val heartPointsBurn = heartPoints * (weightKg / 70.0) * 4.0
+
+        return baseBurn + heartPointsBurn
     }
 
     private fun calculateWorkoutBurn(context: Context, date: String, weightKg: Double): Double {
@@ -250,33 +270,4 @@ object WellnessEngine {
         }
     }
 
-    data class Milestone(val id: String, val title: String, val emoji: String, val description: String)
-
-    val milestones = listOf(
-        Milestone("century_walker", "Century Walker", "Walking", "100k total steps achieved!"),
-        Milestone("hydration_hero", "Hydration Hero", "Water", "7-day water streak!"),
-        Milestone("sleep_master", "Sleep Master", "Sleep", "Perfect sleep for 30 days!"),
-        Milestone("early_bird", "Early Bird", "Morning", "5 consecutive 6 AM check-ins!")
-    )
-
-    fun checkMilestones(context: Context) {
-        val hdm = HealthDataManager(context)
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val milestoneCal = Calendar.getInstance()
-
-        var totalSteps = 0L
-        for (i in 0 until 60) {
-            totalSteps += hdm.getHistoricalSteps(sdf.format(milestoneCal.time))
-            milestoneCal.add(Calendar.DAY_OF_YEAR, -1)
-        }
-        if (totalSteps >= 100_000) UserPreferencesStore.unlockBadge(context, "century_walker")
-
-        milestoneCal.time = Date()
-        var waterStreak = 0
-        for (i in 0 until 7) {
-            if (hdm.getWaterIntake(sdf.format(milestoneCal.time)) >= 2.0) waterStreak++ else break
-            milestoneCal.add(Calendar.DAY_OF_YEAR, -1)
-        }
-        if (waterStreak >= 7) UserPreferencesStore.unlockBadge(context, "hydration_hero")
-    }
 }

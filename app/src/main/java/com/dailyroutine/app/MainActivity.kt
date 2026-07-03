@@ -28,7 +28,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZonedDateTime
@@ -37,11 +36,27 @@ import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
+    private enum class FirstLaunchPermissionStep {
+        NONE,
+        NOTIFICATION,
+        EXACT_ALARM,
+        HEALTH_CONNECT,
+        GOOGLE_FIT
+    }
+
+    private companion object {
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 100
+    }
+
     private lateinit var mgr: ReminderManager
     private lateinit var planManager: PlanManager
     private lateinit var healthDataManager: HealthDataManager
     private lateinit var healthConnectManager: HealthConnectManager
+    private lateinit var googleFitHeartPointsManager: GoogleFitHeartPointsManager
     private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Set<String>>
+    private var firstLaunchPermissionFlowActive = false
+    private var firstLaunchPermissionStep = FirstLaunchPermissionStep.NONE
+    private var waitingForExactAlarmSettings = false
     private val dataUpdatedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             updateDashboard()
@@ -82,25 +97,35 @@ class MainActivity : AppCompatActivity() {
         planManager = PlanManager(this)
         healthDataManager = HealthDataManager(this)
         healthConnectManager = HealthConnectManager(this)
-        
+        googleFitHeartPointsManager = GoogleFitHeartPointsManager(this)
+
         mgr.scheduleAllEnabled()
 
         requestPermissionsLauncher = registerForActivityResult(
             PermissionController.createRequestPermissionResultContract()
-        ) { granted ->
+        ) { _ ->
             fetchHealthData()
+            if (firstLaunchPermissionFlowActive && firstLaunchPermissionStep == FirstLaunchPermissionStep.HEALTH_CONNECT) {
+                findViewById<View>(android.R.id.content).postDelayed({
+                    firstLaunchPermissionStep = FirstLaunchPermissionStep.GOOGLE_FIT
+                    continueFirstLaunchPermissionFlow()
+                }, 600)
+            }
         }
 
         updateGreeting()
         updateDashboard()
-        updateStreak()
 
         findViewById<TextView>(R.id.tvGreeting).setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
         }
 
-        findViewById<View>(R.id.cardProgress).setOnClickListener {
-            startActivity(Intent(this, HabitProgressActivity::class.java))
+        findViewById<View>(R.id.cardProfileAvatar).setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+
+        findViewById<View>(R.id.cardWellnessScore).setOnClickListener {
+            startActivity(Intent(this, WellnessScoreActivity::class.java))
         }
 
         findViewById<View>(R.id.cardDiet).setOnClickListener {
@@ -166,23 +191,234 @@ class MainActivity : AppCompatActivity() {
             popup.show()
         }
 
-        requestNotificationPermission()
-        requestExactAlarmPermission()
-        
         addDefaultsOnFirstRun()
 
-        val healthPrefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
-        if (healthPrefs.getBoolean("needs_initial_permission_request", true)) {
-            startHealthAppScanning()
-            healthPrefs.edit().putBoolean("needs_initial_permission_request", false).apply()
-        }
-        
         HealthSyncWorker.scheduleAutoSync(this)
+
+        findViewById<View>(android.R.id.content).postDelayed({
+            startFirstLaunchPermissionFlowIfNeeded()
+        }, 300)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == GoogleFitHeartPointsManager.HEART_POINTS_REQUEST_CODE) {
+            when (val result = googleFitHeartPointsManager.handlePermissionResult(data)) {
+                is GoogleFitHeartPointsManager.PermissionResult.Granted -> {
+                    val email = result.email.orEmpty()
+                    Toast.makeText(
+                        this,
+                        if (email.isNotEmpty()) "Google Fit Heart Points access enabled for $email" else "Google Fit Heart Points access enabled",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    fetchHealthData()
+                    if (firstLaunchPermissionFlowActive && firstLaunchPermissionStep == FirstLaunchPermissionStep.GOOGLE_FIT) {
+                        finishFirstLaunchPermissionFlow()
+                    }
+                }
+                is GoogleFitHeartPointsManager.PermissionResult.MissingFitnessScope -> {
+                    showGoogleFitHeartPointsAccessNotGrantedDialog(result.email, null)
+                }
+                is GoogleFitHeartPointsManager.PermissionResult.Failed -> {
+                    showGoogleFitHeartPointsAccessNotGrantedDialog(null, "Status ${result.statusCode}: ${result.message ?: "Google sign-in failed"}")
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE && firstLaunchPermissionFlowActive) {
+            firstLaunchPermissionStep = FirstLaunchPermissionStep.EXACT_ALARM
+            continueFirstLaunchPermissionFlow()
+        }
+    }
+
+    private fun startFirstLaunchPermissionFlowIfNeeded() {
+        val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
+        if (!prefs.getBoolean("needs_initial_permission_request", false) || firstLaunchPermissionFlowActive) {
+            return
+        }
+
+        firstLaunchPermissionFlowActive = true
+        firstLaunchPermissionStep = FirstLaunchPermissionStep.NOTIFICATION
+        continueFirstLaunchPermissionFlow()
+    }
+
+    private fun continueFirstLaunchPermissionFlow() {
+        if (!firstLaunchPermissionFlowActive || isFinishing || isDestroyed) return
+
+        when (firstLaunchPermissionStep) {
+            FirstLaunchPermissionStep.NOTIFICATION -> runNotificationPermissionStep()
+            FirstLaunchPermissionStep.EXACT_ALARM -> runExactAlarmPermissionStep()
+            FirstLaunchPermissionStep.HEALTH_CONNECT -> runHealthConnectPermissionStep()
+            FirstLaunchPermissionStep.GOOGLE_FIT -> runGoogleFitPermissionStep()
+            FirstLaunchPermissionStep.NONE -> finishFirstLaunchPermissionFlow()
+        }
+    }
+
+    private fun runNotificationPermissionStep() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), NOTIFICATION_PERMISSION_REQUEST_CODE)
+        } else {
+            firstLaunchPermissionStep = FirstLaunchPermissionStep.EXACT_ALARM
+            continueFirstLaunchPermissionFlow()
+        }
+    }
+
+    private fun runExactAlarmPermissionStep() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(android.app.AlarmManager::class.java)
+            if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle("Allow reminder alarms")
+                    .setMessage("Routinely uses exact alarms so reminders can ring at the time you set. Please allow alarm permission on the next screen, then return to Routinely to continue setup.")
+                    .setPositiveButton("Open Settings") { _, _ ->
+                        waitingForExactAlarmSettings = true
+                        startActivity(Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+                    }
+                    .setNegativeButton("Skip") { _, _ ->
+                        waitingForExactAlarmSettings = false
+                        firstLaunchPermissionStep = FirstLaunchPermissionStep.HEALTH_CONNECT
+                        continueFirstLaunchPermissionFlow()
+                    }
+                    .show()
+                return
+            }
+        }
+
+        firstLaunchPermissionStep = FirstLaunchPermissionStep.HEALTH_CONNECT
+        continueFirstLaunchPermissionFlow()
+    }
+
+    private fun runHealthConnectPermissionStep() {
+        val availability = HealthConnectClient.getSdkStatus(this)
+        if (availability != HealthConnectClient.SDK_AVAILABLE) {
+            Toast.makeText(this, "Health Connect is not available on this device.", Toast.LENGTH_SHORT).show()
+            firstLaunchPermissionStep = FirstLaunchPermissionStep.GOOGLE_FIT
+            continueFirstLaunchPermissionFlow()
+            return
+        }
+
+        // Auto-select a data source so we can prompt for Health Connect access directly.
+        if (healthDataManager.getConnectedAppName().isNullOrEmpty()) {
+            val apps = HealthAppScanner.getInstalledFitnessApps(this)
+            if (apps.isNotEmpty()) {
+                val selectedApp = apps.first()
+                healthDataManager.setConnectedAppName(selectedApp.name)
+                healthDataManager.setConnectedAppPackage(selectedApp.packageName)
+            }
+        }
+
+        lifecycleScope.launch {
+            if (healthConnectManager.hasAnyPermission()) {
+                fetchHealthData()
+                firstLaunchPermissionStep = FirstLaunchPermissionStep.GOOGLE_FIT
+                continueFirstLaunchPermissionFlow()
+            } else {
+                // Launch the Health Connect permission screen directly (compulsory prompt).
+                requestPermissionsLauncher.launch(healthConnectManager.permissions)
+            }
+        }
+    }
+
+    private fun runGoogleFitPermissionStep() {
+        val googleFitInstalled = HealthAppScanner.getInstalledFitnessApps(this)
+            .any { it.packageName == GoogleFitHeartPointsManager.GOOGLE_FIT_PACKAGE }
+        if (!googleFitInstalled || googleFitHeartPointsManager.hasReadPermission(this)) {
+            finishFirstLaunchPermissionFlow()
+            return
+        }
+
+        // Launch the Google account chooser / Heart Points consent directly (compulsory prompt).
+        googleFitHeartPointsManager.requestReadPermission(this)
+    }
+
+    private fun finishFirstLaunchPermissionFlow() {
+        getSharedPreferences("health_data_pref", MODE_PRIVATE)
+            .edit()
+            .putBoolean("needs_initial_permission_request", false)
+            .apply()
+        firstLaunchPermissionFlowActive = false
+        firstLaunchPermissionStep = FirstLaunchPermissionStep.NONE
+        waitingForExactAlarmSettings = false
+    }
+
+    private fun showGoogleFitHeartPointsUnavailableToast() {
+        val email = googleFitHeartPointsManager.signedInEmail().orEmpty()
+        val msg = if (email.isNotEmpty()) {
+            "Google Fit Heart Points access is not enabled for $email. Tap Health Sync > Google Fit to retry."
+        } else {
+            "Google Fit Heart Points access is not enabled. Tap Health Sync > Google Fit to connect."
+        }
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+    }
+
+    private fun showGoogleFitHeartPointsPermissionDialog() {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Allow Google Fit Heart Points")
+            .setMessage(
+                "For Heart Points, Google first asks you to choose the Gmail account used in Google Fit. " +
+                    "After choosing the account, Google grants this app the Google Fit activity read scope used for Heart Points. " +
+                    "Please choose the same Gmail account that shows your Heart Points in Google Fit."
+            )
+            .setPositiveButton("Continue") { _, _ ->
+                googleFitHeartPointsManager.requestReadPermission(this)
+            }
+            .setNegativeButton("Not Now") { _, _ ->
+                checkHealthConnectPermissions()
+            }
+            .show()
+    }
+
+    private fun showGoogleFitHeartPointsAccessNotGrantedDialog(email: String? = null, errorDetails: String? = null) {
+        val accountLine = if (!email.isNullOrBlank()) "\n\nSelected account: $email" else ""
+        val errorLine = if (!errorDetails.isNullOrBlank()) "\n\nGoogle error: $errorDetails" else ""
+        val status10Help = if (errorDetails?.contains("Status 10") == true) {
+            "\n\nStatus 10 is Google Sign-In DEVELOPER_ERROR. It is not caused by Health Connect permissions. " +
+                "It means Google does not recognize this installed APK as an authorized Android OAuth client for Google Fit." +
+                "\n\nAdd this debug build to Google Cloud OAuth:" +
+                "\nPackage: com.dailyroutine.app" +
+                "\nSHA-1: F0:BD:00:C7:25:A3:C0:32:73:6E:4E:1C:78:FC:C2:2B:54:A7:A1:E0" +
+                "\n\nAlso enable Google Fit API and add your Gmail as an OAuth test user if the consent screen is in Testing."
+        } else {
+            ""
+        }
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Google Fit access not granted")
+            .setMessage(
+                "Google did not grant this app the Google Fit fitness activity read scope, so Heart Points cannot be read yet." +
+                    accountLine +
+                    errorLine +
+                    status10Help +
+                    "\n\nYour Health Connect permissions are separate and can be fully granted while Google Fit OAuth still fails. " +
+                    "Heart Points from Google Fit require this Google OAuth step because the data is stored under your Google account."
+            )
+            .setPositiveButton("Try Again") { _, _ ->
+                googleFitHeartPointsManager.requestReadPermission(this)
+            }
+            .setNegativeButton("Later") { _, _ ->
+                if (firstLaunchPermissionFlowActive && firstLaunchPermissionStep == FirstLaunchPermissionStep.GOOGLE_FIT) {
+                    finishFirstLaunchPermissionFlow()
+                } else {
+                    checkHealthConnectPermissions()
+                }
+            }
+            .show()
     }
 
     private fun addDefaultsOnFirstRun() {
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         if (prefs.getBoolean("is_first_run", true)) {
+            // Ensure no legacy/mock health data exists
+            getSharedPreferences("health_data_pref", MODE_PRIVATE)
+                .edit()
+                .clear()
+                .putBoolean("needs_initial_permission_request", true)
+                .apply()
+
             mgr.saveReminder(Reminder(title = "Drink Water", type = ReminderType.HYDRATION, isIntervalBased = true, intervalMinutes = 120))
             mgr.saveReminder(Reminder(title = "Healthy Meal", type = ReminderType.MEAL, hour = 13, minute = 0))
             mgr.saveReminder(Reminder(title = "Meditation", type = ReminderType.MEDITATION, hour = 8, minute = 0))
@@ -210,6 +446,14 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         ViewCompat.requestApplyInsets(scroll)
+
+        // Apply insets to header to prevent overlap with system status bar
+        val rootView = findViewById<View>(android.R.id.content).parent as View
+        ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
+            // Let the system handle the default behavior
+            insets
+        }
+        ViewCompat.requestApplyInsets(rootView)
     }
 
     private fun startHealthAppScanning() {
@@ -226,7 +470,13 @@ class MainActivity : AppCompatActivity() {
                 val selectedApp = apps[which]
                 healthDataManager.setConnectedAppName(selectedApp.name)
                 healthDataManager.setConnectedAppPackage(selectedApp.packageName)
-                checkHealthConnectPermissions()
+                if (selectedApp.packageName == GoogleFitHeartPointsManager.GOOGLE_FIT_PACKAGE &&
+                    !googleFitHeartPointsManager.hasReadPermission(this)
+                ) {
+                    showGoogleFitHeartPointsPermissionDialog()
+                } else {
+                    checkHealthConnectPermissions()
+                }
             }
             .setNeutralButton("Test Background Sync") { _, _ ->
                 val request = OneTimeWorkRequestBuilder<HealthSyncWorker>().build()
@@ -269,10 +519,18 @@ class MainActivity : AppCompatActivity() {
         val appName = healthDataManager.getConnectedAppName()
         val appPkg = healthDataManager.getConnectedAppPackage()
         
+        // Safety Check: If no app is connected and we aren't in a "Syncing" context, skip.
+        if (appName == "None" || appPkg == null) {
+            Log.d("HealthSync", "No app connected. Skipping background sync.")
+            return
+        }
+
         lifecycleScope.launch {
             val now = Instant.now()
-            val startOfToday = java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-            
+            val zoneId = java.time.ZoneId.systemDefault()
+            val todayDate = java.time.LocalDate.now(zoneId)
+            val startOfToday = todayDate.atStartOfDay(zoneId).toInstant()
+
             val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
             val editor = prefs.edit().putBoolean("is_fitness_connected", true)
             val granted = healthConnectManager.getGrantedPermissions()
@@ -282,6 +540,10 @@ class MainActivity : AppCompatActivity() {
             var sleepToday = ""
             var caloriesToday = ""
             var weightToday = 0.0
+            var heartPointsToday = 0.0
+            var heartPointsByDate = emptyMap<String, Double>()
+            val canReadGoogleFitHeartPoints = appPkg == GoogleFitHeartPointsManager.GOOGLE_FIT_PACKAGE &&
+                googleFitHeartPointsManager.hasReadPermission(this@MainActivity)
 
             if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
                 stepsToday = healthConnectManager.readSteps(startOfToday, now, appPkg)
@@ -314,11 +576,31 @@ class MainActivity : AppCompatActivity() {
                     editor.putString("current_weight", "%.1f kg".format(weightToday))
                 }
             }
+            if (canReadGoogleFitHeartPoints) {
+                val oldestDate = todayDate.minusDays((HealthDataManager.SYNC_HISTORY_DAYS - 1).toLong())
+                heartPointsByDate = googleFitHeartPointsManager.readDailyHeartPoints(oldestDate, now, zoneId)
+                heartPointsToday = heartPointsByDate[todayDate.toString()] ?: googleFitHeartPointsManager.readHeartPoints(startOfToday, now)
+                healthDataManager.setHeartPoints(heartPointsToday.toInt())
+                Log.d("MainActivity", "Google Fit Heart Points synced: $heartPointsToday")
+                Toast.makeText(this@MainActivity, "✓ Google Fit Heart Points: ${heartPointsToday.toInt()}", Toast.LENGTH_LONG).show()
+            } else if (appPkg == GoogleFitHeartPointsManager.GOOGLE_FIT_PACKAGE) {
+                Log.w("MainActivity", "Google Fit Heart Points permission not granted; not auto-requesting to avoid account picker loop")
+                healthDataManager.setHeartPoints(0)
+                showGoogleFitHeartPointsUnavailableToast()
+            } else {
+                healthDataManager.setHeartPoints(0)
+            }
+
+            // Data Validation: If we connected an app but got no critical data (Steps and Sleep), notify the user.
+            if (appName != "None" && stepsToday == 0L && sleepToday.isEmpty()) {
+                Toast.makeText(this@MainActivity, "Cannot sync health data from $appName: App not supported or data missing.", Toast.LENGTH_LONG).show()
+            }
 
             for (i in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
-                val dayStart = java.time.LocalDate.now().minusDays(i.toLong()).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-                val dayEnd = if (i == 0) now else java.time.LocalDate.now().minusDays(i.toLong() - 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-                val dateStr = java.time.LocalDate.now().minusDays(i.toLong()).toString()
+                val date = todayDate.minusDays(i.toLong())
+                val dayStart = date.atStartOfDay(zoneId).toInstant()
+                val dayEnd = if (i == 0) now else date.plusDays(1).atStartOfDay(zoneId).toInstant()
+                val dateStr = date.toString()
 
                 if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
                     healthDataManager.saveHistoricalSteps(dateStr, healthConnectManager.readSteps(dayStart, dayEnd, appPkg))
@@ -341,6 +623,11 @@ class MainActivity : AppCompatActivity() {
                         healthDataManager.saveWeight(dateStr, weightKg)
                     }
                 }
+                if (canReadGoogleFitHeartPoints) {
+                    healthDataManager.saveHistoricalHeartPoints(dateStr, heartPointsByDate[dateStr] ?: 0.0)
+                } else {
+                    healthDataManager.saveHistoricalHeartPoints(dateStr, 0.0)
+                }
             }
 
             val timestamp = java.text.SimpleDateFormat("hh:mm a, dd MMM", java.util.Locale.US).format(java.util.Date())
@@ -352,6 +639,7 @@ class MainActivity : AppCompatActivity() {
             val summary = StringBuilder("Sync complete from $appName!")
             if (stepsToday > 0) summary.append("\nSteps Today: %,d".format(stepsToday))
             if (moveMinsToday > 0) summary.append("\nMove: $moveMinsToday min")
+            if (heartPointsToday > 0) summary.append("\nHeart Points: %.1f".format(heartPointsToday))
             if (caloriesToday.isNotEmpty() && caloriesToday != "0") summary.append("\nBurned Today: $caloriesToday kcal")
             if (weightToday > 0) summary.append("\nWeight: %.1f kg".format(weightToday))
             
@@ -379,7 +667,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         updateDashboard()
-        updateStreak()
+
+        if (firstLaunchPermissionFlowActive && waitingForExactAlarmSettings) {
+            waitingForExactAlarmSettings = false
+            firstLaunchPermissionStep = FirstLaunchPermissionStep.HEALTH_CONNECT
+            findViewById<View>(android.R.id.content).postDelayed({
+                continueFirstLaunchPermissionFlow()
+            }, 500)
+        }
     }
 
     override fun onPause() {
@@ -396,35 +691,16 @@ class MainActivity : AppCompatActivity() {
             in 17..20 -> "Good Evening"
             else -> "Good Night"
         }
-        findViewById<TextView>(R.id.tvGreeting).text = "$greeting, $name!"
+        findViewById<TextView>(R.id.tvGreetingLabel).text = greeting
+        findViewById<TextView>(R.id.tvGreeting).text = name
+
+        val dateFormat = java.text.SimpleDateFormat("EEEE, d MMMM", java.util.Locale.getDefault())
+        findViewById<TextView>(R.id.tvHeaderDate).text = dateFormat.format(java.util.Date())
+
+        val initial = name.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+        findViewById<TextView>(R.id.tvProfileInitial).text = initial
     }
 
-    private fun updateStreak() {
-        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
-        val lastUpdate = UserPreferencesStore.getLastStreakUpdate(this)
-        
-        if (lastUpdate != today) {
-            val cal = Calendar.getInstance()
-            cal.add(Calendar.DAY_OF_YEAR, -1)
-            val yesterday = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(cal.time)
-            
-            var currentStreak = UserPreferencesStore.getStreakCount(this)
-            
-            if (lastUpdate == yesterday) {
-                currentStreak++
-            } else if (lastUpdate != "") {
-                currentStreak = 0 
-            } else {
-                currentStreak = 1 
-            }
-            
-            UserPreferencesStore.setStreakCount(this, currentStreak)
-            UserPreferencesStore.setLastStreakUpdate(this, today)
-        }
-
-        val streak = UserPreferencesStore.getStreakCount(this)
-        findViewById<TextView>(R.id.tvStreak).text = "$streak Days"
-    }
 
     private fun showWaterQuickAdd() {
         val options = arrayOf("+250 ml", "+500 ml", "+1 Liter")
@@ -475,21 +751,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateDashboard() {
         val allReminders = mgr.getAllReminders().filter { it.isEnabled }
-        val activeRemindersCount = allReminders.filter { !it.isHidden }.size
-        
+
         val calendar = Calendar.getInstance()
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(calendar.time)
         
-        val todayMeals = planManager.getMealsForDate(todayStr).size
-        val todayWorkout = planManager.getExercisesForDate(todayStr).size
-        
-        val totalHabits = activeRemindersCount + todayMeals + todayWorkout
-        val doneHabits = RoutineProgressStore.getDoneCount(this)
-        
-        findViewById<TextView>(R.id.tvHabitProgress).text = 
-            "Today's Progress: $doneHabits/$totalHabits habits completed"
-        val progress = if (totalHabits > 0) (doneHabits * 100 / totalHabits) else 0
-        findViewById<LinearProgressIndicator>(R.id.progressHabits).progress = progress
+        val mealsList = planManager.getMealsForDate(todayStr)
+        val workoutList = planManager.getExercisesForDate(todayStr)
 
         val stepsStr = healthDataManager.getSteps().replace(",", "")
         val stepsCount = stepsStr.toIntOrNull() ?: 0
@@ -528,14 +795,25 @@ class MainActivity : AppCompatActivity() {
         val doneIds = RoutineProgressStore.getDoneIds(this)
         val waterFromReminders = allReminders
             .filter { it.type == ReminderType.HYDRATION && it.id.toString() in doneIds }
-            .size * 0.25 
-        
+            .size * 0.25
+
         findViewById<TextView>(R.id.tvValWater).text = "%.1f Liters".format(waterValManual + waterFromReminders)
 
         findViewById<TextView>(R.id.tvLastSync).text = "Last Auto-Sync: ${healthDataManager.getLastSyncTime()}"
-        WellnessEngine.checkMilestones(this)
 
-        val score = WellnessScoreManager.calculateDailyScore(this, stepsCount, sleepHours, doneHabits, totalHabits)
+        val doneIdsForScore = RoutineProgressStore.getDoneIds(this, todayStr)
+
+        val nutritionDone = mealsList.count { it.id.toString() in doneIdsForScore }
+        val nutritionTotal = mealsList.size
+        val workoutDone = workoutList.count { it.id.toString() in doneIdsForScore }
+        val workoutTotal = workoutList.size
+
+        val score = WellnessScoreManager.calculateDailyScore(
+            this, stepsCount, sleepHours,
+            workoutDone, workoutTotal,
+            nutritionDone, nutritionTotal
+        )
+        WellnessScoreManager.saveDailyScore(this, todayStr, score)
         findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(R.id.progressWellness).progress = score
         findViewById<TextView>(R.id.tvWellnessScore).text = score.toString()
         findViewById<TextView>(R.id.tvWellnessMsg).text = when {
@@ -581,23 +859,5 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             .show()
-    }
-
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
-            }
-        }
-    }
-
-    private fun requestExactAlarmPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = getSystemService(android.app.AlarmManager::class.java)
-            if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
-                val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                startActivity(intent)
-            }
-        }
     }
 }
