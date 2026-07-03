@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Routinely App Feature Guide</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --paper: #ffffff;
+      --soft: #f6f8ff;
+      --purple: #6f42c1;
+      --blue: #1685fe;
+      --cyan: #06b6d4;
+      --green: #16a34a;
+      --orange: #f59e0b;
+      --pink: #ec4899;
+      --red: #ef4444;
+      --line: #dde5f2;
+    }
+
+    * { box-sizing: border-box; }
+    html { color: var(--ink); font-family: "Segoe UI", Arial, Helvetica, sans-serif; }
+    body { margin: 0; background: #eaf0ff; }
+    @page { size: A4; margin: 13mm; }
+    @media print {
+      body { background: white; }
+      .page { min-height: 270mm; box-shadow: none; margin: 0 auto; page-break-after: always; }
+      .page:last-child { page-break-after: auto; }
+      .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 18px auto;
+      padding: 18mm;
+      background: var(--paper);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 38px rgba(24, 39, 75, .18);
+    }
+
+    .cover {
+      color: white;
+      background:
+        radial-gradient(circle at 8% 12%, rgba(255,255,255,.24), transparent 30%),
+        radial-gradient(circle at 90% 18%, rgba(255,255,255,.18), transparent 25%),
+        linear-gradient(135deg, #553c9a 0%, #1685fe 50%, #10b981 100%);
+    }
+    .cover::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      right: -170px;
+      bottom: -150px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.13);
+    }
+    .badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.35);
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+    .cover h1 { font-size: 58px; line-height: .98; margin: 60px 0 18px; letter-spacing: -2px; }
+    .cover .subtitle { font-size: 22px; max-width: 620px; line-height: 1.4; opacity: .96; }
+    .cover-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 44px; }
+    .cover-card {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.28);
+      backdrop-filter: blur(4px);
+    }
+    .cover-card strong { display: block; font-size: 16px; margin-bottom: 6px; }
+    .cover-card span { opacity: .92; font-size: 13px; line-height: 1.35; }
+    .footer-note { position: absolute; left: 18mm; bottom: 16mm; font-size: 12px; opacity: .9; }
+
+    h2 { margin: 0 0 14px; font-size: 30px; color: #172033; letter-spacing: -.6px; }
+    h3 { margin: 0 0 8px; font-size: 17px; color: #172033; }
+    p { margin: 0 0 10px; line-height: 1.48; color: #344054; }
+    .lead { font-size: 15.5px; color: #475467; }
+    .section-kicker { color: var(--blue); text-transform: uppercase; font-weight: 800; font-size: 11px; letter-spacing: 1.3px; margin-bottom: 7px; }
+    .toc { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 18px; }
+    .toc-item { padding: 12px 14px; border-radius: 16px; background: var(--soft); border-left: 5px solid var(--blue); font-weight: 700; color: #24324b; }
+    .toc-item small { display: block; color: var(--muted); font-weight: 500; margin-top: 3px; }
+
+    .snapshot { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; }
+    .metric { padding: 15px 12px; border-radius: 18px; color: white; min-height: 88px; }
+    .metric:nth-child(1) { background: linear-gradient(135deg, #7c3aed, #4f46e5); }
+    .metric:nth-child(2) { background: linear-gradient(135deg, #06b6d4, #0284c7); }
+    .metric:nth-child(3) { background: linear-gradient(135deg, #10b981, #15803d); }
+    .metric:nth-child(4) { background: linear-gradient(135deg, #f97316, #db2777); }
+    .metric .num { font-size: 28px; font-weight: 900; line-height: 1; }
+    .metric .label { margin-top: 8px; font-size: 12px; opacity: .94; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 13px; margin-top: 14px; }
+    .feature-card {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 15px;
+      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0; width: 6px;
+      background: var(--accent, var(--blue));
+    }
+    .feature-card .icon { font-size: 24px; margin-bottom: 6px; }
+    .feature-card p { font-size: 12.8px; margin-bottom: 0; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+    .tag { padding: 5px 9px; border-radius: 999px; background: #eef4ff; color: #175cd3; font-size: 11px; font-weight: 700; }
+
+    .stripe { padding: 16px 18px; border-radius: 22px; color: white; background: linear-gradient(135deg, #1685fe, #06b6d4); margin: 16px 0; }
+    .stripe.green { background: linear-gradient(135deg, #16a34a, #84cc16); }
+    .stripe.purple { background: linear-gradient(135deg, #6f42c1, #db2777); }
+    .stripe.orange { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    .stripe h3, .stripe p { color: white; }
+
+    .numbered { counter-reset: item; display: grid; gap: 10px; }
+    .num-card {
+      counter-increment: item;
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      padding: 13px;
+      border-radius: 18px;
+      background: #f8fbff;
+      border: 1px solid var(--line);
+    }
+    .num-card::before {
+      content: counter(item);
+      width: 36px; height: 36px;
+      border-radius: 12px;
+      color: white;
+      background: var(--accent, var(--blue));
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+    .num-card p { font-size: 12.8px; }
+
+    .table { width: 100%; border-collapse: collapse; margin-top: 12px; overflow: hidden; border-radius: 16px; font-size: 12.5px; }
+    .table th { background: #172033; color: white; text-align: left; padding: 10px; }
+    .table td { padding: 9px 10px; border-bottom: 1px solid #e5eaf4; color: #344054; vertical-align: top; }
+    .table tr:nth-child(even) td { background: #f8fbff; }
+
+    .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .pill { border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 700; color: #24324b; background: #f2f4f7; border: 1px solid #e4e7ec; }
+    .source-box { margin-top: 18px; padding: 14px 16px; border-radius: 18px; background: #fffbeb; border: 1px solid #fde68a; color: #78350f; font-size: 12px; line-height: 1.5; }
+    .caption { color: var(--muted); font-size: 11.5px; margin-top: 6px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .mini-card { padding: 13px; border-radius: 16px; background: #f8fbff; border: 1px solid var(--line); }
+    .mini-card strong { color: #172033; }
+    .bar { height: 10px; background: #e5e7eb; border-radius: 99px; overflow: hidden; margin: 7px 0 12px; }
+    .bar > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #06b6d4, #16a34a); }
+    .watermark { position: absolute; right: 15mm; bottom: 10mm; color: #98a2b3; font-size: 10px; }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <div class="badge">Daily Routine Hybrid • Feature Documentation</div>
+    <h1>Routinely<br/>App Guide</h1>
+    <p class="subtitle">A colourful, easy-to-understand walkthrough of the Android app’s reminders, wellness dashboard, health integrations, plans, reports, and background sync features.</p>
+    <div class="cover-grid">
+      <div class="cover-card"><strong>Core idea</strong><span>Help users build consistent daily routines for meals, workouts, water, sleep, mindfulness, and personal tasks.</span></div>
+      <div class="cover-card"><strong>Health focus</strong><span>Tracks steps, sleep, calories, distance, weight, water intake, heart points, and wellness scores.</span></div>
+      <div class="cover-card"><strong>Smart scheduling</strong><span>Supports exact reminders, interval reminders, notification actions, snoozing, and boot restore.</span></div>
+      <div class="cover-card"><strong>Tech foundation</strong><span>Kotlin Android app using XML layouts, Material components, Health Connect, Google Fit, WorkManager, and SharedPreferences.</span></div>
+    </div>
+    <div class="footer-note">Prepared from workspace source review • Generated July 3, 2026</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">Overview</div>
+    <h2>What this app does</h2>
+    <p class="lead"><strong>Daily Routine Hybrid</strong>, presented in the report as <strong>Routinely</strong>, is an Android wellness companion. It combines daily reminder management with health tracking, meal planning, workout planning, progress scoring, profile metrics, and shareable wellness reporting.</p>
+
+    <div class="snapshot">
+      <div class="metric"><div class="num">9</div><div class="label">Reminder categories</div></div>
+      <div class="metric"><div class="num">11</div><div class="label">Main app screens</div></div>
+      <div class="metric"><div class="num">180</div><div class="label">Days of health history support</div></div>
+      <div class="metric"><div class="num">19+</div><div class="label">Known fitness apps scanned</div></div>
+    </div>
+
+    <div class="stripe">
+      <h3>Simple explanation</h3>
+      <p>The app is designed for someone who wants one place to remember daily habits, plan food and exercise, connect health data, view progress, and export wellness information.</p>
+    </div>
+
+    <div class="section-kicker">Contents</div>
+    <div class="toc">
+      <div class="toc-item">1. Dashboard <small>Today’s summary and quick actions</small></div>
+      <div class="toc-item">2. Reminders <small>Meals, workouts, hydration, sleep, tasks</small></div>
+      <div class="toc-item">3. Diet planning <small>Meals, calories, templates</small></div>
+      <div class="toc-item">4. Workout planning <small>Exercises, intensity, MET burn</small></div>
+      <div class="toc-item">5. Health tracking <small>Steps, heart points, sleep, weight, calories</small></div>
+      <div class="toc-item">6. Integrations <small>Health Connect, Google Fit, fitness app scanner</small></div>
+      <div class="toc-item">7. Wellness score <small>Weighted score out of 100</small></div>
+      <div class="toc-item">8. Reports & architecture <small>PDF report, storage, workers</small></div>
+    </div>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">Feature set</div>
+    <h2>Main features, one by one</h2>
+    <div class="feature-grid">
+      <div class="feature-card" style="--accent:#1685fe"><div class="icon">🏠</div><h3>1. Home dashboard</h3><p>Shows today’s wellness snapshot, routine progress, reminders, health sync status, water intake, and navigation cards for major health areas.</p><div class="tag-row"><span class="tag">Today view</span><span class="tag">Progress</span></div></div>
+      <div class="feature-card" style="--accent:#6f42c1"><div class="icon">⏰</div><h3>2. Reminder manager</h3><p>Create, edit, view, enable, hide, or delete reminders. Reminders can use fixed times, repeat days, monthly days, or interval-based repetition.</p><div class="tag-row"><span class="tag">Fixed time</span><span class="tag">Interval</span></div></div>
+      <div class="feature-card" style="--accent:#f59e0b"><div class="icon">🍽️</div><h3>3. Diet plan</h3><p>Plan meals by calendar date, including meal name, description, time, meal type, calories, and optional reminder synchronization.</p><div class="tag-row"><span class="tag">Calories</span><span class="tag">Meal templates</span></div></div>
+      <div class="feature-card" style="--accent:#ef4444"><div class="icon">💪</div><h3>4. Workout plan</h3><p>Plan exercises per date with sets, reps, target area, intensity, reminder time, and MET estimation for burn calculations.</p><div class="tag-row"><span class="tag">Intensity</span><span class="tag">Burn estimate</span></div></div>
+      <div class="feature-card" style="--accent:#10b981"><div class="icon">🚶</div><h3>5. Walking data</h3><p>Tracks steps, distance, move minutes, and heart points with Today, Weekly, and Monthly graph-style views.</p><div class="tag-row"><span class="tag">Steps</span><span class="tag">Heart Points</span></div></div>
+      <div class="feature-card" style="--accent:#06b6d4"><div class="icon">😴</div><h3>6. Sleep tracking</h3><p>Reads or stores sleep hours, contributes to the daily wellness score, and uses an 8-hour target in scoring.</p><div class="tag-row"><span class="tag">Sleep hours</span><span class="tag">Score input</span></div></div>
+      <div class="feature-card" style="--accent:#ec4899"><div class="icon">⚖️</div><h3>7. Weight and profile</h3><p>Users can store age, height, weight, gender, and weight history. Profile metrics calculate BMI, BMR, ideal calories, and ideal weight.</p><div class="tag-row"><span class="tag">BMI</span><span class="tag">BMR</span></div></div>
+      <div class="feature-card" style="--accent:#84cc16"><div class="icon">💧</div><h3>8. Water tracking</h3><p>Daily water intake is stored by date and can be adjusted from the app and surfaced through the wellness widget.</p><div class="tag-row"><span class="tag">Daily log</span><span class="tag">Widget</span></div></div>
+    </div>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">Reminders</div>
+    <h2>Routine reminders and notifications</h2>
+    <p class="lead">Reminder functionality is the foundation of the app. It helps users turn health goals and daily responsibilities into scheduled actions.</p>
+
+    <table class="table avoid-break">
+      <thead><tr><th>Reminder type</th><th>Purpose</th><th>Default user message</th></tr></thead>
+      <tbody>
+        <tr><td>Meal Time 🍽️</td><td>Breakfast, lunch, dinner, snack, or custom food reminder.</td><td>Eat healthy and mindfully.</td></tr>
+        <tr><td>Exercise 💪</td><td>Workout or movement sessions.</td><td>Time to get moving.</td></tr>
+        <tr><td>Hydration 💧</td><td>Regular water intake.</td><td>Stay hydrated.</td></tr>
+        <tr><td>Sleep 😴</td><td>Bedtime and wind-down prompts.</td><td>Get restful sleep.</td></tr>
+        <tr><td>Meditation 🧘</td><td>Mindfulness breaks.</td><td>Take a mindful break.</td></tr>
+        <tr><td>Daily To Do’s 📝</td><td>Everyday productivity tasks.</td><td>Check today’s tasks.</td></tr>
+        <tr><td>Weekend Tasks 🏡</td><td>Weekend goals and chores.</td><td>Remember weekend goals.</td></tr>
+        <tr><td>Monthly Tasks 📅</td><td>Monthly reviews or recurring monthly habits.</td><td>Review monthly progress.</td></tr>
+        <tr><td>Custom ⏰</td><td>Anything the user wants to schedule.</td><td>Scheduled activity reminder.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="two-col" style="margin-top:16px">
+      <div class="mini-card"><strong>Scheduling options</strong><p>Reminders can run at a specific hour/minute, repeat on selected days, repeat monthly on a day of month, or run as interval reminders every configured number of minutes.</p></div>
+      <div class="mini-card"><strong>Notification actions</strong><p>Notifications include <strong>Done</strong> and <strong>Snooze</strong> actions. Done records progress; Snooze delays the reminder without requiring users to open the app.</p></div>
+      <div class="mini-card"><strong>Boot restore</strong><p>A boot receiver restores enabled reminders after a device restart, so reminders continue working after reboot or quick boot events.</p></div>
+      <div class="mini-card"><strong>Hidden plan reminders</strong><p>Meals and exercises can sync into the reminder system as hidden reminders, keeping plan-based alerts working without cluttering the main reminder list.</p></div>
+    </div>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">Planning</div>
+    <h2>Diet plan and workout plan</h2>
+    <div class="stripe orange">
+      <h3>Calendar-first planning</h3>
+      <p>Both meals and exercises are stored against specific dates, allowing the user to plan different routines for different days.</p>
+    </div>
+
+    <div class="numbered">
+      <div class="num-card" style="--accent:#f59e0b"><div><h3>Meal entries</h3><p>Each meal can contain a name, description, time, meal type such as Breakfast/Lunch/Dinner/Snack, calorie value, and reminder toggle.</p></div></div>
+      <div class="num-card" style="--accent:#f59e0b"><div><h3>Meal templates</h3><p>Users can create, rename, duplicate, delete, and apply meal templates. Template durations include weekly, 10 days, fortnight/bi-weekly, and monthly ranges.</p></div></div>
+      <div class="num-card" style="--accent:#ef4444"><div><h3>Exercise entries</h3><p>Each exercise can include name, sets, reps or duration, target area, intensity from 0 to 100, time, reminder toggle, MET estimate, and MET source.</p></div></div>
+      <div class="num-card" style="--accent:#ef4444"><div><h3>Workout templates</h3><p>Workout templates can be built from existing date ranges and applied to future ranges with overlap checks to avoid accidental conflicts.</p></div></div>
+      <div class="num-card" style="--accent:#10b981"><div><h3>Progress connection</h3><p>Completed meals and exercises contribute to nutrition and workout parts of the wellness score, making planning directly visible in daily progress.</p></div></div>
+    </div>
+
+    <div class="source-box">Implementation detail: The planning system is managed by <strong>PlanManager</strong> and stored with Gson in SharedPreferences. It supports date-keyed meal and exercise lists plus applied template ranges.</div>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">Health tracking</div>
+    <h2>Health data and integrations</h2>
+    <p class="lead">The app combines local wellness data with Android health integrations so users can view meaningful daily and historical trends.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card" style="--accent:#1685fe"><div class="icon">🔗</div><h3>Health Connect</h3><p>Reads steps, sleep, active calories, total calories, basal metabolic rate, distance, exercise sessions, weight, historical data, and background health data when permissions allow.</p></div>
+      <div class="feature-card" style="--accent:#34a853"><div class="icon">💚</div><h3>Google Fit Heart Points</h3><p>Uses Google Sign-In fitness scopes to read raw and aggregate Heart Points, including daily buckets for history.</p></div>
+      <div class="feature-card" style="--accent:#8b5cf6"><div class="icon">📱</div><h3>Fitness app scanner</h3><p>Detects installed fitness apps such as Google Fit, Samsung Health, Fitbit, Garmin, Xiaomi, Zepp, NoiseFit, boAt, Huawei Health, Withings, Suunto, Polar, and more.</p></div>
+      <div class="feature-card" style="--accent:#06b6d4"><div class="icon">📊</div><h3>Historical storage</h3><p>Keeps historical values for steps, sleep, calories, heart points, and weight. Health sync history is designed around a 180-day window.</p></div>
+    </div>
+
+    <table class="table avoid-break">
+      <thead><tr><th>Data area</th><th>What the app uses it for</th><th>Default/logic</th></tr></thead>
+      <tbody>
+        <tr><td>Steps</td><td>Dashboard, walking screens, active calorie estimate, wellness score.</td><td>Default daily step goal: 10,000.</td></tr>
+        <tr><td>Distance</td><td>Walking speed and burn estimate.</td><td>Fallback estimate: steps × 0.76m.</td></tr>
+        <tr><td>Move minutes</td><td>Walking burn estimate if available.</td><td>Fallback estimate: steps ÷ 100.</td></tr>
+        <tr><td>Sleep</td><td>Sleep screen and wellness score.</td><td>Scoring target: 8 hours.</td></tr>
+        <tr><td>Calories</td><td>Calories screen, wellness report, daily balance.</td><td>Default daily calorie goal: 2,000.</td></tr>
+        <tr><td>Weight</td><td>Weight history, BMI, BMR, ideal weight calculations.</td><td>Uses profile weight if daily weight missing.</td></tr>
+      </tbody>
+    </table>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">Scoring and insights</div>
+    <h2>Wellness score and profile metrics</h2>
+    <p class="lead">The app turns several daily signals into a score out of 100, while also calculating personal health metrics from the user profile.</p>
+
+    <div class="two-col">
+      <div class="mini-card">
+        <h3>Default score weighting</h3>
+        <p>Weights can be customized by the user in the score customization screen.</p>
+        <strong>Sleep</strong><div class="bar"><span style="width:35%"></span></div>
+        <strong>Workout</strong><div class="bar"><span style="width:25%"></span></div>
+        <strong>Nutrition</strong><div class="bar"><span style="width:25%"></span></div>
+        <strong>Steps</strong><div class="bar"><span style="width:15%"></span></div>
+      </div>
+      <div class="mini-card">
+        <h3>How scoring behaves</h3>
+        <p>If a data area has no logged/planned data, the active factors are rescaled instead of unfairly punishing the user. The final score is clamped between 0 and 100.</p>
+        <div class="pill-list"><span class="pill">Sleep progress</span><span class="pill">Workout completion</span><span class="pill">Nutrition completion</span><span class="pill">Step goal progress</span></div>
+      </div>
+      <div class="mini-card">
+        <h3>Profile calculations</h3>
+        <p>Profile metrics include BMI category, BMR using Mifflin-St Jeor style formulas, ideal weight, and ideal daily calories rounded to the nearest 50.</p>
+      </div>
+      <div class="mini-card">
+        <h3>Trend insight</h3>
+        <p>The wellness engine compares current-week and previous-week step totals to generate friendly weekly movement insights.</p>
+      </div>
+    </div>
+
+    <div class="stripe green">
+      <h3>Why this matters</h3>
+      <p>Instead of only listing raw numbers, the app translates routine completion and health data into motivation: “keep moving,” “good start,” “great job,” and similar dashboard feedback.</p>
+    </div>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">Reports and background services</div>
+    <h2>Reports, widget, sync, and permissions</h2>
+
+    <div class="feature-grid">
+      <div class="feature-card" style="--accent:#ef4444"><div class="icon">📄</div><h3>180-day wellness PDF report</h3><p>The in-app report generator creates a shareable PDF with daily rows for steps, intake, burned calories, net calories, sleep, weight, BMI, notes, and summary totals.</p></div>
+      <div class="feature-card" style="--accent:#10b981"><div class="icon">🧩</div><h3>Wellness widget</h3><p>A home screen widget displays wellness information and supports quick actions such as adding water.</p></div>
+      <div class="feature-card" style="--accent:#1685fe"><div class="icon">🔄</div><h3>Background health sync</h3><p>A WorkManager worker syncs health data in the background and supports modes such as all data, steps-only, sleep-only, and history-focused sync.</p></div>
+      <div class="feature-card" style="--accent:#f59e0b"><div class="icon">🔐</div><h3>Permission flow</h3><p>The app requests notifications, exact alarms, Health Connect permissions, and Google Fit access when needed. It checks permissions before reading data.</p></div>
+    </div>
+
+    <div class="section-kicker" style="margin-top:18px">Architecture at a glance</div>
+    <table class="table avoid-break">
+      <thead><tr><th>Area</th><th>Main implementation</th><th>Role</th></tr></thead>
+      <tbody>
+        <tr><td>UI</td><td>Kotlin Activities + XML layouts</td><td>Dashboard, reminders, plans, health screens, score customization, profile, signup.</td></tr>
+        <tr><td>Persistence</td><td>SharedPreferences + Gson</td><td>Stores reminders, profile settings, plans, templates, health history, water intake, score history.</td></tr>
+        <tr><td>Scheduling</td><td>AlarmManager + BroadcastReceivers</td><td>Exact reminders, done/snooze actions, boot restoration.</td></tr>
+        <tr><td>Background work</td><td>WorkManager</td><td>Periodic or requested health data synchronization.</td></tr>
+        <tr><td>Health APIs</td><td>Health Connect + Google Fit</td><td>Reads health metrics and Heart Points with user permission.</td></tr>
+        <tr><td>Sharing</td><td>Android PdfDocument + FileProvider</td><td>Generates and shares wellness PDF reports safely.</td></tr>
+      </tbody>
+    </table>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">User journey</div>
+    <h2>How a user would experience the app</h2>
+    <div class="numbered">
+      <div class="num-card" style="--accent:#6f42c1"><div><h3>Sign up and set profile</h3><p>The user starts with basic onboarding, then fills in profile data such as name, age, height, weight, and gender for personalized metrics.</p></div></div>
+      <div class="num-card" style="--accent:#1685fe"><div><h3>Connect health sources</h3><p>The app scans known fitness apps, requests Health Connect access, and can request Google Fit Heart Points permission.</p></div></div>
+      <div class="num-card" style="--accent:#f59e0b"><div><h3>Plan the day</h3><p>The user adds meals, workouts, water goals, sleep reminders, meditation prompts, to-dos, or custom routines.</p></div></div>
+      <div class="num-card" style="--accent:#10b981"><div><h3>Receive reminders</h3><p>Scheduled notifications appear at the right time. The user can mark them Done or Snooze them directly from the notification.</p></div></div>
+      <div class="num-card" style="--accent:#ec4899"><div><h3>Review progress</h3><p>The dashboard and detail screens show health data, completion progress, score, and weekly/monthly walking trends.</p></div></div>
+      <div class="num-card" style="--accent:#ef4444"><div><h3>Export wellness history</h3><p>When needed, the user can generate a 180-day wellness report PDF for review, sharing, or personal record keeping.</p></div></div>
+    </div>
+
+    <div class="source-box"><strong>Research sources reviewed:</strong> README, AndroidManifest, app activities, reminder models/managers, plan models/managers, HealthDataManager, HealthConnectManager, GoogleFitHeartPointsManager, HealthSyncWorker, WellnessEngine, WellnessScoreManager, ProfileHealthMetrics, WellnessReportManager, widget and receiver declarations.</div>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+
+  <section class="page">
+    <div class="section-kicker">Quick reference</div>
+    <h2>Feature reference summary</h2>
+    <table class="table">
+      <thead><tr><th>Feature</th><th>Plain-language description</th></tr></thead>
+      <tbody>
+        <tr><td>Dashboard</td><td>Central home screen for today’s wellness and quick navigation.</td></tr>
+        <tr><td>Reminders</td><td>Daily, weekly, monthly, fixed-time, and interval alerts for routines.</td></tr>
+        <tr><td>Done/Snooze</td><td>Notification actions that let users respond immediately.</td></tr>
+        <tr><td>Diet planning</td><td>Date-based meal planning with calories and templates.</td></tr>
+        <tr><td>Workout planning</td><td>Date-based exercise planning with sets, reps, intensity, reminders, and burn estimates.</td></tr>
+        <tr><td>Water intake</td><td>Daily hydration tracking with quick adjustments and widget support.</td></tr>
+        <tr><td>Walking data</td><td>Steps, distance, move minutes, heart points, and historical views.</td></tr>
+        <tr><td>Sleep tracking</td><td>Sleep values that feed the sleep screen and wellness score.</td></tr>
+        <tr><td>Weight tracking</td><td>Daily weight history plus BMI and related profile calculations.</td></tr>
+        <tr><td>Calories tracking</td><td>Goal-based calorie tracking and active burn calculations.</td></tr>
+        <tr><td>Health Connect</td><td>Android health data integration for major wellness metrics.</td></tr>
+        <tr><td>Google Fit Heart Points</td><td>OAuth-based Heart Points reading from Google Fit.</td></tr>
+        <tr><td>Wellness score</td><td>Customizable score out of 100 based on sleep, workouts, nutrition, and steps.</td></tr>
+        <tr><td>Profile</td><td>Stores personal information and computes BMI, BMR, ideal calories, ideal weight.</td></tr>
+        <tr><td>PDF report</td><td>In-app 180-day wellness report with daily rows and summary totals.</td></tr>
+        <tr><td>Background sync</td><td>Network-aware WorkManager sync of health history and selected data modes.</td></tr>
+      </tbody>
+    </table>
+    <p class="caption">This document describes the current workspace implementation, not a future roadmap.</p>
+    <div class="watermark">Routinely App Feature Guide</div>
+  </section>
+</body>
+</html>
