@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -17,25 +16,33 @@ class ReminderReceiver : BroadcastReceiver() {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as android.os.PowerManager
         val wakeLock = powerManager.newWakeLock(android.os.PowerManager.PARTIAL_WAKE_LOCK, "DailyRoutine:ReminderWakeLock")
         wakeLock.acquire(5000) // Acquire for 5 seconds to ensure notification shows
-        val id = intent.getIntExtra(ReminderManager.EXTRA_ID, -1)
-        val title = intent.getStringExtra(ReminderManager.EXTRA_TITLE) ?: "Reminder"
-        val typeName = intent.getStringExtra(ReminderManager.EXTRA_TYPE) ?: ReminderType.CUSTOM.name
-        val triggerKind = intent.getStringExtra(ReminderManager.EXTRA_TRIGGER_KIND)
-            ?: ReminderManager.TRIGGER_KIND_ORIGINAL
-        val type = runCatching { ReminderType.valueOf(typeName) }.getOrDefault(ReminderType.CUSTOM)
+        try {
+            val id = intent.getIntExtra(ReminderManager.EXTRA_ID, -1)
+            val title = intent.getStringExtra(ReminderManager.EXTRA_TITLE) ?: "Reminder"
+            val typeName = intent.getStringExtra(ReminderManager.EXTRA_TYPE) ?: ReminderType.CUSTOM.name
+            val triggerKind = intent.getStringExtra(ReminderManager.EXTRA_TRIGGER_KIND)
+                ?: ReminderManager.TRIGGER_KIND_ORIGINAL
+            val type = runCatching { ReminderType.valueOf(typeName) }.getOrDefault(ReminderType.CUSTOM)
 
-        val manager = ReminderManager(context)
-        val saved = if (id >= 0) manager.getReminderById(id) else null
-        val reminder = saved ?: Reminder(
-            id = id,
-            title = title,
-            type = type,
-            isEnabled = true
-        )
+            val manager = ReminderManager(context)
+            val saved = if (id >= 0) manager.getReminderById(id) else null
+            if (id >= 0 && saved?.isEnabled != true) {
+                return
+            }
 
-        showNotification(context, reminder)
-        if (triggerKind == ReminderManager.TRIGGER_KIND_ORIGINAL && saved != null && saved.isEnabled) {
-            manager.scheduleReminder(saved)
+            val reminder = saved ?: Reminder(
+                id = id,
+                title = title,
+                type = type,
+                isEnabled = true
+            )
+
+            showNotification(context, reminder)
+            if (triggerKind == ReminderManager.TRIGGER_KIND_ORIGINAL) {
+                manager.scheduleReminder(reminder)
+            }
+        } finally {
+            if (wakeLock.isHeld) wakeLock.release()
         }
     }
 

@@ -669,7 +669,8 @@ class DietPlanActivity : AppCompatActivity() {
         val etDesc = v.findViewById<EditText>(R.id.etMealNotes)
         val spinner = v.findViewById<Spinner>(R.id.spinnerMealType)
         val tvTime = v.findViewById<TextView>(R.id.tvMealTime)
-        
+        val swReminder = v.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.swMealReminder)
+
         val types = arrayOf("Breakfast", "Lunch", "Dinner", "Snack")
         spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, types)
 
@@ -686,6 +687,7 @@ class DietPlanActivity : AppCompatActivity() {
             etName.setText(it.name)
             etDesc.setText(it.description)
             spinner.setSelection(types.indexOf(it.mealType).coerceAtLeast(0))
+            swReminder.isChecked = it.isReminderEnabled
             updateTimeLabel()
         }
 
@@ -717,6 +719,7 @@ class DietPlanActivity : AppCompatActivity() {
                         mealType = spinner.selectedItem.toString(),
                         hour = h,
                         minute = m,
+                        isReminderEnabled = swReminder.isChecked,
                         calories = cals
                     )
                     planManager.saveMealForDate(dateStr, newMeal)
