@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.google.android.material.button.MaterialButton
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -31,9 +30,12 @@ class ProfileActivity : AppCompatActivity() {
         val etHeight = findViewById<EditText>(R.id.etProfileHeight)
         val etWeight = findViewById<EditText>(R.id.etProfileWeight)
         val spinnerGender = findViewById<Spinner>(R.id.spinnerGender)
-        val btnBmi = findViewById<MaterialButton>(R.id.btnProfileBmi)
-        val btnBmr = findViewById<MaterialButton>(R.id.btnProfileBmr)
-        val tvMetricsHint = findViewById<TextView>(R.id.tvProfileMetricsHint)
+        val tvBmiValue = findViewById<TextView>(R.id.tvProfileBmiValue)
+        val tvBmiCategory = findViewById<TextView>(R.id.tvProfileBmiCategory)
+        val tvBmrValue = findViewById<TextView>(R.id.tvProfileBmrValue)
+        val tvBmrCategory = findViewById<TextView>(R.id.tvProfileBmrCategory)
+        val tvIdealWeight = findViewById<TextView>(R.id.tvProfileIdealWeight)
+        val tvIdealCalories = findViewById<TextView>(R.id.tvProfileIdealCalories)
         val btnSave = findViewById<Button>(R.id.btnSaveProfile)
         val btnExport = findViewById<Button>(R.id.btnExportReport)
 
@@ -54,14 +56,20 @@ class ProfileActivity : AppCompatActivity() {
             val gender = spinnerGender.selectedItem?.toString() ?: "Male"
             val metrics = ProfileHealthMetricsCalculator.calculate(age, height, weight, gender)
             if (metrics == null) {
-                btnBmi.text = "BMI --"
-                btnBmr.text = "BMR --"
-                tvMetricsHint.text = "Add valid age, height, weight, and gender to calculate BMI/BMR."
+                tvBmiValue.text = "--"
+                tvBmiCategory.text = "Add details"
+                tvBmrValue.text = "--"
+                tvBmrCategory.text = "kcal/day"
+                tvIdealWeight.text = "Ideal weight updates after details"
+                tvIdealCalories.text = "Ideal intake updates after details"
                 return
             }
-            btnBmi.text = "BMI\n%.1f • ${metrics.bmiCategory}".format(metrics.bmi)
-            btnBmr.text = "BMR\n${metrics.bmr} kcal/day"
-            tvMetricsHint.text = "Ideal weight %.1f kg • Ideal intake ${metrics.idealCalories} kcal/day".format(metrics.idealWeightKg)
+            tvBmiValue.text = "%.1f".format(metrics.bmi)
+            tvBmiCategory.text = metrics.bmiCategory
+            tvBmrValue.text = metrics.bmr.toString()
+            tvBmrCategory.text = "kcal/day"
+            tvIdealWeight.text = "Ideal weight: %.1f kg".format(metrics.idealWeightKg)
+            tvIdealCalories.text = "Ideal intake: ${metrics.idealCalories} kcal/day"
         }
 
         val watcher = object : TextWatcher {

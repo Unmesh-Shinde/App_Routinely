@@ -147,45 +147,137 @@
                         android:baselineAligned="false"
                         android:orientation="horizontal">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnProfileBmi"
+                        <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
-                            android:layout_height="72dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
-                            android:gravity="center"
-                            android:minHeight="72dp"
-                            android:text="BMI --"
-                            android:textAllCaps="false"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            app:backgroundTint="#00897B"
-                            app:cornerRadius="18dp" />
+                            app:cardBackgroundColor="#00897B"
+                            app:cardCornerRadius="18dp"
+                            app:cardElevation="0dp">
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnProfileBmr"
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="96dp"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="BMI"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvProfileBmiValue"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:ellipsize="end"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:text="--"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="24sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvProfileBmiCategory"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:ellipsize="end"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:text="Category"
+                                    android:textColor="#E8FFFB"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
                             android:layout_width="0dp"
-                            android:layout_height="72dp"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            android:gravity="center"
-                            android:minHeight="72dp"
-                            android:text="BMR --"
-                            android:textAllCaps="false"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            app:backgroundTint="#EC407A"
-                            app:cornerRadius="18dp" />
+                            app:cardBackgroundColor="#EC407A"
+                            app:cardCornerRadius="18dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="96dp"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="12dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="BMR"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="13sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvProfileBmrValue"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:ellipsize="end"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:text="--"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="24sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/tvProfileBmrCategory"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:ellipsize="end"
+                                    android:gravity="center"
+                                    android:maxLines="1"
+                                    android:text="kcal/day"
+                                    android:textColor="#FFEAF2"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/tvProfileMetricsHint"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="BMI/BMR update as you edit age, height, weight, or gender."
-                        android:textColor="@color/textSecondary"
-                        android:textSize="12sp" />
+                        android:baselineAligned="false"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvProfileIdealWeight"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:layout_weight="1"
+                            android:text="Ideal weight updates here"
+                            android:textColor="@color/textSecondary"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvProfileIdealCalories"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:gravity="end"
+                            android:text="Ideal intake updates here"
+                            android:textColor="@color/textSecondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
