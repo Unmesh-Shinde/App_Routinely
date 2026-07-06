@@ -24,6 +24,7 @@ class HealthDataManager(context: Context) {
         private const val KEY_HEART_POINTS = "heart_points_count"
         private const val KEY_LAST_SYNC = "last_background_sync_time"
         private const val KEY_DISTANCE_VAL = "distance_val"
+        private const val KEY_INITIAL_HISTORY_SYNC_DONE = "initial_history_sync_done"
     }
 
     fun getDistanceKm(): Double {
@@ -45,7 +46,16 @@ class HealthDataManager(context: Context) {
     fun setConnectedAppName(name: String) = prefs.edit().putString(KEY_SOURCE_APP, name).apply()
 
     fun getConnectedAppPackage(): String? = prefs.getString(KEY_SOURCE_PKG, null)
-    fun setConnectedAppPackage(pkg: String) = prefs.edit().putString(KEY_SOURCE_PKG, pkg).apply()
+    fun setConnectedAppPackage(pkg: String) {
+        val previousPkg = getConnectedAppPackage()
+        prefs.edit()
+            .putString(KEY_SOURCE_PKG, pkg)
+            .putBoolean(KEY_INITIAL_HISTORY_SYNC_DONE, previousPkg == pkg && isInitialHistorySyncDone())
+            .apply()
+    }
+
+    fun isInitialHistorySyncDone(): Boolean = prefs.getBoolean(KEY_INITIAL_HISTORY_SYNC_DONE, false)
+    fun setInitialHistorySyncDone(done: Boolean) = prefs.edit().putBoolean(KEY_INITIAL_HISTORY_SYNC_DONE, done).apply()
 
     fun isConnected(): Boolean = prefs.getBoolean(KEY_IS_CONNECTED, false)
 

@@ -27,9 +27,9 @@ object GeminiClient {
 
     suspend fun getCaloriesForMeal(title: String, description: String, context: Context? = null): Int = withContext(Dispatchers.IO) {
         val configs = listOf(
-            "v1beta" to "gemini-2.5-flash",
             "v1beta" to "gemini-2.0-flash",
-            "v1beta" to "gemini-flash-latest"
+            "v1beta" to "gemini-flash-latest",
+            "v1beta" to "gemini-2.5-flash"
         )
 
         for ((apiVersion, modelName) in configs) {
@@ -49,9 +49,9 @@ object GeminiClient {
 
     suspend fun getMetForWorkout(exercise: Exercise): Double = withContext(Dispatchers.IO) {
         val configs = listOf(
-            "v1beta" to "gemini-2.5-flash",
             "v1beta" to "gemini-2.0-flash",
-            "v1beta" to "gemini-flash-latest"
+            "v1beta" to "gemini-flash-latest",
+            "v1beta" to "gemini-2.5-flash"
         )
 
         for ((apiVersion, modelName) in configs) {

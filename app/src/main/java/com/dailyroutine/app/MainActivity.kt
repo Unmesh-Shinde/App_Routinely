@@ -544,6 +544,7 @@ class MainActivity : AppCompatActivity() {
             var heartPointsByDate = emptyMap<String, Double>()
             val canReadGoogleFitHeartPoints = appPkg == GoogleFitHeartPointsManager.GOOGLE_FIT_PACKAGE &&
                 googleFitHeartPointsManager.hasReadPermission(this@MainActivity)
+            val shouldSyncFullHistory = !healthDataManager.isInitialHistorySyncDone()
 
             if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
                 stepsToday = healthConnectManager.readSteps(startOfToday, now, appPkg)
@@ -577,9 +578,13 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             if (canReadGoogleFitHeartPoints) {
-                val oldestDate = todayDate.minusDays((HealthDataManager.SYNC_HISTORY_DAYS - 1).toLong())
-                heartPointsByDate = googleFitHeartPointsManager.readDailyHeartPoints(oldestDate, now, zoneId)
-                heartPointsToday = heartPointsByDate[todayDate.toString()] ?: googleFitHeartPointsManager.readHeartPoints(startOfToday, now)
+                heartPointsToday = if (shouldSyncFullHistory) {
+                    val oldestDate = todayDate.minusDays((HealthDataManager.SYNC_HISTORY_DAYS - 1).toLong())
+                    heartPointsByDate = googleFitHeartPointsManager.readDailyHeartPoints(oldestDate, now, zoneId)
+                    heartPointsByDate[todayDate.toString()] ?: googleFitHeartPointsManager.readHeartPoints(startOfToday, now)
+                } else {
+                    googleFitHeartPointsManager.readHeartPoints(startOfToday, now)
+                }
                 healthDataManager.setHeartPoints(heartPointsToday.toInt())
                 Log.d("MainActivity", "Google Fit Heart Points synced: $heartPointsToday")
                 Toast.makeText(this@MainActivity, "✓ Google Fit Heart Points: ${heartPointsToday.toInt()}", Toast.LENGTH_LONG).show()
@@ -596,38 +601,41 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Cannot sync health data from $appName: App not supported or data missing.", Toast.LENGTH_LONG).show()
             }
 
-            for (i in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
-                val date = todayDate.minusDays(i.toLong())
-                val dayStart = date.atStartOfDay(zoneId).toInstant()
-                val dayEnd = if (i == 0) now else date.plusDays(1).atStartOfDay(zoneId).toInstant()
-                val dateStr = date.toString()
+            if (shouldSyncFullHistory) {
+                for (i in 0 until HealthDataManager.SYNC_HISTORY_DAYS) {
+                    val date = todayDate.minusDays(i.toLong())
+                    val dayStart = date.atStartOfDay(zoneId).toInstant()
+                    val dayEnd = if (i == 0) now else date.plusDays(1).atStartOfDay(zoneId).toInstant()
+                    val dateStr = date.toString()
 
-                if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
-                    healthDataManager.saveHistoricalSteps(dateStr, healthConnectManager.readSteps(dayStart, dayEnd, appPkg))
-                }
-                if (granted.contains(HealthPermission.getReadPermission(SleepSessionRecord::class))) {
-                    val sessions = healthConnectManager.readSleepSessions(dayStart, dayEnd, appPkg)
-                    val mins = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
-                    healthDataManager.saveHistoricalSleep(dateStr, mins / 60.0)
-                }
-                if (granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
-                    healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readTotalCalories(dayStart, dayEnd, appPkg))
-                }
-                if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
-                    val distKm = healthConnectManager.readDistanceMeters(dayStart, dayEnd, appPkg) / 1000.0
-                    prefs.edit().putString("hist_dist_$dateStr", "%.2f km".format(distKm)).apply()
-                }
-                if (granted.contains(HealthPermission.getReadPermission(WeightRecord::class))) {
-                    val weightKg = healthConnectManager.readWeightKg(dayStart, dayEnd, appPkg)
-                    if (weightKg > 0) {
-                        healthDataManager.saveWeight(dateStr, weightKg)
+                    if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
+                        healthDataManager.saveHistoricalSteps(dateStr, healthConnectManager.readSteps(dayStart, dayEnd, appPkg))
+                    }
+                    if (granted.contains(HealthPermission.getReadPermission(SleepSessionRecord::class))) {
+                        val sessions = healthConnectManager.readSleepSessions(dayStart, dayEnd, appPkg)
+                        val mins = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
+                        healthDataManager.saveHistoricalSleep(dateStr, mins / 60.0)
+                    }
+                    if (granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
+                        healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readTotalCalories(dayStart, dayEnd, appPkg))
+                    }
+                    if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
+                        val distKm = healthConnectManager.readDistanceMeters(dayStart, dayEnd, appPkg) / 1000.0
+                        prefs.edit().putString("hist_dist_$dateStr", "%.2f km".format(distKm)).apply()
+                    }
+                    if (granted.contains(HealthPermission.getReadPermission(WeightRecord::class))) {
+                        val weightKg = healthConnectManager.readWeightKg(dayStart, dayEnd, appPkg)
+                        if (weightKg > 0) {
+                            healthDataManager.saveWeight(dateStr, weightKg)
+                        }
+                    }
+                    if (canReadGoogleFitHeartPoints) {
+                        healthDataManager.saveHistoricalHeartPoints(dateStr, heartPointsByDate[dateStr] ?: 0.0)
+                    } else {
+                        healthDataManager.saveHistoricalHeartPoints(dateStr, 0.0)
                     }
                 }
-                if (canReadGoogleFitHeartPoints) {
-                    healthDataManager.saveHistoricalHeartPoints(dateStr, heartPointsByDate[dateStr] ?: 0.0)
-                } else {
-                    healthDataManager.saveHistoricalHeartPoints(dateStr, 0.0)
-                }
+                healthDataManager.setInitialHistorySyncDone(true)
             }
 
             val timestamp = java.text.SimpleDateFormat("hh:mm a, dd MMM", java.util.Locale.US).format(java.util.Date())
