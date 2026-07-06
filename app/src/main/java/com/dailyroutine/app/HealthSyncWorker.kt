@@ -193,22 +193,27 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
 
         private fun scheduleNextStepSync(context: Context) {
             val now = Calendar.getInstance()
-            val currentHour = now.get(Calendar.HOUR_OF_DAY)
-            val currentMinute = now.get(Calendar.MINUTE)
 
             // Fixed Slots: 12 AM (0), 6 AM, 9 AM, 12 PM (12), 3 PM (15), 6 PM (18), 9 PM (21)
             // Note: 3 AM is skipped for StepSync because Deep History Sync runs at 3:15 AM.
             val slots = listOf(0, 6, 9, 12, 15, 18, 21)
+            val nextTarget = slots.map { hour ->
+                Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, hour)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                    if (!after(now)) add(Calendar.DAY_OF_YEAR, 1)
+                }
+            }.minByOrNull { it.timeInMillis } ?: now
 
-            // Find the next slot after the current time
-            val nextHour = slots.firstOrNull { it > currentHour || (it == currentHour && currentMinute < 1) } ?: 6 // Default to 6 AM (tomorrow) if all passed
+            android.util.Log.d(
+                "HealthSync",
+                "Scheduling next StepSync. Current Hour: ${now.get(Calendar.HOUR_OF_DAY)}. " +
+                    "Next Slot: ${nextTarget.get(Calendar.HOUR_OF_DAY)}"
+            )
 
-            // If the next slot is 0, it means we are at 9 PM and looking for 12 AM tomorrow.
-            // Our delayUntil helper handles the day-wrap automatically.
-
-            android.util.Log.d("HealthSync", "Scheduling next StepSync. Current Hour: $currentHour. Next Slot: $nextHour")
-
-            val delayMs = delayUntil(nextHour, 0)
+            val delayMs = nextTarget.timeInMillis - now.timeInMillis
             enqueueUniqueSync(context, "StepSync", TAG_STEP_SYNC, delayMs, SYNC_MODE_STEPS)
         }
 
