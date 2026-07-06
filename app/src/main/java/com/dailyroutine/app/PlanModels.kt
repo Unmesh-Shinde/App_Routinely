@@ -4,20 +4,6 @@ import java.io.Serializable
 
 // --- Diet Plan Models ---
 
-enum class PlanDuration(val label: String, val totalDays: Int) {
-    WEEKLY("Weekly", 7),
-    TEN_DAYS("10 Days", 10),
-    BI_WEEKLY("Bi-Weekly", 14),
-    MONTHLY("Monthly", 30)
-}
-
-enum class TemplateDuration(val label: String, val totalDays: Int) {
-    WEEKLY("Weekly", 7),
-    TEN_DAYS("10 Days", 10),
-    FORTNIGHT("Fortnight", 14),
-    MONTHLY("Monthly", 30)
-}
-
 data class Meal(
     val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),
     val name: String = "",
@@ -55,12 +41,6 @@ data class AppliedTemplateRange(
 
 // --- Workout Plan Models ---
 
-enum class ChallengeDuration(val label: String, val days: Int) {
-    WEEKLY("Weekly", 7),
-    TEN_DAYS("10 Days", 10),
-    FIFTEEN_DAYS("15 Days", 15),
-    THIRTY_DAYS("30 Days", 30)
-}
 
 data class Exercise(
     val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),

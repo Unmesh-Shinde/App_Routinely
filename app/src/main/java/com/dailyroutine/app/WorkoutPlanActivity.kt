@@ -168,13 +168,11 @@ class WorkoutPlanActivity : AppCompatActivity() {
     private fun showTemplateActionsDialog() {
         showTemplateActionDialog(
             title = "Workout Templates",
-            message = "Choose what you want to do. Large rows are buttons; smaller text only explains the action.",
+            message = "Create reusable workout plans, manage saved templates, or review ranges already applied to the calendar.",
             actions = listOf(
-                TemplateDialogAction("Apply workout template", "Pick a saved workout plan and date range.") { showApplyTemplatePicker() },
-                TemplateDialogAction("Applied workout plans", "See where workout templates are active on the calendar.") { showAppliedWorkoutPlansDialog() },
-                TemplateDialogAction("Create from calendar", "Save exercises from an existing date range as a reusable template.") { showCreateTemplateDialog() },
-                TemplateDialogAction("Create empty template", "Create a blank template structure for future planning.") { showCreateNewTemplateDialog() },
-                TemplateDialogAction("Manage saved templates", "Open templates to apply, view, rename, duplicate, or delete.") { showManageSavedWorkoutTemplatesDialog() }
+                TemplateDialogAction("Create template", "Save workouts from a selected calendar range as a reusable plan.") { showCreateTemplateDialog() },
+                TemplateDialogAction("Saved templates", "Apply, view, rename, or delete your saved workout templates.") { showManageSavedWorkoutTemplatesDialog() },
+                TemplateDialogAction("Applied workout plans", "Review or remove template markers already placed on the calendar.") { showAppliedWorkoutPlansDialog() }
             )
         )
     }
@@ -253,42 +251,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun showCreateNewTemplateDialog() {
-        pickDateRange { startDate, endDate ->
-            promptTemplateName("Create New Workout Template", "New Workout Template") { name ->
-                val ok = planManager.createWorkoutTemplateFromRange(
-                    name = name,
-                    startDate = startDate,
-                    endDate = endDate,
-                    allowEmpty = true
-                )
-                if (ok) {
-                    Toast.makeText(this, "Template created for $startDate to $endDate", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Unable to create template", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
-    private fun showApplyTemplatePicker() {
-        val templates = planManager.listWorkoutTemplates()
-        if (templates.isEmpty()) {
-            Toast.makeText(this, "No workout templates found", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val labels = templates.map {
-            "${it.name} • ${it.durationDays} days • ${workoutTemplateExerciseCount(it)} exercise(s) • ${workoutTemplateAppliedCount(it)} applied"
-        }.toTypedArray()
-        AlertDialog.Builder(this)
-            .setTitle("Apply Workout Template")
-            .setItems(labels) { _, which ->
-                val template = templates[which]
-                pickWorkoutTemplateRangeAndConfirm(template)
-            }
-            .show()
     }
 
     private fun pickWorkoutTemplateRangeAndConfirm(template: WorkoutTemplate) {
@@ -406,15 +368,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
                         }
                     }
                 },
-                TemplateDialogAction("Duplicate template", "Create a copy that you can rename and reuse separately.") {
-                    promptTemplateName("Duplicate Workout Template", "${template.name} Copy") { newName ->
-                        if (planManager.duplicateWorkoutTemplate(template.id, newName)) {
-                            Toast.makeText(this, "Template duplicated", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(this, "Unable to duplicate template", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                },
                 TemplateDialogAction("Delete saved template", "Remove this template and its colored applied markers. Copied exercises remain on calendar.") { confirmDeleteWorkoutTemplate(template) }
             )
         )
@@ -486,8 +439,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
     private fun showAppliedWorkoutRangeActions(range: AppliedTemplateRange) {
         val options = arrayOf(
             "View applied details",
-            "Jump to start date",
-            "Jump to end date",
             "Remove applied marker"
         )
         AlertDialog.Builder(this)
@@ -496,9 +447,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> showAppliedWorkoutRangeDetails(range)
-                    1 -> jumpToWorkoutDate(range.startDate)
-                    2 -> jumpToWorkoutDate(range.endDate)
-                    3 -> {
+                    1 -> {
                         val removed = planManager.removeAppliedWorkoutTemplateRange(range.startDate, range.endDate)
                         if (removed) {
                             Toast.makeText(this, "Applied workout marker removed", Toast.LENGTH_SHORT).show()

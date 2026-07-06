@@ -78,12 +78,6 @@ class PlanManager(context: Context) {
 
     fun listMealTemplates(): List<MealTemplate> = getMealTemplates().sortedBy { it.name.lowercase(Locale.US) }
 
-    fun createMealTemplate(name: String, startDate: String, durationDays: Int): Boolean {
-        val start = parseDate(startDate)
-        val end = addDays(start, durationDays - 1)
-        return createMealTemplateFromRange(name, formatDate(start), formatDate(end), allowEmpty = false)
-    }
-
     fun createMealTemplateFromRange(name: String, startDate: String, endDate: String, allowEmpty: Boolean): Boolean {
         val cleanName = name.trim()
         if (cleanName.isEmpty()) return false
@@ -133,25 +127,6 @@ class PlanManager(context: Context) {
         return true
     }
 
-    fun duplicateMealTemplate(templateId: String, newName: String): Boolean {
-        val original = getMealTemplates().firstOrNull { it.id == templateId } ?: return false
-        val cleanName = newName.trim()
-        if (cleanName.isEmpty()) return false
-        val templates = getMealTemplates()
-        val copiedMeals = original.mealsByDayOffset.mapValues { entry ->
-            entry.value.map { it.copy() }.toMutableList()
-        }.toMutableMap()
-        templates.add(
-            original.copy(
-                id = UUID.randomUUID().toString(),
-                name = cleanName,
-                mealsByDayOffset = copiedMeals
-            )
-        )
-        saveMealTemplates(templates)
-        return true
-    }
-
     fun deleteMealTemplate(templateId: String) {
         val templates = getMealTemplates().toMutableList()
         templates.removeAll { it.id == templateId }
@@ -175,16 +150,6 @@ class PlanManager(context: Context) {
         return getAppliedMealTemplateRanges().sortedBy { it.startDate }
     }
 
-    fun findAppliedMealRangesInRange(startDate: String, endDate: String): List<AppliedTemplateRange> {
-        val start = parseDate(startDate)
-        val end = parseDate(endDate)
-        return getAppliedMealTemplateRanges().filter { range ->
-            val rangeStart = parseDate(range.startDate)
-            val rangeEnd = parseDate(range.endDate)
-            !end.before(rangeStart) && !start.after(rangeEnd)
-        }.sortedBy { it.startDate }
-    }
-
     fun removeAppliedMealTemplateRange(startDate: String, endDate: String): Boolean {
         val ranges = getAppliedMealTemplateRanges().toMutableList()
         val removed = ranges.removeAll { it.startDate == startDate && it.endDate == endDate }
@@ -201,14 +166,6 @@ class PlanManager(context: Context) {
             val end = parseDate(range.endDate)
             !day.before(start) && !day.after(end)
         }
-    }
-
-    fun applyMealTemplate(templateId: String, startDate: String): TemplateApplyResult {
-        val template = getMealTemplates().firstOrNull { it.id == templateId }
-            ?: return TemplateApplyResult(applied = false)
-        val start = parseDate(startDate)
-        val end = addDays(start, template.durationDays - 1)
-        return applyMealTemplateToRange(templateId, formatDate(start), formatDate(end))
     }
 
     fun applyMealTemplateToRange(templateId: String, startDate: String, endDate: String): TemplateApplyResult {
@@ -304,12 +261,6 @@ class PlanManager(context: Context) {
 
     fun listWorkoutTemplates(): List<WorkoutTemplate> = getWorkoutTemplates().sortedBy { it.name.lowercase(Locale.US) }
 
-    fun createWorkoutTemplate(name: String, startDate: String, durationDays: Int): Boolean {
-        val start = parseDate(startDate)
-        val end = addDays(start, durationDays - 1)
-        return createWorkoutTemplateFromRange(name, formatDate(start), formatDate(end), allowEmpty = false)
-    }
-
     fun createWorkoutTemplateFromRange(name: String, startDate: String, endDate: String, allowEmpty: Boolean): Boolean {
         val cleanName = name.trim()
         if (cleanName.isEmpty()) return false
@@ -359,25 +310,6 @@ class PlanManager(context: Context) {
         return true
     }
 
-    fun duplicateWorkoutTemplate(templateId: String, newName: String): Boolean {
-        val original = getWorkoutTemplates().firstOrNull { it.id == templateId } ?: return false
-        val cleanName = newName.trim()
-        if (cleanName.isEmpty()) return false
-        val templates = getWorkoutTemplates()
-        val copiedExercises = original.exercisesByDayOffset.mapValues { entry ->
-            entry.value.map { it.copy() }.toMutableList()
-        }.toMutableMap()
-        templates.add(
-            original.copy(
-                id = UUID.randomUUID().toString(),
-                name = cleanName,
-                exercisesByDayOffset = copiedExercises
-            )
-        )
-        saveWorkoutTemplates(templates)
-        return true
-    }
-
     fun deleteWorkoutTemplate(templateId: String) {
         val templates = getWorkoutTemplates().toMutableList()
         templates.removeAll { it.id == templateId }
@@ -401,16 +333,6 @@ class PlanManager(context: Context) {
         return getAppliedWorkoutTemplateRanges().sortedBy { it.startDate }
     }
 
-    fun findAppliedWorkoutRangesInRange(startDate: String, endDate: String): List<AppliedTemplateRange> {
-        val start = parseDate(startDate)
-        val end = parseDate(endDate)
-        return getAppliedWorkoutTemplateRanges().filter { range ->
-            val rangeStart = parseDate(range.startDate)
-            val rangeEnd = parseDate(range.endDate)
-            !end.before(rangeStart) && !start.after(rangeEnd)
-        }.sortedBy { it.startDate }
-    }
-
     fun removeAppliedWorkoutTemplateRange(startDate: String, endDate: String): Boolean {
         val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
         val removed = ranges.removeAll { it.startDate == startDate && it.endDate == endDate }
@@ -427,14 +349,6 @@ class PlanManager(context: Context) {
             val end = parseDate(range.endDate)
             !day.before(start) && !day.after(end)
         }
-    }
-
-    fun applyWorkoutTemplate(templateId: String, startDate: String): TemplateApplyResult {
-        val template = getWorkoutTemplates().firstOrNull { it.id == templateId }
-            ?: return TemplateApplyResult(applied = false)
-        val start = parseDate(startDate)
-        val end = addDays(start, template.durationDays - 1)
-        return applyWorkoutTemplateToRange(templateId, formatDate(start), formatDate(end))
     }
 
     fun applyWorkoutTemplateToRange(templateId: String, startDate: String, endDate: String): TemplateApplyResult {
@@ -536,16 +450,6 @@ class PlanManager(context: Context) {
         ))
     }
 
-    // --- Legacy Challenge Management (If needed, can be refactored to use dates) ---
-
-    fun getWorkoutPlan(duration: ChallengeDuration): WorkoutPlan {
-        // This could be deprecated or refactored to return a challenge template
-        return WorkoutPlan()
-    }
-
-    fun saveWorkoutPlan(plan: WorkoutPlan) {
-        // Logic for saving a whole plan/challenge
-    }
 
     private fun parseDate(date: String): Calendar {
         val parsed = dateFormatter.parse(date) ?: Date()

@@ -176,13 +176,11 @@ class DietPlanActivity : AppCompatActivity() {
     private fun showTemplateActionsDialog() {
         showTemplateActionDialog(
             title = "Meal Templates",
-            message = "Choose what you want to do. Large rows are buttons; smaller text only explains the action.",
+            message = "Create reusable meal plans, manage saved templates, or review ranges already applied to the calendar.",
             actions = listOf(
-                TemplateDialogAction("Apply meal template", "Pick a saved meal plan and date range.") { showApplyTemplatePicker() },
-                TemplateDialogAction("Applied meal plans", "See where meal templates are active on the calendar.") { showAppliedMealPlansDialog() },
-                TemplateDialogAction("Create from calendar", "Save meals from an existing date range as a reusable template.") { showCreateTemplateDialog() },
-                TemplateDialogAction("Create empty template", "Create a blank template structure for future planning.") { showCreateNewTemplateDialog() },
-                TemplateDialogAction("Manage saved templates", "Open templates to apply, view, rename, duplicate, or delete.") { showManageSavedMealTemplatesDialog() }
+                TemplateDialogAction("Create template", "Save meals from a selected calendar range as a reusable plan.") { showCreateTemplateDialog() },
+                TemplateDialogAction("Saved templates", "Apply, view, rename, or delete your saved meal templates.") { showManageSavedMealTemplatesDialog() },
+                TemplateDialogAction("Applied meal plans", "Review or remove template markers already placed on the calendar.") { showAppliedMealPlansDialog() }
             )
         )
     }
@@ -261,42 +259,6 @@ class DietPlanActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun showCreateNewTemplateDialog() {
-        pickDateRange { startDate, endDate ->
-            promptTemplateName("Create New Meal Template", "New Meal Template") { name ->
-                val ok = planManager.createMealTemplateFromRange(
-                    name = name,
-                    startDate = startDate,
-                    endDate = endDate,
-                    allowEmpty = true
-                )
-                if (ok) {
-                    Toast.makeText(this, "Template created for $startDate to $endDate", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Unable to create template", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
-    private fun showApplyTemplatePicker() {
-        val templates = planManager.listMealTemplates()
-        if (templates.isEmpty()) {
-            Toast.makeText(this, "No meal templates found", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val labels = templates.map {
-            "${it.name} • ${it.durationDays} days • ${mealTemplateMealCount(it)} meal(s) • ${mealTemplateAppliedCount(it)} applied"
-        }.toTypedArray()
-        AlertDialog.Builder(this)
-            .setTitle("Apply Meal Template")
-            .setItems(labels) { _, which ->
-                val template = templates[which]
-                pickMealTemplateRangeAndConfirm(template)
-            }
-            .show()
     }
 
     private fun pickMealTemplateRangeAndConfirm(template: MealTemplate) {
@@ -414,15 +376,6 @@ class DietPlanActivity : AppCompatActivity() {
                         }
                     }
                 },
-                TemplateDialogAction("Duplicate template", "Create a copy that you can rename and reuse separately.") {
-                    promptTemplateName("Duplicate Meal Template", "${template.name} Copy") { newName ->
-                        if (planManager.duplicateMealTemplate(template.id, newName)) {
-                            Toast.makeText(this, "Template duplicated", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(this, "Unable to duplicate template", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                },
                 TemplateDialogAction("Delete saved template", "Remove this template and its colored applied markers. Copied meals remain on calendar.") { confirmDeleteMealTemplate(template) }
             )
         )
@@ -494,8 +447,6 @@ class DietPlanActivity : AppCompatActivity() {
     private fun showAppliedMealRangeActions(range: AppliedTemplateRange) {
         val options = arrayOf(
             "View applied details",
-            "Jump to start date",
-            "Jump to end date",
             "Remove applied marker"
         )
         AlertDialog.Builder(this)
@@ -504,9 +455,7 @@ class DietPlanActivity : AppCompatActivity() {
             .setItems(options) { _, which ->
                 when (which) {
                     0 -> showAppliedMealRangeDetails(range)
-                    1 -> jumpToMealDate(range.startDate)
-                    2 -> jumpToMealDate(range.endDate)
-                    3 -> {
+                    1 -> {
                         val removed = planManager.removeAppliedMealTemplateRange(range.startDate, range.endDate)
                         if (removed) {
                             Toast.makeText(this, "Applied meal marker removed", Toast.LENGTH_SHORT).show()
