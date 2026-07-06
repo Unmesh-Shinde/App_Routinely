@@ -150,19 +150,6 @@
         android:paddingBottom="96dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnQuickRoutine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="24dp"
-        android:text="Quick Routine"
-        android:textAllCaps="false"
-        app:cornerRadius="24dp"
-        android:backgroundTint="#EF9A9A"
-        android:textColor="@color/textPrimary"
-        app:icon="@drawable/ic_calendar"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddMeal"

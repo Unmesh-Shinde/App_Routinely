@@ -38,7 +38,6 @@ class DietPlanActivity : AppCompatActivity() {
         setContentView(R.layout.activity_diet_plan)
         InsetHelper.applyTopPadding(findViewById(R.id.appBar))
         InsetHelper.applyBottomPadding(findViewById(R.id.rvMeals))
-        InsetHelper.applyBottomMargin(findViewById(R.id.btnQuickRoutine))
         InsetHelper.applyBottomMargin(findViewById(R.id.fabAddMeal))
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
@@ -56,10 +55,6 @@ class DietPlanActivity : AppCompatActivity() {
             showEditMealDialog(null)
         }
 
-        findViewById<MaterialButton>(R.id.btnQuickRoutine).setOnClickListener {
-            planManager.addQuickIndianDiet(dateFormatter.format(calendar.time))
-            refreshMeals()
-        }
 
         findViewById<MaterialButton>(R.id.btnTemplatesDiet).setOnClickListener {
             showTemplateActionsDialog()
