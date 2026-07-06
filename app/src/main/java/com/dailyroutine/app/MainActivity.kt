@@ -426,6 +426,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyHomeInsets() {
+        val header = findViewById<View>(R.id.homeHeader)
+        val headerBaseLeft = header.paddingLeft
+        val headerBaseTop = header.paddingTop
+        val headerBaseRight = header.paddingRight
+        val headerBaseBottom = header.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(header) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+            view.setPadding(
+                headerBaseLeft + maxOf(systemBars.left, cutout.left),
+                headerBaseTop + maxOf(systemBars.top, cutout.top),
+                headerBaseRight + maxOf(systemBars.right, cutout.right),
+                headerBaseBottom
+            )
+            insets
+        }
+        ViewCompat.requestApplyInsets(header)
+
         val scroll = findViewById<View>(R.id.homeScroll)
         val baseLeft = scroll.paddingLeft
         val baseTop = scroll.paddingTop
