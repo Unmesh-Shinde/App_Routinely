@@ -31,8 +31,6 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     private lateinit var rv: RecyclerView
     private lateinit var emptyGroup: View
     private lateinit var fab: ExtendedFloatingActionButton
-    private lateinit var banner: TextView
-    private lateinit var progressText: TextView
 
     private val fileToneLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -62,8 +60,6 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
         rv = findViewById(R.id.recyclerView)
         emptyGroup = findViewById(R.id.emptyGroup)
         fab = findViewById(R.id.fab)
-        banner = findViewById(R.id.tvBannerLeft)
-        progressText = findViewById(R.id.tvProgress)
 
         rv.adapter = adapter
         InsetHelper.applyBottomPadding(rv)
@@ -108,23 +104,6 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
         val list = mgr.getAllReminders()
         adapter.setReminders(list)
         emptyGroup.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
-        updateBanner(list)
-    }
-
-    private fun updateBanner(list: List<Reminder>) {
-        if (list.isEmpty()) {
-            banner.text = "Keep your routine on track"
-            progressText.text = "No reminders set"
-            return
-        }
-        val doneCount = RoutineProgressStore.getDoneCount(this)
-        val total = list.size
-        banner.text = when {
-            doneCount == 0 -> "Let's get started!"
-            doneCount < total -> "Great job! Keep going!"
-            else -> "Perfect day! All done!"
-        }
-        progressText.text = "Today's progress: $doneCount/$total completed"
     }
 
     private fun requestNotificationPermission() {
