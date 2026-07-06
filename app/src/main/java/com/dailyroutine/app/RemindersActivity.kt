@@ -30,21 +30,16 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     private lateinit var banner: TextView
     private lateinit var progressText: TextView
 
-    private val systemToneLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val uri = result.data?.getParcelableExtra<android.net.Uri>(android.media.RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-            ReminderDialogHelper.updateActiveTone(uri?.toString())
-        }
-    }
-
     private val fileToneLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
         uri?.let {
-            contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            ReminderDialogHelper.updateActiveTone(it.toString())
+            if (ReminderToneHelper.isToneDurationAllowed(this, it)) {
+                runCatching { contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+                ReminderDialogHelper.updateActiveTone(it.toString())
+            } else {
+                Toast.makeText(this, ReminderToneHelper.durationWarningText(), Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -167,21 +162,35 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     }
 
     private fun showToneSourcePicker(currentUri: String?) {
-        val options = arrayOf("System Ringtones", "File Manager (MP3/Audio)")
+        val options = arrayOf("System notification tones", "Audio file from device")
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("Pick Notification Tone")
+            .setMessage("Only sounds up to 6 seconds can be used for reminder alerts.")
             .setItems(options) { _, which ->
                 if (which == 0) {
-                    val intent = Intent(android.media.RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TYPE, android.media.RingtoneManager.TYPE_NOTIFICATION)
-                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone")
-                        putExtra(android.media.RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, currentUri?.let { android.net.Uri.parse(it) })
-                    }
-                    systemToneLauncher.launch(intent)
+                    showSystemNotificationTonePicker(currentUri)
                 } else {
                     fileToneLauncher.launch(arrayOf("audio/*"))
                 }
             }
+            .show()
+    }
+
+    private fun showSystemNotificationTonePicker(currentUri: String?) {
+        val tones = ReminderToneHelper.eligibleSystemNotificationTones(this)
+        if (tones.isEmpty()) {
+            Toast.makeText(this, "No notification tones up to 6 seconds were found.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val currentIndex = tones.indexOfFirst { it.uri?.toString() == currentUri }.coerceAtLeast(0)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Select Notification Tone")
+            .setSingleChoiceItems(tones.map { it.title }.toTypedArray(), currentIndex) { dialog, which ->
+                ReminderDialogHelper.updateActiveTone(tones[which].uri?.toString())
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel", null)
             .show()
     }
 

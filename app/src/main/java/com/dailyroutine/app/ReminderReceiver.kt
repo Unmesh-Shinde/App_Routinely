@@ -6,7 +6,9 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 
@@ -48,7 +50,9 @@ class ReminderReceiver : BroadcastReceiver() {
 
     private fun showNotification(context: Context, reminder: Reminder) {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        ensureChannel(nm)
+        val soundUri = resolveNotificationSound(context, reminder)
+        val channelId = channelIdForSound(soundUri)
+        ensureChannel(nm, channelId, soundUri)
 
         val openIntent = PendingIntent.getActivity(
             context,
@@ -90,10 +94,7 @@ class ReminderReceiver : BroadcastReceiver() {
             else -> reminder.type.defaultMessage
         }
 
-        val soundUri = reminder.soundUri?.let { android.net.Uri.parse(it) } 
-            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-
-        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(reminder.title)
             .setContentText(message)
@@ -111,17 +112,38 @@ class ReminderReceiver : BroadcastReceiver() {
         nm.notify(reminder.id, notification)
     }
 
-    private fun ensureChannel(nm: NotificationManager) {
+    private fun resolveNotificationSound(context: Context, reminder: Reminder): Uri {
+        val selectedUri = reminder.soundUri
+            ?.takeIf { it.isNotBlank() }
+            ?.let { runCatching { Uri.parse(it) }.getOrNull() }
+
+        if (selectedUri != null && ReminderToneHelper.isToneDurationAllowed(context, selectedUri)) {
+            return selectedUri
+        }
+
+        return RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+    }
+
+    private fun channelIdForSound(soundUri: Uri): String {
+        return "${CHANNEL_ID}_${Integer.toHexString(soundUri.toString().hashCode())}"
+    }
+
+    private fun ensureChannel(nm: NotificationManager, channelId: String, soundUri: Uri) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if (nm.getNotificationChannel(CHANNEL_ID) != null) return
+            if (nm.getNotificationChannel(channelId) != null) return
+
+            val audioAttributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build()
 
             NotificationChannel(
-                CHANNEL_ID,
+                channelId,
                 "Routinely Reminders",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "Notifications for your Routinely reminders"
-                setSound(null, null) // Allow builder to specify sound
+                setSound(soundUri, audioAttributes)
                 enableVibration(true)
                 vibrationPattern = longArrayOf(0, 200, 100, 200)
             }.also { nm.createNotificationChannel(it) }

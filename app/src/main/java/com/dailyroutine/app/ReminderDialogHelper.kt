@@ -88,18 +88,11 @@ object ReminderDialogHelper {
         refreshTimeLabel()
 
         fun updateToneLabel(uri: String?) {
-            selectedToneUri = uri
-            if (uri == null) {
-                tvToneName.text = "Default Notification Tone"
-            } else {
-                try {
-                    val rUri = android.net.Uri.parse(uri)
-                    val ringtone = android.media.RingtoneManager.getRingtone(context, rUri)
-                    tvToneName.text = ringtone?.getTitle(context) ?: "Custom Audio File"
-                } catch (e: Exception) {
-                    tvToneName.text = "Custom Audio File"
-                }
+            val allowedUri = uri?.takeIf {
+                runCatching { ReminderToneHelper.isToneDurationAllowed(context, android.net.Uri.parse(it)) }.getOrDefault(false)
             }
+            selectedToneUri = allowedUri
+            tvToneName.text = ReminderToneHelper.getToneTitle(context, allowedUri)
         }
         updateToneLabel(selectedToneUri)
         activeToneUpdater = ::updateToneLabel
