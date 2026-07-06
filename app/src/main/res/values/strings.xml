@@ -3,6 +3,15 @@
     <string name="app_name">Routinely</string>
     <string name="widget_name">Routinely Widget</string>
     <string name="widget_title">Routinely</string>
+    <string name="widget_date_placeholder">Mon, Jul 6</string>
+    <string name="widget_steps_label">Steps</string>
+    <string name="widget_steps_placeholder">0</string>
+    <string name="widget_distance_label">Distance</string>
+    <string name="widget_distance_placeholder">0.0 km</string>
+    <string name="widget_water_label">Water intake</string>
+    <string name="widget_water_placeholder">0.0 L</string>
+    <string name="widget_remove_water">−</string>
+    <string name="widget_add_water">+</string>
     <string name="channel_name">Routinely Reminders</string>
     <string name="channel_desc">Timely notifications for meals, exercise, hydration, and more.</string>
 </resources>

@@ -54,15 +54,15 @@ class WellnessWidget : AppWidgetProvider() {
                 .filter { it.isEnabled && it.type == ReminderType.HYDRATION && it.id.toString() in doneIds }
                 .size * 0.25
             val water = hdm.getWaterIntake(today) + waterFromReminders
-            val calories = hdm.getCalories()
             val stepsInt = steps.replace(",", "").toIntOrNull() ?: 0
             val distance = hdm.calculateDistanceKm(stepsInt)
-            
+            val todayLabel = SimpleDateFormat("EEE, MMM d", Locale.US).format(Date())
+
             // 2. Set Views
+            views.setTextViewText(R.id.tvWidgetDate, todayLabel)
             views.setTextViewText(R.id.tvWidgetSteps, steps)
-            views.setTextViewText(R.id.tvWidgetDistance, "%.1fkm".format(distance))
-            views.setTextViewText(R.id.tvWidgetCalories, calories)
-            views.setTextViewText(R.id.tvWidgetWater, "%.1fL".format(water))
+            views.setTextViewText(R.id.tvWidgetDistance, String.format(Locale.US, "%.1f km", distance))
+            views.setTextViewText(R.id.tvWidgetWater, String.format(Locale.US, "%.1f L", water))
 
             // 4. Click Intents for Water
             val waterIntent = Intent(context, WellnessWidget::class.java).apply {
@@ -89,7 +89,7 @@ class WellnessWidget : AppWidgetProvider() {
                 context, 0, openIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            views.setOnClickPendingIntent(R.id.widgetTitle, openPendingIntent)
+            views.setOnClickPendingIntent(R.id.widgetRoot, openPendingIntent)
 
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
