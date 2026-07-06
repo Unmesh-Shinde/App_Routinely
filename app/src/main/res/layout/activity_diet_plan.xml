@@ -14,14 +14,14 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="#E57373"
+            android:background="@color/nutritionHeaderBg"
             app:title="Nutrition Calendar"
             app:titleTextColor="@android:color/white"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#E57373"
+            android:background="@color/nutritionHeaderBg"
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
             android:paddingBottom="12dp"
@@ -61,7 +61,7 @@
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#EF9A9A"
+            android:background="@color/nutritionDayStripBg"
             android:scrollbars="none">
             <LinearLayout
                 android:id="@+id/llDays"
@@ -75,7 +75,7 @@
             android:id="@+id/llMealTemplateLegend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFCDD2"
+            android:background="@color/nutritionLegendBg"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:text="Template applied"
-                android:textColor="#5D0000"
+                android:textColor="@color/nutritionLegendText"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -106,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:text="Meals added"
-                android:textColor="#5D0000"
+                android:textColor="@color/nutritionLegendText"
                 android:textSize="11sp" />
         </LinearLayout>
 

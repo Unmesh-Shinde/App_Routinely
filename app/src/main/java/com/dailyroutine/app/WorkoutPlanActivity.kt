@@ -78,7 +78,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
 
         val stripDateFormatter = SimpleDateFormat("EEE\ndd", Locale.US)
 
-        for (i in 0 until 7) {
+        repeat(7) {
             val dateStr = dateFormatter.format(tempCal.time)
             val isSelected = dateStr == dateFormatter.format(selectedCalendar.time)
             val hasExercises = planManager.hasExercisesForDate(dateStr)
@@ -103,7 +103,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
                     updateDateUI()
                     setupDateStrip()
                 }
-                alpha = if (isSelected || hasExercises || inTemplateRange) 1f else 0.55f
+                alpha = 1f
             }
             styleWorkoutStripButton(btn, isSelected, inTemplateRange, hasExercises)
             container.addView(btn)
@@ -115,17 +115,17 @@ class WorkoutPlanActivity : AppCompatActivity() {
         val isNightMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
         val bgColor = when {
-            inTemplateRange -> if (isNightMode) 0xFFFF9100.toInt() else 0xFFE65100.toInt()
-            isSelected -> if (isNightMode) 0x40FFFFFF else 0x33000000
-            hasExercises -> if (isNightMode) 0x99FF9800.toInt() else 0x88EF6C00.toInt()
-            else -> 0x00FFFFFF
+            inTemplateRange -> if (isNightMode) 0xFFB35A00.toInt() else 0xFFE65100.toInt()
+            isSelected -> if (isNightMode) 0xFF2A3048.toInt() else 0xFFFFFFFF.toInt()
+            hasExercises -> if (isNightMode) 0xFF3B2817.toInt() else 0xFFFFE2BF.toInt()
+            else -> if (isNightMode) 0xFF171B2F.toInt() else 0xFFFFFFFF.toInt()
         }
         val strokeColor = when {
-            inTemplateRange && isSelected -> if (isNightMode) Color.WHITE else Color.BLACK
-            inTemplateRange -> Color.WHITE
-            isSelected -> if (isNightMode) 0xCCFFFFFF.toInt() else 0xCC000000.toInt()
-            hasExercises -> if (isNightMode) 0xFFFFB74D.toInt() else 0xFFE65100.toInt()
-            else -> if (isNightMode) 0x66FFFFFF else 0x66000000
+            inTemplateRange && isSelected -> Color.WHITE
+            inTemplateRange -> if (isNightMode) 0xFFFFCC80.toInt() else 0xFFE65100.toInt()
+            isSelected -> if (isNightMode) 0xFFFFFFFF.toInt() else 0xFF4A1800.toInt()
+            hasExercises -> if (isNightMode) 0xFFFFB74D.toInt() else 0xFFEF6C00.toInt()
+            else -> if (isNightMode) 0xFF4A526E.toInt() else 0xFFE0C3A0.toInt()
         }
         val strokeWidth = ((if (inTemplateRange) 3 else 1) * resources.displayMetrics.density).toInt()
 
@@ -138,9 +138,9 @@ class WorkoutPlanActivity : AppCompatActivity() {
         button.background = drawable
         val textColor = when {
             inTemplateRange -> Color.WHITE
-            isSelected -> if (isNightMode) Color.WHITE else Color.BLACK
-            hasExercises -> if (isNightMode) Color.WHITE else Color.BLACK
-            else -> if (isNightMode) Color.argb(230, 255, 255, 255) else Color.argb(230, 0, 0, 0)
+            isSelected -> if (isNightMode) Color.WHITE else 0xFF3A1200.toInt()
+            hasExercises -> if (isNightMode) 0xFFFFF1DF.toInt() else 0xFF3A1200.toInt()
+            else -> if (isNightMode) 0xFFF3F5FF.toInt() else 0xFF1A1A2E.toInt()
         }
         button.setTextColor(textColor)
     }
@@ -589,6 +589,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
                     startCal.get(Calendar.DAY_OF_MONTH)
                 )
                 endPicker.datePicker.minDate = startCal.timeInMillis
+                endPicker.setTitle("Select end date")
                 endPicker.show()
             },
             selectedCalendar.get(Calendar.YEAR),

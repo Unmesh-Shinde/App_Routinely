@@ -105,7 +105,7 @@ class DietPlanActivity : AppCompatActivity() {
 
         val stripDateFormatter = SimpleDateFormat("EEE\ndd", Locale.US)
 
-        for (i in 0 until 7) {
+        repeat(7) {
             val dateStr = dateFormatter.format(tempCal.time)
             val isSelected = dateStr == dateFormatter.format(calendar.time)
             val hasMeals = planManager.hasMealsForDate(dateStr)
@@ -131,7 +131,7 @@ class DietPlanActivity : AppCompatActivity() {
                     refreshMeals()
                     updateDaysStrip()
                 }
-                alpha = if (isSelected || hasMeals || inTemplateRange) 1f else 0.55f
+                alpha = 1f
             }
             styleMealStripButton(btn, isSelected, inTemplateRange, hasMeals)
             llDays.addView(btn)
@@ -143,17 +143,17 @@ class DietPlanActivity : AppCompatActivity() {
         val isNightMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 
         val bgColor = when {
-            inTemplateRange -> if (isNightMode) 0xFFFF1744.toInt() else 0xFFD50000.toInt()
-            isSelected -> if (isNightMode) 0x40FFFFFF else 0x33000000
-            hasMeals -> if (isNightMode) 0x99E57373.toInt() else 0x88D32F2F.toInt()
-            else -> 0x00FFFFFF
+            inTemplateRange -> if (isNightMode) 0xFFB71C1C.toInt() else 0xFFD50000.toInt()
+            isSelected -> if (isNightMode) 0xFF2A3048.toInt() else 0xFFFFFFFF.toInt()
+            hasMeals -> if (isNightMode) 0xFF3A2024.toInt() else 0xFFFFE0E0.toInt()
+            else -> if (isNightMode) 0xFF171B2F.toInt() else 0xFFFFFFFF.toInt()
         }
         val strokeColor = when {
-            inTemplateRange && isSelected -> if (isNightMode) Color.WHITE else Color.BLACK
-            inTemplateRange -> Color.WHITE
-            isSelected -> if (isNightMode) 0xCCFFFFFF.toInt() else 0xCC000000.toInt()
-            hasMeals -> if (isNightMode) 0xFFE57373.toInt() else 0xFFB71C1C.toInt()
-            else -> if (isNightMode) 0x66FFFFFF else 0x66000000
+            inTemplateRange && isSelected -> Color.WHITE
+            inTemplateRange -> if (isNightMode) 0xFFFF8A80.toInt() else 0xFFB71C1C.toInt()
+            isSelected -> if (isNightMode) 0xFFFFFFFF.toInt() else 0xFF5D0000.toInt()
+            hasMeals -> if (isNightMode) 0xFFFF8A80.toInt() else 0xFFD32F2F.toInt()
+            else -> if (isNightMode) 0xFF4A526E.toInt() else 0xFFE0B8B8.toInt()
         }
         val strokeWidth = ((if (inTemplateRange) 3 else 1) * resources.displayMetrics.density).toInt()
 
@@ -166,9 +166,9 @@ class DietPlanActivity : AppCompatActivity() {
         button.background = drawable
         val textColor = when {
             inTemplateRange -> Color.WHITE
-            isSelected -> if (isNightMode) Color.WHITE else Color.BLACK
-            hasMeals -> if (isNightMode) Color.WHITE else Color.BLACK
-            else -> if (isNightMode) Color.argb(230, 255, 255, 255) else Color.argb(230, 0, 0, 0)
+            isSelected -> if (isNightMode) Color.WHITE else 0xFF3B0000.toInt()
+            hasMeals -> if (isNightMode) 0xFFFFF0F0.toInt() else 0xFF4A0000.toInt()
+            else -> if (isNightMode) 0xFFF3F5FF.toInt() else 0xFF1A1A2E.toInt()
         }
         button.setTextColor(textColor)
     }
@@ -598,6 +598,7 @@ class DietPlanActivity : AppCompatActivity() {
                     startCal.get(Calendar.DAY_OF_MONTH)
                 )
                 endPicker.datePicker.minDate = startCal.timeInMillis
+                endPicker.setTitle("Select end date")
                 endPicker.show()
             },
             calendar.get(Calendar.YEAR),

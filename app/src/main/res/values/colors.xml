@@ -15,6 +15,16 @@
     <color name="healthCalories">#EC407A</color>
     <color name="healthSync">#009688</color>
 
+    <!-- Dashboard calendar strips -->
+    <color name="nutritionHeaderBg">#C62828</color>
+    <color name="nutritionDayStripBg">#FFF7F7</color>
+    <color name="nutritionLegendBg">#FFE7E7</color>
+    <color name="nutritionLegendText">#5D0000</color>
+    <color name="workoutHeaderBg">#E65100</color>
+    <color name="workoutDayStripBg">#FFF8EF</color>
+    <color name="workoutLegendBg">#FFE9CC</color>
+    <color name="workoutLegendText">#4A1800</color>
+
     <!-- Backgrounds -->
     <color name="bgPage">#F5F5F7</color>
     <color name="cardBg">#FFFFFF</color>

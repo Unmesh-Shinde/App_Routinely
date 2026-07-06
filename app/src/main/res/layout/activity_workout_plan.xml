@@ -14,14 +14,14 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/healthWorkout"
+            android:background="@color/workoutHeaderBg"
             app:title="Workout Calendar"
             app:titleTextColor="@android:color/white"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/healthWorkout"
+            android:background="@color/workoutHeaderBg"
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
             android:paddingBottom="12dp"
@@ -61,7 +61,7 @@
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFE0B2"
+            android:background="@color/workoutDayStripBg"
             android:scrollbars="none">
             <LinearLayout
                 android:id="@+id/llWorkoutDaysStrip"
@@ -75,7 +75,7 @@
             android:id="@+id/llWorkoutTemplateLegend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFCC80"
+            android:background="@color/workoutLegendBg"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:text="Template applied"
-                android:textColor="#4A1800"
+                android:textColor="@color/workoutLegendText"
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
@@ -106,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:text="Exercises added"
-                android:textColor="#4A1800"
+                android:textColor="@color/workoutLegendText"
                 android:textSize="11sp" />
         </LinearLayout>
 
