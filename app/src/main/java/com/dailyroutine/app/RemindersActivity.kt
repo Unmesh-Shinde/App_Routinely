@@ -19,6 +19,10 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListener {
 
@@ -65,6 +69,7 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
         InsetHelper.applyBottomPadding(rv)
         InsetHelper.applyBottomPadding(emptyGroup)
         InsetHelper.applyBottomMargin(fab)
+        ReminderToneHelper.preloadSystemNotificationTones(this)
 
         fab.setOnClickListener { showDialog(null) }
 
@@ -176,7 +181,30 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     }
 
     private fun showSystemNotificationTonePicker(currentUri: String?) {
-        val tones = ReminderToneHelper.eligibleSystemNotificationTones(this)
+        ReminderToneHelper.cachedSystemNotificationTones()?.let {
+            showSystemNotificationToneList(it, currentUri)
+            return
+        }
+
+        val loadingDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Loading notification tones")
+            .setMessage("Preparing available short tones...")
+            .setCancelable(false)
+            .create()
+        loadingDialog.show()
+
+        lifecycleScope.launch {
+            val tones = withContext(Dispatchers.IO) {
+                ReminderToneHelper.eligibleSystemNotificationTones(this@RemindersActivity)
+            }
+            if (!isFinishing && !isDestroyed) {
+                loadingDialog.dismiss()
+                showSystemNotificationToneList(tones, currentUri)
+            }
+        }
+    }
+
+    private fun showSystemNotificationToneList(tones: List<ReminderToneHelper.ToneOption>, currentUri: String?) {
         if (tones.isEmpty()) {
             Toast.makeText(this, "No notification tones up to 6 seconds were found.", Toast.LENGTH_LONG).show()
             return

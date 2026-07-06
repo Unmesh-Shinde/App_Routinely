@@ -8,6 +8,9 @@ import android.net.Uri
 object ReminderToneHelper {
     const val MAX_TONE_DURATION_MS = 6_000L
 
+    @Volatile
+    private var cachedSystemTones: List<ToneOption>? = null
+
     data class ToneOption(
         val title: String,
         val uri: Uri?
@@ -23,6 +26,25 @@ object ReminderToneHelper {
     }
 
     fun eligibleSystemNotificationTones(context: Context): List<ToneOption> {
+        cachedSystemTones?.let { return it }
+
+        return synchronized(this) {
+            cachedSystemTones ?: loadEligibleSystemNotificationTones(context.applicationContext).also {
+                cachedSystemTones = it
+            }
+        }
+    }
+
+    fun cachedSystemNotificationTones(): List<ToneOption>? = cachedSystemTones
+
+    fun preloadSystemNotificationTones(context: Context) {
+        if (cachedSystemTones != null) return
+        Thread {
+            eligibleSystemNotificationTones(context.applicationContext)
+        }.start()
+    }
+
+    private fun loadEligibleSystemNotificationTones(context: Context): List<ToneOption> {
         val tones = mutableListOf<ToneOption>()
         tones.add(ToneOption("Default Notification Tone", null))
 

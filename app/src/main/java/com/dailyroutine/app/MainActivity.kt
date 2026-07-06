@@ -28,7 +28,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -95,6 +97,7 @@ class MainActivity : AppCompatActivity() {
         googleFitHeartPointsManager = GoogleFitHeartPointsManager(this)
 
         mgr.scheduleAllEnabled()
+        ReminderToneHelper.preloadSystemNotificationTones(this)
 
         requestPermissionsLauncher = registerForActivityResult(
             PermissionController.createRequestPermissionResultContract()
@@ -860,7 +863,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showSystemNotificationTonePicker(currentUri: String?) {
-        val tones = ReminderToneHelper.eligibleSystemNotificationTones(this)
+        ReminderToneHelper.cachedSystemNotificationTones()?.let {
+            showSystemNotificationToneList(it, currentUri)
+            return
+        }
+
+        val loadingDialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Loading notification tones")
+            .setMessage("Preparing available short tones...")
+            .setCancelable(false)
+            .create()
+        loadingDialog.show()
+
+        lifecycleScope.launch {
+            val tones = withContext(Dispatchers.IO) {
+                ReminderToneHelper.eligibleSystemNotificationTones(this@MainActivity)
+            }
+            if (!isFinishing && !isDestroyed) {
+                loadingDialog.dismiss()
+                showSystemNotificationToneList(tones, currentUri)
+            }
+        }
+    }
+
+    private fun showSystemNotificationToneList(tones: List<ReminderToneHelper.ToneOption>, currentUri: String?) {
         if (tones.isEmpty()) {
             Toast.makeText(this, "No notification tones up to 6 seconds were found.", Toast.LENGTH_LONG).show()
             return
