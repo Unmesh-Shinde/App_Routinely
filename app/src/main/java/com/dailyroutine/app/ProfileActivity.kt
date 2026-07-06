@@ -1,6 +1,7 @@
 package com.dailyroutine.app
 
 import android.os.Bundle
+import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -17,6 +18,8 @@ class ProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+        InsetHelper.applyTopPadding(findViewById(R.id.appBar))
+        InsetHelper.applyBottomPadding(findViewById(R.id.profileScroll))
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -77,6 +80,10 @@ class ProfileActivity : AppCompatActivity() {
 
         btnExport.setOnClickListener {
             WellnessReportManager.generateAndShareReport(this)
+        }
+
+        findViewById<MaterialButton>(R.id.btnProfileSettings).setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
         btnSave.setOnClickListener {
