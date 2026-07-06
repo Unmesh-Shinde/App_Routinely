@@ -21,6 +21,7 @@ class AppLockActivity : AppCompatActivity() {
 		setContentView(R.layout.activity_app_lock)
 
 		val tvHint = findViewById<TextView>(R.id.tvLockHint)
+		val tvPinHint = findViewById<TextView>(R.id.tvPinHint)
 		val pinGroup = findViewById<View>(R.id.pinUnlockGroup)
 		val etPin = findViewById<EditText>(R.id.etUnlockPin)
 		val btnUnlock = findViewById<MaterialButton>(R.id.btnUnlockWithPin)
@@ -37,14 +38,23 @@ class AppLockActivity : AppCompatActivity() {
 
 		if (UserSettingsStore.getLockMethod(this) == UserSettingsStore.LOCK_METHOD_BIOMETRIC) {
 			pinGroup.visibility = View.GONE
+			tvPinHint.visibility = View.GONE
 			btnBiometric.visibility = View.VISIBLE
-			tvHint.text = "Use your phone's fingerprint or face unlock to continue."
+			tvHint.text = "Use fingerprint or face unlock to continue."
 			btnBiometric.setOnClickListener { showBiometricPrompt() }
 			showBiometricPrompt()
 		} else {
 			pinGroup.visibility = View.VISIBLE
 			btnBiometric.visibility = View.GONE
-			tvHint.text = "Enter your 6-digit Routinely PIN to unlock."
+			tvHint.text = "Enter your PIN to unlock"
+			etPin.hint = "Enter PIN"
+			val savedHint = UserSettingsStore.getManualPinHint(this)
+			if (savedHint.isNotBlank()) {
+				tvPinHint.text = "Hint: $savedHint"
+				tvPinHint.visibility = View.VISIBLE
+			} else {
+				tvPinHint.visibility = View.GONE
+			}
 			btnUnlock.setOnClickListener {
 				val pin = etPin.text.toString()
 				if (UserSettingsStore.verifyManualPin(this, pin)) {
@@ -83,7 +93,7 @@ class AppLockActivity : AppCompatActivity() {
 
 		val promptInfo = BiometricPrompt.PromptInfo.Builder()
 			.setTitle("Unlock Routinely")
-			.setSubtitle("Confirm it is you to continue")
+			.setSubtitle("Use fingerprint or face unlock to continue")
 			.setNegativeButtonText("Cancel")
 			.setAllowedAuthenticators(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK)
 			.build()

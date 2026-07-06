@@ -26,6 +26,7 @@ object UserSettingsStore {
 	private const val KEY_LOCK_TIMEOUT_MS = "lock_timeout_ms"
 	private const val KEY_PIN_SALT = "pin_salt"
 	private const val KEY_PIN_HASH = "pin_hash"
+	private const val KEY_PIN_HINT = "pin_hint"
 
 	private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -64,7 +65,7 @@ object UserSettingsStore {
 
 	fun hasManualPin(context: Context): Boolean = !prefs(context).getString(KEY_PIN_HASH, null).isNullOrBlank()
 
-	fun setManualPin(context: Context, pin: String): Boolean {
+	fun setManualPin(context: Context, pin: String, hint: String = ""): Boolean {
 		if (!pin.matches(Regex("\\d{6}"))) return false
 
 		val salt = ByteArray(16).also { SecureRandom().nextBytes(it) }
@@ -73,9 +74,12 @@ object UserSettingsStore {
 		prefs(context).edit()
 			.putString(KEY_PIN_SALT, saltText)
 			.putString(KEY_PIN_HASH, hash)
+			.putString(KEY_PIN_HINT, hint.trim())
 			.apply()
 		return true
 	}
+
+	fun getManualPinHint(context: Context): String = prefs(context).getString(KEY_PIN_HINT, "")?.trim().orEmpty()
 
 	fun verifyManualPin(context: Context, pin: String): Boolean {
 		if (!pin.matches(Regex("\\d{6}"))) return false

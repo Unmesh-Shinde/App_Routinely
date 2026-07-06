@@ -82,7 +82,7 @@ class ProfileActivity : AppCompatActivity() {
             WellnessReportManager.generateAndShareReport(this)
         }
 
-        findViewById<MaterialButton>(R.id.btnProfileSettings).setOnClickListener {
+        findViewById<View>(R.id.btnProfileSettings).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
 
@@ -109,7 +109,7 @@ class ProfileActivity : AppCompatActivity() {
                 HealthDataManager(this).saveWeight(today, weight)
             }
 
-            Toast.makeText(this, "Profile updated successfully! ✅", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
             finish()
         }
     }

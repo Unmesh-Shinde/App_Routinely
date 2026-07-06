@@ -20,6 +20,7 @@ class SettingsActivity : AppCompatActivity() {
 	private lateinit var tvLockSummary: TextView
 	private lateinit var radioMethodPin: RadioButton
 	private lateinit var radioMethodBiometric: RadioButton
+	private lateinit var btnChangePin: MaterialButton
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -36,6 +37,7 @@ class SettingsActivity : AppCompatActivity() {
 		tvLockSummary = findViewById(R.id.tvLockSummary)
 		radioMethodPin = findViewById(R.id.radioUnlockPin)
 		radioMethodBiometric = findViewById(R.id.radioUnlockBiometric)
+		btnChangePin = findViewById(R.id.btnChangePin)
 
 		setupThemeSettings()
 		setupLockSettings()
@@ -102,7 +104,6 @@ class SettingsActivity : AppCompatActivity() {
 						updateLockSummary()
 					} else {
 						showSetPinDialog(
-							title = "Create 6-digit PIN",
 							onSaved = {
 								UserSettingsStore.setLockMethod(this, UserSettingsStore.LOCK_METHOD_PIN)
 								AppLockCoordinator.markLockSettingsChanged(UserSettingsStore.isAppLockEnabled(this))
@@ -138,9 +139,8 @@ class SettingsActivity : AppCompatActivity() {
 			}
 		}
 
-		findViewById<MaterialButton>(R.id.btnChangePin).setOnClickListener {
+		btnChangePin.setOnClickListener {
 			showSetPinDialog(
-				title = if (UserSettingsStore.hasManualPin(this)) "Change 6-digit PIN" else "Create 6-digit PIN",
 				onSaved = {
 					UserSettingsStore.setLockMethod(this, UserSettingsStore.LOCK_METHOD_PIN)
 					methodGroup.check(R.id.radioUnlockPin)
@@ -174,7 +174,6 @@ class SettingsActivity : AppCompatActivity() {
 			else -> {
 				switchAppLock.isChecked = false
 				showSetPinDialog(
-					title = "Create 6-digit PIN",
 					onSaved = {
 						UserSettingsStore.setLockMethod(this, UserSettingsStore.LOCK_METHOD_PIN)
 						radioMethodPin.isChecked = true
@@ -208,44 +207,55 @@ class SettingsActivity : AppCompatActivity() {
 			else -> "as soon as you exit the app"
 		}
 		val method = if (UserSettingsStore.getLockMethod(this) == UserSettingsStore.LOCK_METHOD_BIOMETRIC) {
-			"fingerprint/face unlock"
+			"fingerprint or face unlock"
 		} else {
-			"6-digit PIN"
+			"six digit PIN"
 		}
 		tvLockSummary.text = if (UserSettingsStore.isAppLockEnabled(this)) {
-			"Enabled â€¢ Locks $timeout â€¢ Unlock with $method"
+			"Enabled. Routinely locks $timeout and unlocks with $method."
 		} else {
-			"Off â€¢ Choose a method and timeout, then enable App Lock."
+			"Off. Select an unlock method and lock timing, then turn on App Lock."
 		}
+		btnChangePin.text = if (UserSettingsStore.hasManualPin(this)) "Change PIN" else "Create PIN"
 	}
 
-	private fun showSetPinDialog(title: String, onSaved: () -> Unit, onCancelled: () -> Unit = {}) {
+	private fun showSetPinDialog(onSaved: () -> Unit, onCancelled: () -> Unit = {}) {
+		val hasExistingPin = UserSettingsStore.hasManualPin(this)
 		val container = LinearLayout(this).apply {
 			orientation = LinearLayout.VERTICAL
 			setPadding(48, 16, 48, 0)
 		}
-		val pin = createPinEditText("New 6-digit PIN")
+		val oldPin = if (hasExistingPin) createPinEditText("Enter your old PIN") else null
+		val pin = createPinEditText(if (hasExistingPin) "Enter new PIN" else "Enter New 6-digit PIN")
 		val confirm = createPinEditText("Confirm PIN")
+		val hint = createHintEditText("Add a Hint").apply {
+			setText(UserSettingsStore.getManualPinHint(this@SettingsActivity))
+		}
+		oldPin?.let { container.addView(it) }
 		container.addView(pin)
 		container.addView(confirm)
+		container.addView(hint)
 
 		val dialog = AlertDialog.Builder(this)
-			.setTitle(title)
-			.setMessage("Use exactly 6 numbers. Avoid easy PINs like 000000 or 123456.")
+			.setTitle(if (hasExistingPin) "Change PIN" else "Create PIN")
+			.setMessage("Use exactly six numbers. Avoid obvious PINs such as 000000 or 123456.")
 			.setView(container)
-			.setPositiveButton("Save", null)
+			.setPositiveButton(if (hasExistingPin) "Change PIN" else "Create PIN", null)
 			.setNegativeButton("Cancel") { _, _ -> onCancelled() }
 			.create()
 
 		dialog.setOnShowListener {
 			dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+				val previous = oldPin?.text?.toString().orEmpty()
 				val first = pin.text.toString()
 				val second = confirm.text.toString()
 				when {
+					hasExistingPin && !UserSettingsStore.verifyManualPin(this, previous) -> oldPin?.error = "Enter the correct current PIN"
 					!first.matches(Regex("\\d{6}")) -> pin.error = "Enter exactly 6 digits"
+					hasExistingPin && UserSettingsStore.verifyManualPin(this, first) -> pin.error = "Choose a new PIN that is different from your current PIN"
 					first != second -> confirm.error = "PINs do not match"
 					first == "000000" || first == "123456" -> pin.error = "Choose a less obvious PIN"
-					UserSettingsStore.setManualPin(this, first) -> {
+					UserSettingsStore.setManualPin(this, first, hint.text.toString()) -> {
 						dialog.dismiss()
 						onSaved()
 					}
@@ -261,6 +271,15 @@ class SettingsActivity : AppCompatActivity() {
 			hint = hintText
 			inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
 			filters = arrayOf(InputFilter.LengthFilter(6))
+			setSingleLine(true)
+		}
+	}
+
+	private fun createHintEditText(hintText: String): EditText {
+		return EditText(this).apply {
+			hint = hintText
+			inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+			filters = arrayOf(InputFilter.LengthFilter(80))
 			setSingleLine(true)
 		}
 	}

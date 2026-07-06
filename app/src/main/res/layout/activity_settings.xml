@@ -52,7 +52,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Appearance"
+                        android:text="Display preferences"
                         android:textColor="@color/textPrimary"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -61,7 +61,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Choose how Routinely should look across the whole app."
+                        android:text="Choose the visual theme that Routinely should use across the app."
                         android:textColor="@color/textSecondary"
                         android:textSize="13sp" />
 
@@ -76,21 +76,21 @@
                             android:id="@+id/radioThemeSystem"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Follow system"
+                            android:text="Use device theme"
                             android:textColor="@color/textPrimary" />
 
                         <RadioButton
                             android:id="@+id/radioThemeLight"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Light"
+                            android:text="Light mode"
                             android:textColor="@color/textPrimary" />
 
                         <RadioButton
                             android:id="@+id/radioThemeDark"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Dark"
+                            android:text="Dark mode"
                             android:textColor="@color/textPrimary" />
                     </RadioGroup>
                 </LinearLayout>
@@ -164,28 +164,28 @@
                             android:id="@+id/radioLockExit"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="After app exit"
+                            android:text="Immediately after leaving"
                             android:textColor="@color/textPrimary" />
 
                         <RadioButton
                             android:id="@+id/radioLock10"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="After 10 minutes"
+                            android:text="After 10 minutes away"
                             android:textColor="@color/textPrimary" />
 
                         <RadioButton
                             android:id="@+id/radioLock30"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="After 30 minutes"
+                            android:text="After 30 minutes away"
                             android:textColor="@color/textPrimary" />
 
                         <RadioButton
                             android:id="@+id/radioLock60"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="After 60 minutes"
+                            android:text="After 60 minutes away"
                             android:textColor="@color/textPrimary" />
                     </RadioGroup>
 
@@ -205,14 +205,14 @@
                             android:id="@+id/radioUnlockPin"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Manual 6-digit PIN"
+                            android:text="Six digit PIN"
                             android:textColor="@color/textPrimary" />
 
                         <RadioButton
                             android:id="@+id/radioUnlockBiometric"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Phone fingerprint or face unlock"
+                            android:text="Fingerprint or face unlock"
                             android:textColor="@color/textPrimary" />
                     </RadioGroup>
 
@@ -222,8 +222,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:layout_marginTop="14dp"
-                        android:text="Create or Change PIN"
+                        android:text="Create PIN"
                         android:textAllCaps="false"
+                        android:textStyle="bold"
                         app:cornerRadius="14dp"
                         app:strokeColor="@color/primary" />
 
@@ -232,7 +233,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
                         android:lineSpacingMultiplier="1.2"
-                        android:text="Tip: Biometric unlock uses your phone's enrolled fingerprint or face data. Routinely never stores biometric data."
+                        android:text="Biometric unlock uses credentials enrolled on this device. Routinely does not store biometric data."
                         android:textColor="@color/textSecondary"
                         android:textSize="12sp" />
                 </LinearLayout>
