@@ -849,7 +849,6 @@ class MainActivity : AppCompatActivity() {
         val options = arrayOf("System notification tones", "Audio file from device")
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle("Pick Notification Tone")
-            .setMessage("Only sounds up to 6 seconds can be used for reminder alerts.")
             .setItems(options) { _, which ->
                 if (which == 0) {
                     showSystemNotificationTonePicker(currentUri)

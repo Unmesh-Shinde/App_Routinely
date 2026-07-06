@@ -1,4 +1,4 @@
-package com.dailyroutine.app
+﻿package com.dailyroutine.app
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
@@ -30,14 +30,13 @@ object ReminderToneHelper {
             setType(RingtoneManager.TYPE_NOTIFICATION)
         }
         val cursor = manager.cursor ?: return tones
-        if (!cursor.moveToFirst()) return tones
 
-        do {
-            val uri = manager.getRingtoneUri(cursor.position) ?: continue
+        for (position in 0 until cursor.count) {
+            val uri = runCatching { manager.getRingtoneUri(position) }.getOrNull() ?: continue
             if (!isToneDurationAllowed(context, uri)) continue
-            val title = manager.getRingtone(cursor.position)?.getTitle(context) ?: continue
+            val title = runCatching { manager.getRingtone(position)?.getTitle(context) }.getOrNull() ?: continue
             tones.add(ToneOption(title, uri))
-        } while (cursor.moveToNext())
+        }
 
         return tones.distinctBy { it.uri?.toString().orEmpty() }
     }
