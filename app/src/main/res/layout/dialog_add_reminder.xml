@@ -12,6 +12,46 @@
         android:paddingTop="8dp"
         android:paddingBottom="16dp">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
+
+            <ImageView
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="@drawable/bg_circle_reminders"
+                android:contentDescription="Reminder"
+                android:padding="11dp"
+                app:srcCompat="@drawable/ic_alarm" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reminder setup"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Choose the cue, rhythm and notification tone."
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- ── Category ── -->
         <TextView
             style="@style/LabelText"
@@ -129,7 +169,9 @@
                 android:textSize="36sp"
                 android:textStyle="bold"
                 android:textColor="@color/primary"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:paddingVertical="8dp"
+                android:background="@drawable/bg_field"/>
 
             <Button
                 android:id="@+id/btnPickTime"
@@ -137,7 +179,8 @@
                 android:layout_height="wrap_content"
                 android:text="Change"
                 android:backgroundTint="@color/primary"
-                android:textColor="@android:color/white"/>
+                android:textColor="@android:color/white"
+                app:cornerRadius="14dp"/>
         </LinearLayout>
 
         <!-- ── Interval section ── -->
@@ -361,7 +404,7 @@
                 android:layout_height="48dp"
                 android:layout_marginStart="10dp"
                 android:src="@drawable/ic_calendar"
-                android:background="@drawable/bg_circle_diet"
+                android:background="@drawable/bg_circle_reminders"
                 android:backgroundTint="@color/primary"
                 android:padding="10dp"
                 app:tint="@android:color/white"/>

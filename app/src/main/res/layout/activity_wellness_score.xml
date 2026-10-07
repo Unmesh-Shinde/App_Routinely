@@ -9,25 +9,26 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/healthSync">
+        android:background="@color/m3_premium_surface"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="Wellness Score"
-            app:titleTextColor="@android:color/white"
+            app:titleTextColor="@color/textPrimary"
             app:navigationIcon="?attr/homeAsUpIndicator"
-            app:navigationIconTint="@android:color/white"/>
+            app:navigationIconTint="@color/textPrimary"/>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/healthSync"
-            app:tabTextColor="#B2DFDB"
-            app:tabSelectedTextColor="@android:color/white"
-            app:tabIndicatorColor="@android:color/white"
+            android:background="@color/m3_premium_surface"
+            app:tabTextColor="@color/textSecondary"
+            app:tabSelectedTextColor="@color/primary"
+            app:tabIndicatorColor="@color/primary"
             app:tabMode="fixed">
             <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Configure"/>
             <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weekly"/>
@@ -68,7 +69,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Adjust the weightage for each factor. The total must be 100%."
+                    android:text="Adjust the weightage for each factor. The total must be 10."
                     android:textSize="14sp"
                     android:textColor="@color/textSecondary"
                     android:layout_marginTop="8dp"
@@ -93,18 +94,18 @@
                         android:layout_height="wrap_content"
                         android:text="35%"
                         android:textStyle="bold"
-                        android:textColor="@color/healthSync" />
+                        android:textColor="@color/healthWellness" />
                 </LinearLayout>
                 <com.google.android.material.slider.Slider
                     android:id="@+id/sliderSleep"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:valueFrom="0"
-                    android:valueTo="100"
+                    android:valueTo="10"
                     android:stepSize="1"
-                    android:value="35"
-                    app:thumbColor="@color/healthSync"
-                    app:trackColorActive="@color/healthSync" />
+                    android:value="4"
+                    app:thumbColor="@color/healthWellness"
+                    app:trackColorActive="@color/healthWellness" />
 
                 <!-- Nutrition Weight -->
                 <LinearLayout
@@ -126,18 +127,18 @@
                         android:layout_height="wrap_content"
                         android:text="25%"
                         android:textStyle="bold"
-                        android:textColor="@color/healthSync" />
+                        android:textColor="@color/healthWellness" />
                 </LinearLayout>
                 <com.google.android.material.slider.Slider
                     android:id="@+id/sliderNutrition"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:valueFrom="0"
-                    android:valueTo="100"
+                    android:valueTo="10"
                     android:stepSize="1"
-                    android:value="25"
-                    app:thumbColor="@color/healthSync"
-                    app:trackColorActive="@color/healthSync" />
+                    android:value="2"
+                    app:thumbColor="@color/healthWellness"
+                    app:trackColorActive="@color/healthWellness" />
 
                 <!-- Workout Weight -->
                 <LinearLayout
@@ -159,18 +160,18 @@
                         android:layout_height="wrap_content"
                         android:text="25%"
                         android:textStyle="bold"
-                        android:textColor="@color/healthSync" />
+                        android:textColor="@color/healthWellness" />
                 </LinearLayout>
                 <com.google.android.material.slider.Slider
                     android:id="@+id/sliderWorkout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:valueFrom="0"
-                    android:valueTo="100"
+                    android:valueTo="10"
                     android:stepSize="1"
-                    android:value="25"
-                    app:thumbColor="@color/healthSync"
-                    app:trackColorActive="@color/healthSync" />
+                    android:value="2"
+                    app:thumbColor="@color/healthWellness"
+                    app:trackColorActive="@color/healthWellness" />
 
                 <!-- Steps Weight -->
                 <LinearLayout
@@ -192,24 +193,24 @@
                         android:layout_height="wrap_content"
                         android:text="15%"
                         android:textStyle="bold"
-                        android:textColor="@color/healthSync" />
+                        android:textColor="@color/healthWellness" />
                 </LinearLayout>
                 <com.google.android.material.slider.Slider
                     android:id="@+id/sliderSteps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:valueFrom="0"
-                    android:valueTo="100"
+                    android:valueTo="10"
                     android:stepSize="1"
-                    android:value="15"
-                    app:thumbColor="@color/healthSync"
-                    app:trackColorActive="@color/healthSync" />
+                    android:value="2"
+                    app:thumbColor="@color/healthWellness"
+                    app:trackColorActive="@color/healthWellness" />
 
                 <TextView
                     android:id="@+id/tvTotalWeight"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Total: 100%"
+                    android:text="Total: 10"
                     android:gravity="center"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -222,7 +223,8 @@
                     android:layout_height="56dp"
                     android:text="Save &amp; Apply"
                     android:layout_marginTop="24dp"
-                    android:backgroundTint="@color/healthSync"
+                    android:backgroundTint="@color/primary"
+                    android:textColor="@android:color/white"
                     app:cornerRadius="12dp" />
 
             </LinearLayout>

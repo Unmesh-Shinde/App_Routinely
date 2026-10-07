@@ -1,18 +1,23 @@
 package com.dailyroutine.app
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -27,13 +32,13 @@ import androidx.health.connect.client.records.*
 import androidx.lifecycle.lifecycleScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.await
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
@@ -53,12 +58,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mgr: ReminderManager
     private lateinit var planManager: PlanManager
     private lateinit var healthDataManager: HealthDataManager
-    private lateinit var healthConnectManager: HealthConnectManager
-    private lateinit var googleFitHeartPointsManager: GoogleFitHeartPointsManager
+    private lateinit var healthConnectManager: IHealthConnectManager
+    private lateinit var googleFitHeartPointsManager: IGoogleFitHeartPointsManager
     private lateinit var requestPermissionsLauncher: ActivityResultLauncher<Set<String>>
     private var firstLaunchPermissionFlowActive = false
     private var firstLaunchPermissionStep = FirstLaunchPermissionStep.NONE
     private var waitingForExactAlarmSettings = false
+    private var headerBackground: AnimatedHeaderBackgroundDrawable? = null
+    private var entranceAnimationPlayed = false
+    private var homeSavedInstanceState: Bundle? = null
     private val dataUpdatedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             updateDashboard()
@@ -79,7 +87,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        homeSavedInstanceState = savedInstanceState
         
         if (!UserPreferencesStore.isSignedUp(this)) {
             startActivity(Intent(this, SignupActivity::class.java))
@@ -89,12 +99,14 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
         applyHomeInsets()
+        setupAnimatedHomeHeader()
 
         mgr = ReminderManager(this)
         planManager = PlanManager(this)
         healthDataManager = HealthDataManager(this)
         healthConnectManager = HealthConnectManager(this)
         googleFitHeartPointsManager = GoogleFitHeartPointsManager(this)
+        healthDataManager.pruneHistoricalData()
 
         mgr.scheduleAllEnabled()
         ReminderToneHelper.preloadSystemNotificationTones(this)
@@ -189,7 +201,11 @@ class MainActivity : AppCompatActivity() {
             popup.show()
         }
 
-        addDefaultsOnFirstRun()
+        findViewById<TextView>(R.id.tvLastSync).setOnClickListener {
+            showSyncLogDialog()
+        }
+
+        initializeFirstRunState()
 
         HealthSyncWorker.scheduleAutoSync(this)
 
@@ -311,13 +327,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            if (healthConnectManager.hasAnyPermission()) {
+            val missingPermissions = healthConnectManager.getMissingPermissions()
+            if (missingPermissions.isEmpty()) {
                 fetchHealthData()
                 firstLaunchPermissionStep = FirstLaunchPermissionStep.GOOGLE_FIT
                 continueFirstLaunchPermissionFlow()
             } else {
                 // Launch the Health Connect permission screen directly (compulsory prompt).
-                requestPermissionsLauncher.launch(healthConnectManager.permissions)
+                requestPermissionsLauncher.launch(missingPermissions)
             }
         }
     }
@@ -407,7 +424,7 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun addDefaultsOnFirstRun() {
+    private fun initializeFirstRunState() {
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         if (prefs.getBoolean("is_first_run", true)) {
             // Ensure no legacy/mock health data exists
@@ -417,11 +434,7 @@ class MainActivity : AppCompatActivity() {
                 .putBoolean("needs_initial_permission_request", true)
                 .apply()
 
-            mgr.saveReminder(Reminder(title = "Drink Water", type = ReminderType.HYDRATION, isIntervalBased = true, intervalMinutes = 120))
-            mgr.saveReminder(Reminder(title = "Healthy Meal", type = ReminderType.MEAL, hour = 13, minute = 0))
-            mgr.saveReminder(Reminder(title = "Meditation", type = ReminderType.MEDITATION, hour = 8, minute = 0))
             prefs.edit().putBoolean("is_first_run", false).apply()
-            updateDashboard()
         }
     }
 
@@ -473,6 +486,88 @@ class MainActivity : AppCompatActivity() {
         ViewCompat.requestApplyInsets(rootView)
     }
 
+    private fun setupAnimatedHomeHeader() {
+        val header = findViewById<View>(R.id.homeHeader)
+        headerBackground = AnimatedHeaderBackgroundDrawable.forTimeOfDay(this).also { drawable ->
+            header.background = drawable
+        }
+    }
+
+    private fun startHomeHeaderAnimationIfNeeded(savedInstanceState: Bundle?) {
+        if (!HeaderAnimationStartupGate.shouldPlayOnHomeCreate(savedInstanceState)) {
+            return
+        }
+
+        if (!ValueAnimator.areAnimatorsEnabled()) {
+            findViewById<TextView>(R.id.tvGreetingLabel).alpha = 1f
+            findViewById<TextView>(R.id.tvGreeting).alpha = 1f
+            findViewById<TextView>(R.id.tvHeaderDate).alpha = 1f
+            findViewById<View>(R.id.cardProfileAvatar).alpha = 1f
+            return
+        }
+        
+        // Hide views instantly to prepare for entrance sequence
+        findViewById<TextView>(R.id.tvGreetingLabel).alpha = 0f
+        findViewById<TextView>(R.id.tvGreeting).alpha = 0f
+        findViewById<TextView>(R.id.tvHeaderDate).alpha = 0f
+        findViewById<View>(R.id.cardProfileAvatar).alpha = 0f
+
+        findViewById<View>(R.id.homeHeader).post {
+            if (ValueAnimator.areAnimatorsEnabled()) {
+                headerBackground?.start()
+            }
+            runPremiumEntranceAnimation()
+        }
+    }
+
+    private fun runPremiumEntranceAnimation() {
+        val tvGreetingLabel = findViewById<TextView>(R.id.tvGreetingLabel)
+        val tvGreeting = findViewById<TextView>(R.id.tvGreeting)
+        val tvHeaderDate = findViewById<TextView>(R.id.tvHeaderDate)
+        val cardAvatar = findViewById<View>(R.id.cardProfileAvatar)
+
+        // Convert DP to pixels for reliable motion
+        val density = resources.displayMetrics.density
+        val shiftPx = 24 * density
+
+        // Reset states for animation
+        tvGreetingLabel.translationY = -shiftPx
+        tvGreeting.translationY = shiftPx
+        cardAvatar.scaleX = 0.5f
+        cardAvatar.scaleY = 0.5f
+
+        // Sequence (Extra slow as requested)
+        tvGreetingLabel.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(1500)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .start()
+
+        tvGreeting.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setStartDelay(400)
+            .setDuration(1600)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .start()
+
+        tvHeaderDate.animate()
+            .alpha(1f)
+            .setStartDelay(1000)
+            .setDuration(1500)
+            .start()
+
+        cardAvatar.animate()
+            .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setStartDelay(800)
+            .setDuration(1500)
+            .setInterpolator(android.view.animation.OvershootInterpolator(1.4f))
+            .start()
+    }
+
     private fun startHealthAppScanning() {
         val apps = HealthAppScanner.getInstalledFitnessApps(this)
         if (apps.isEmpty()) {
@@ -512,7 +607,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            if (healthConnectManager.hasAnyPermission()) {
+            val missingPermissions = healthConnectManager.getMissingPermissions()
+            if (missingPermissions.isEmpty()) {
                 fetchHealthData()
             } else {
                 val appName = healthDataManager.getConnectedAppName()
@@ -520,7 +616,7 @@ class MainActivity : AppCompatActivity() {
                     .setTitle("Link with $appName? ⌚")
                     .setMessage("To automatically fetch your Steps, Sleep, and Calories, we use Android's Health Connect system. \n\nIMPORTANT: Please ensure Google Fit is linked to Health Connect in its settings first.")
                     .setPositiveButton("Grant Permissions") { _, _ ->
-                        requestPermissionsLauncher.launch(healthConnectManager.permissions)
+                        requestPermissionsLauncher.launch(missingPermissions)
                     }
                     .setNeutralButton("Settings") { _, _ ->
                         val intent = Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS)
@@ -546,10 +642,12 @@ class MainActivity : AppCompatActivity() {
             val now = Instant.now()
             val zoneId = java.time.ZoneId.systemDefault()
             val todayDate = java.time.LocalDate.now(zoneId)
+            val todayKey = todayDate.toString()
             val startOfToday = todayDate.atStartOfDay(zoneId).toInstant()
 
             val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
             val editor = prefs.edit().putBoolean("is_fitness_connected", true)
+            val roomWriter = HealthMetricsRoomWriter(this@MainActivity)
             val granted = healthConnectManager.getGrantedPermissions()
 
             var stepsToday = 0L
@@ -559,17 +657,24 @@ class MainActivity : AppCompatActivity() {
             var weightToday = 0.0
             var heartPointsToday = 0.0
             var heartPointsByDate = emptyMap<String, Double>()
-            val canReadGoogleFitHeartPoints = appPkg == GoogleFitHeartPointsManager.GOOGLE_FIT_PACKAGE &&
-                googleFitHeartPointsManager.hasReadPermission(this@MainActivity)
-            val shouldSyncFullHistory = !healthDataManager.isInitialHistorySyncDone()
+            val canReadGoogleFitHeartPoints = googleFitHeartPointsManager.hasReadPermission(this@MainActivity)
+            val shouldSyncStepHistory = !healthDataManager.isInitialHistorySyncDone() ||
+                !healthDataManager.isStepHistoryComplete()
+            val shouldSyncHeartPointsHistory = canReadGoogleFitHeartPoints &&
+                (!healthDataManager.isInitialHeartPointsHistorySyncDone() || !healthDataManager.isHeartPointsHistoryComplete())
+            val shouldSyncFullHistory = shouldSyncStepHistory || shouldSyncHeartPointsHistory
+            var stepHistoryHadReadFailures = false
 
             if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
-                stepsToday = healthConnectManager.readSteps(startOfToday, now, appPkg)
+                stepsToday = healthConnectManager.readStepsWithFallback(startOfToday, now, appPkg) ?: 0L
                 editor.putString("steps_count", "%,d".format(stepsToday))
+                roomWriter.upsertMetric(date = todayKey, steps = stepsToday, stepsSynced = true)
             }
             if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
                 val distanceToday = healthConnectManager.readDistanceMeters(startOfToday, now, appPkg) / 1000.0
                 editor.putString("distance_val", "%.2f km".format(distanceToday))
+                healthDataManager.saveHistoricalDistance(todayKey, distanceToday)
+                roomWriter.upsertMetric(date = todayKey, distanceKm = distanceToday)
             }
             if (granted.contains(HealthPermission.getReadPermission(ExerciseSessionRecord::class))) {
                 moveMinsToday = healthConnectManager.readMoveMinutes(startOfToday, now, appPkg)
@@ -581,36 +686,56 @@ class MainActivity : AppCompatActivity() {
                     val totalDurationMin = sleepSessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
                     sleepToday = "${totalDurationMin / 60}h ${totalDurationMin % 60}m"
                     editor.putString("sleep_hours", sleepToday)
+                    roomWriter.upsertMetric(date = todayKey, sleepHours = totalDurationMin / 60.0)
                 }
             }
-            if (granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
+            
+            var activeSynced = false
+            if (granted.contains(HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class))) {
+                val activeBurned = healthConnectManager.readActiveCalories(startOfToday, now, appPkg)
+                if (activeBurned > 0) {
+                    caloriesToday = "%.0f".format(activeBurned)
+                    healthDataManager.saveHistoricalActiveCalories(todayKey, activeBurned)
+                    roomWriter.upsertMetric(date = todayKey, activeCalories = activeBurned)
+                    activeSynced = true
+                }
+            }
+            if (!activeSynced && granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
                 val burnedCals = healthConnectManager.readTotalCalories(startOfToday, now, appPkg)
-                caloriesToday = "%.0f".format(burnedCals)
-                editor.putString("calories_burnt", caloriesToday)
+                if (burnedCals > 0) {
+                    caloriesToday = "%.0f".format(burnedCals)
+                    editor.putString("calories_burnt", caloriesToday)
+                    roomWriter.upsertMetric(date = todayKey, totalCalories = burnedCals)
+                }
             }
             if (granted.contains(HealthPermission.getReadPermission(WeightRecord::class))) {
                 weightToday = healthConnectManager.readWeightKg(startOfToday, now, appPkg)
                 if (weightToday > 0) {
                     editor.putString("current_weight", "%.1f kg".format(weightToday))
+                    roomWriter.upsertMetric(date = todayKey, weightKg = weightToday)
                 }
             }
             if (canReadGoogleFitHeartPoints) {
-                heartPointsToday = if (shouldSyncFullHistory) {
+                heartPointsToday = if (shouldSyncHeartPointsHistory) {
                     val oldestDate = todayDate.minusDays((HealthDataManager.SYNC_HISTORY_DAYS - 1).toLong())
                     heartPointsByDate = googleFitHeartPointsManager.readDailyHeartPoints(oldestDate, now, zoneId)
                     heartPointsByDate[todayDate.toString()] ?: googleFitHeartPointsManager.readHeartPoints(startOfToday, now)
                 } else {
                     googleFitHeartPointsManager.readHeartPoints(startOfToday, now)
                 }
-                healthDataManager.setHeartPoints(heartPointsToday.toInt())
-                Log.d("MainActivity", "Google Fit Heart Points synced: $heartPointsToday")
-                Toast.makeText(this@MainActivity, "✓ Google Fit Heart Points: ${heartPointsToday.toInt()}", Toast.LENGTH_LONG).show()
+                if (heartPointsByDate.isNotEmpty() || heartPointsToday > 0.0) {
+                    healthDataManager.setHeartPoints(heartPointsToday.toInt())
+                    roomWriter.upsertMetric(date = todayKey, heartPoints = heartPointsToday)
+                    Log.d("MainActivity", "Google Fit Heart Points synced: $heartPointsToday")
+                    Toast.makeText(this@MainActivity, "✓ Google Fit Heart Points: ${heartPointsToday.toInt()}", Toast.LENGTH_LONG).show()
+                } else {
+                    Log.w("MainActivity", "Google Fit returned no Heart Points; preserving cached today value")
+                }
             } else if (appPkg == GoogleFitHeartPointsManager.GOOGLE_FIT_PACKAGE) {
                 Log.w("MainActivity", "Google Fit Heart Points permission not granted; not auto-requesting to avoid account picker loop")
-                healthDataManager.setHeartPoints(0)
                 showGoogleFitHeartPointsUnavailableToast()
             } else {
-                healthDataManager.setHeartPoints(0)
+                Log.w("MainActivity", "Google Fit Heart Points permission unavailable; preserving cached Heart Points")
             }
 
             // Data Validation: If we connected an app but got no critical data (Steps and Sleep), notify the user.
@@ -626,39 +751,86 @@ class MainActivity : AppCompatActivity() {
                     val dateStr = date.toString()
 
                     if (granted.contains(HealthPermission.getReadPermission(StepsRecord::class))) {
-                        healthDataManager.saveHistoricalSteps(dateStr, healthConnectManager.readSteps(dayStart, dayEnd, appPkg))
+                        val historicalSteps = healthConnectManager.readStepsWithFallback(dayStart, dayEnd, appPkg)
+                        if (historicalSteps != null) {
+                            healthDataManager.saveHistoricalSteps(dateStr, historicalSteps)
+                            roomWriter.upsertMetric(date = dateStr, steps = historicalSteps, stepsSynced = true)
+                        } else {
+                            stepHistoryHadReadFailures = true
+                            Log.w("MainActivity", "Step history read failed for $dateStr; leaving day pending for retry")
+                        }
+                        
+                        // Distance History
+                        if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
+                            val distKm = healthConnectManager.readDistanceMeters(dayStart, dayEnd, appPkg) / 1000.0
+                            if (distKm > 0) {
+                                healthDataManager.saveHistoricalDistance(dateStr, distKm)
+                                roomWriter.upsertMetric(date = dateStr, distanceKm = distKm)
+                            }
+                        }
+
+                        // Calorie History
+                        var histActiveSynced = false
+                        if (granted.contains(HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class))) {
+                            val activeBurned = healthConnectManager.readActiveCalories(dayStart, dayEnd, appPkg)
+                            if (activeBurned > 0) {
+                                healthDataManager.saveHistoricalActiveCalories(dateStr, activeBurned)
+                                roomWriter.upsertMetric(date = dateStr, activeCalories = activeBurned)
+                                histActiveSynced = true
+                            }
+                        }
+                        if (!histActiveSynced && granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
+                            val historicalCalories = healthConnectManager.readTotalCalories(dayStart, dayEnd, appPkg)
+                            if (historicalCalories > 0) {
+                                healthDataManager.saveHistoricalCalories(dateStr, historicalCalories)
+                                roomWriter.upsertMetric(date = dateStr, totalCalories = historicalCalories)
+                            }
+                        }
                     }
                     if (granted.contains(HealthPermission.getReadPermission(SleepSessionRecord::class))) {
                         val sessions = healthConnectManager.readSleepSessions(dayStart, dayEnd, appPkg)
                         val mins = sessions.sumOf { java.time.Duration.between(it.startTime, it.endTime).toMinutes() }
                         healthDataManager.saveHistoricalSleep(dateStr, mins / 60.0)
-                    }
-                    if (granted.contains(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))) {
-                        healthDataManager.saveHistoricalCalories(dateStr, healthConnectManager.readTotalCalories(dayStart, dayEnd, appPkg))
-                    }
-                    if (granted.contains(HealthPermission.getReadPermission(DistanceRecord::class))) {
-                        val distKm = healthConnectManager.readDistanceMeters(dayStart, dayEnd, appPkg) / 1000.0
-                        prefs.edit().putString("hist_dist_$dateStr", "%.2f km".format(distKm)).apply()
+                        roomWriter.upsertMetric(date = dateStr, sleepHours = mins / 60.0)
                     }
                     if (granted.contains(HealthPermission.getReadPermission(WeightRecord::class))) {
                         val weightKg = healthConnectManager.readWeightKg(dayStart, dayEnd, appPkg)
                         if (weightKg > 0) {
                             healthDataManager.saveWeight(dateStr, weightKg)
+                            roomWriter.upsertMetric(date = dateStr, weightKg = weightKg)
                         }
                     }
-                    if (canReadGoogleFitHeartPoints) {
-                        healthDataManager.saveHistoricalHeartPoints(dateStr, heartPointsByDate[dateStr] ?: 0.0)
-                    } else {
-                        healthDataManager.saveHistoricalHeartPoints(dateStr, 0.0)
+                    if (canReadGoogleFitHeartPoints && heartPointsByDate.containsKey(dateStr)) {
+                        val historicalHeartPoints = heartPointsByDate[dateStr] ?: 0.0
+                        healthDataManager.saveHistoricalHeartPoints(dateStr, historicalHeartPoints)
+                        roomWriter.upsertMetric(date = dateStr, heartPoints = historicalHeartPoints)
                     }
                 }
-                healthDataManager.setInitialHistorySyncDone(true)
+                if (shouldSyncStepHistory) {
+                    val stepPermissionGranted = granted.contains(HealthPermission.getReadPermission(StepsRecord::class))
+                    val historyComplete = stepPermissionGranted && !stepHistoryHadReadFailures && healthDataManager.isStepHistoryComplete()
+                    healthDataManager.setInitialHistorySyncDone(historyComplete)
+                    Log.d(
+                        "MainActivity",
+                        "180-day step history complete: $historyComplete (${healthDataManager.countHistoricalStepSyncedDays()}/${HealthDataManager.SYNC_HISTORY_DAYS})"
+                    )
+                }
+                if (shouldSyncHeartPointsHistory) {
+                    val heartPointsHistoryComplete = heartPointsByDate.isNotEmpty() && healthDataManager.isHeartPointsHistoryComplete()
+                    healthDataManager.setInitialHeartPointsHistorySyncDone(heartPointsHistoryComplete)
+                    Log.d(
+                        "MainActivity",
+                        "180-day Heart Points history complete: $heartPointsHistoryComplete (${healthDataManager.countHistoricalHeartPointsSyncedDays()}/${HealthDataManager.SYNC_HISTORY_DAYS})"
+                    )
+                }
             }
 
             val timestamp = java.text.SimpleDateFormat("hh:mm a, dd MMM", java.util.Locale.US).format(java.util.Date())
             healthDataManager.setLastSyncTime(timestamp)
             
             editor.apply()
+            healthDataManager.pruneHistoricalData()
+            roomWriter.pruneToRetentionWindow()
             updateDashboard()
             
             val summary = StringBuilder("Sync complete from $appName!")
@@ -668,8 +840,58 @@ class MainActivity : AppCompatActivity() {
             if (caloriesToday.isNotEmpty() && caloriesToday != "0") summary.append("\nBurned Today: $caloriesToday kcal")
             if (weightToday > 0) summary.append("\nWeight: %.1f kg".format(weightToday))
             
+            SyncLogManager.addLog(this@MainActivity, appName, "Manual Sync: Steps, Sleep, Heart Points", true)
             Toast.makeText(this@MainActivity, summary.toString(), Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun showSyncLogDialog() {
+        val logs = SyncLogManager.getLogs(this)
+        if (logs.isEmpty()) {
+            Toast.makeText(this, "No sync logs recorded for today yet.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 32, 48, 32)
+        }
+
+        logs.forEach { entry ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, 16, 0, 16)
+            }
+            val timeTv = TextView(this@MainActivity).apply {
+                text = entry.formatTime()
+                textSize = 12f
+                setTextColor(ContextCompat.getColor(this@MainActivity, R.color.textSecondary))
+            }
+            val msgTv = TextView(this@MainActivity).apply {
+                text = "${entry.source}: ${entry.message}"
+                textSize = 14f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(ContextCompat.getColor(this@MainActivity, if (entry.isSuccess) R.color.textPrimary else android.R.color.holo_red_dark))
+            }
+            row.addView(timeTv)
+            row.addView(msgTv)
+            container.addView(row)
+            
+            // Divider
+            val divider = View(this).apply {
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2).apply {
+                    setMargins(0, 8, 0, 8)
+                }
+                setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.m3_premium_stroke))
+            }
+            container.addView(divider)
+        }
+
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Daily Sync History")
+            .setView(ScrollView(this).apply { addView(container) })
+            .setPositiveButton("Close", null)
+            .show()
     }
 
     override fun onResume() {
@@ -680,17 +902,10 @@ class MainActivity : AppCompatActivity() {
             IntentFilter(WellnessWidget.ACTION_DATA_UPDATED),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
-        // 🔴 Day-Rollover Protection: Check if we need to finalize "Yesterday"
-        val prefs = getSharedPreferences("health_data_pref", MODE_PRIVATE)
-        val todayStr = java.time.LocalDate.now().toString()
-        val lastFinalized = prefs.getString("last_finalized_day", "")
-        
-        if (lastFinalized != todayStr) {
-            // New day detected! Finalize yesterday's data before starting today
-            fetchHealthData() // This will backfill yesterday correctly
-            prefs.edit().putString("last_finalized_day", todayStr).apply()
-        }
+        // Ensure the next background sync is scheduled without starting a foreground sync.
+        HealthSyncWorker.scheduleAutoSync(this)
 
+        updateGreeting()
         updateDashboard()
 
         if (firstLaunchPermissionFlowActive && waitingForExactAlarmSettings) {
@@ -702,7 +917,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && !entranceAnimationPlayed) {
+            entranceAnimationPlayed = true
+            startHomeHeaderAnimationIfNeeded(homeSavedInstanceState)
+        } else if (hasFocus && ValueAnimator.areAnimatorsEnabled()) {
+            headerBackground?.takeUnless { it.isRunning }?.start()
+        }
+    }
+
     override fun onPause() {
+        headerBackground?.stop()
         super.onPause()
         runCatching { unregisterReceiver(dataUpdatedReceiver) }
     }
@@ -722,8 +948,8 @@ class MainActivity : AppCompatActivity() {
         val dateFormat = java.text.SimpleDateFormat("EEEE, d MMMM", java.util.Locale.getDefault())
         findViewById<TextView>(R.id.tvHeaderDate).text = dateFormat.format(java.util.Date())
 
-        val initial = name.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "?"
-        findViewById<TextView>(R.id.tvProfileInitial).text = initial
+        val avatarId = UserPreferencesStore.getUserAvatarId(this)
+        AvatarHelper.applyAvatar(findViewById(R.id.ivHeaderAvatar), avatarId)
     }
 
 
@@ -770,6 +996,7 @@ class MainActivity : AppCompatActivity() {
     private fun adjustWaterToday(amount: Double, message: String) {
         val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
         val updated = healthDataManager.adjustWaterIntake(today, amount)
+        HapticHelper.triggerThump(this)
         updateDashboard()
         Toast.makeText(this, "$message - %.1f L today".format(updated), Toast.LENGTH_SHORT).show()
     }
@@ -802,14 +1029,45 @@ class MainActivity : AppCompatActivity() {
         WellnessEngine.calculateIntakeForDate(this, todayStr) { intakeTotal ->
             runOnUiThread {
                 val weightValForBurn = healthDataManager.getWeight(todayStr).let { if (it > 0) it else 70.0 }
-                val burnedTotal = WellnessEngine.calculateActiveBurn(this, stepsCount, weightValForBurn)
-                val netBalance = intakeTotal - burnedTotal.toInt()
+                val bmr = WellnessEngine.calculateBMRForDate(this, todayStr).toInt()
+                val activeBurn = WellnessEngine.calculateActiveBurn(this, stepsCount, weightValForBurn).toInt()
+                val tef = WellnessEngine.calculateTEF(intakeTotal).toInt()
+                val totalBurned = bmr + activeBurn + tef
+                val netBalance = intakeTotal - totalBurned
                 
-                Log.d("BurnEngine", "Intake: $intakeTotal | Steps: $stepsCount | Total Burned: $burnedTotal | Net: $netBalance")
+                Log.d("BurnEngine", "Intake: $intakeTotal | BMR: $bmr | Active: $activeBurn | TEF: $tef | Total Burned: $totalBurned | Net: $netBalance")
 
                 findViewById<TextView>(R.id.tvValSteps).text = if (healthDataManager.isConnected() && stepsCount > 0) healthDataManager.getSteps() else "0"
                 findViewById<TextView>(R.id.tvValSleep).text = if (healthDataManager.isConnected() && sleepHours > 0) healthDataManager.getSleep() else "0h"
-                findViewById<TextView>(R.id.tvValCalories).text = netBalance.toString()
+                
+                val goal = healthDataManager.getDailyCalorieGoal().let { if (it > 0) it else 2000 }
+                val margin = 50
+                val minGreen = goal - margin
+                val maxGreen = goal + margin
+
+                val (calorieColorRes, calorieText) = when {
+                    intakeTotal < minGreen -> {
+                        R.color.calorieStatusOrange to netBalance.toString()
+                    }
+                    intakeTotal in minGreen..maxGreen -> {
+                        R.color.calorieStatusGreen to netBalance.toString()
+                    }
+                    else -> { // intakeTotal > maxGreen
+                        val text = if (netBalance > 0) "+$netBalance" else netBalance.toString()
+                        R.color.calorieStatusRed to text
+                    }
+                }
+
+                val tvValCalories = findViewById<TextView>(R.id.tvValCalories)
+                tvValCalories.text = calorieText
+                tvValCalories.setTextColor(ContextCompat.getColor(this@MainActivity, calorieColorRes))
+
+                findViewById<TextView>(R.id.tvCalorieIn).text = intakeTotal.toString()
+                findViewById<TextView>(R.id.tvCalorieOut).text = totalBurned.toString()
+                
+                val progress = findViewById<LinearProgressIndicator>(R.id.progressCalories)
+                progress.max = goal
+                progress.progress = intakeTotal.coerceAtMost(goal)
             }
         }
         
@@ -839,12 +1097,13 @@ class MainActivity : AppCompatActivity() {
             nutritionDone, nutritionTotal
         )
         WellnessScoreManager.saveDailyScore(this, todayStr, score)
+        findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(R.id.progressWellness).max = 10
         findViewById<com.google.android.material.progressindicator.CircularProgressIndicator>(R.id.progressWellness).progress = score
         findViewById<TextView>(R.id.tvWellnessScore).text = score.toString()
         findViewById<TextView>(R.id.tvWellnessMsg).text = when {
-            score >= 90 -> "Excellent! You're a wellness pro! 🏆"
-            score >= 70 -> "Great job! Keep up the momentum! ✨"
-            score >= 40 -> "Good start! You're making progress. 👍"
+            score >= 9 -> "Excellent! You're a wellness pro! 🏆"
+            score >= 7 -> "Great job! Keep up the momentum! ✨"
+            score >= 4 -> "Good start! You're making progress. 👍"
             else -> "Keep moving to reach your goals! 💪"
         }
 

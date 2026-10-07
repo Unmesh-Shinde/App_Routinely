@@ -35,17 +35,20 @@ object HistoryDateOrder {
 
             val firstDay = maxCalendar(monthStart, oldestAllowed)
             val lastDay = if (sameMonth(monthCursor, today)) {
-                minCalendar(monthEnd, endOfCurrentMonthBoundedWeek(today))
+                minCalendar(monthEnd, today)
             } else {
                 minCalendar(monthEnd, today)
             }
+            
+            // Build groups for this month (ascending)
             val monthGroups = buildMonthGroups(firstDay, lastDay)
-
-            if (sameMonth(monthCursor, today)) {
-                result.addAll(monthGroups.asReversed())
-            } else {
-                result.addAll(monthGroups)
+            
+            // Reverse groups and days within groups for Descending order ([Today] -> [Past])
+            val reversedGroups = monthGroups.asReversed().map { week ->
+                week.asReversed()
             }
+            
+            result.addAll(reversedGroups)
 
             monthCursor.add(Calendar.MONTH, -1)
         }

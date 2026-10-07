@@ -4,6 +4,21 @@ import java.io.Serializable
 
 // --- Diet Plan Models ---
 
+data class MealNutritionInfo(
+    val calories: Int = 0,
+    val carbsG: Double = 0.0,
+    val proteinG: Double = 0.0,
+    val fatG: Double = 0.0,
+    val fiberG: Double = 0.0,
+    val fatBreakdown: Map<String, String> = emptyMap(),
+    val carbBreakdown: Map<String, String> = emptyMap(),
+    val vitamins: Map<String, String> = emptyMap(),
+    val minerals: Map<String, String> = emptyMap(),
+    val aminoAcids: Map<String, String> = emptyMap(),
+    val antioxidants: Map<String, String> = emptyMap(),
+    val otherNutrients: Map<String, String> = emptyMap()
+) : Serializable
+
 data class Meal(
     val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),
     val name: String = "",
@@ -12,13 +27,17 @@ data class Meal(
     val minute: Int = 0,
     val isReminderEnabled: Boolean = true,
     val mealType: String = "Lunch", // Breakfast, Lunch, Dinner, Snack
-    val calories: Int = 0
+    val calories: Int = 0,
+    val nutritionInfo: MealNutritionInfo? = null
 ) : Serializable {
     fun formatTime(): String {
         val h = if (hour == 0 || hour == 12) 12 else hour % 12
         val amPm = if (hour < 12) "AM" else "PM"
         return "%02d:%02d %s".format(h, minute, amPm)
     }
+
+    val displayCalories: Int
+        get() = nutritionInfo?.calories ?: calories
 }
 
 data class DietPlan(
@@ -53,7 +72,15 @@ data class Exercise(
     val targetArea: String = "Full Body",
     val intensity: Int = 50, // 0..100
     val estimatedMet: Double = 0.0,
-    val metSource: String = "local"
+    val metSource: String = "local",
+    val exerciseType: String? = null,
+    val effortLabel: String? = null,
+    val durationSeconds: Int = 0,
+    val restSeconds: Int = 0,
+    val rounds: Int = 0,
+    val workSeconds: Int = 0,
+    val addedWeightKg: Double = 0.0,
+    val distanceKm: Double = 0.0
 ) : Serializable {
     fun formatTime(): String {
         val h = if (hour == 0 || hour == 12) 12 else hour % 12

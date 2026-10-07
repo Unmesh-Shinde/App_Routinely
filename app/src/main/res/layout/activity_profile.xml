@@ -9,14 +9,17 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary">
+        android:background="@color/m3_premium_surface"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="My Profile"
-            app:titleTextColor="@android:color/white">
+            app:titleTextColor="@color/textPrimary"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="@color/textPrimary">
 
             <TextView
                 android:id="@+id/btnProfileSettings"
@@ -29,8 +32,8 @@
                 android:gravity="center"
                 android:paddingHorizontal="16dp"
                 android:text="Settings"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
+                android:textColor="@color/primary"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
         </androidx.appcompat.widget.Toolbar>
@@ -56,8 +59,9 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/surfaceProfile"
                 app:strokeWidth="1dp"
-                app:strokeColor="@color/cardStroke">
+                app:strokeColor="@color/badgeProfile">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -65,17 +69,71 @@
                     android:orientation="vertical"
                     android:padding="20dp">
 
-                    <TextView style="@style/LabelText" android:text="Full Name"/>
-                    <EditText
-                        android:id="@+id/etProfileName"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_field"
-                        android:paddingHorizontal="12dp"
-                        android:inputType="textPersonName|textCapWords"
-                        android:autofillHints="name"
-                        android:hint="Name"/>
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:baselineAligned="false">
+
+                        <FrameLayout
+                            android:id="@+id/containerProfileAvatar"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?attr/selectableItemBackgroundBorderless">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/ivProfileAvatar"
+                                android:layout_width="64dp"
+                                android:layout_height="64dp"
+                                android:layout_gravity="center"
+                                android:scaleType="centerCrop"
+                                app:shapeAppearanceOverlay="@style/ShapeAppearance.DailyRoutine.Circle"
+                                app:strokeWidth="1dp"
+                                app:strokeColor="@color/cardStroke"/>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="bottom|end"
+                                android:layout_margin="4dp"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="2dp"
+                                app:cardBackgroundColor="@color/primary"
+                                app:strokeWidth="1dp"
+                                app:strokeColor="@android:color/white">
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="5dp"
+                                    app:srcCompat="@drawable/ic_edit"
+                                    app:tint="@android:color/white"
+                                    android:contentDescription="Edit Avatar"/>
+                            </com.google.android.material.card.MaterialCardView>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="16dp"
+                            android:orientation="vertical">
+
+                            <TextView style="@style/LabelText" android:text="Full Name"/>
+                            <EditText
+                                android:id="@+id/etProfileName"
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:layout_marginTop="4dp"
+                                android:background="@drawable/bg_field"
+                                android:paddingHorizontal="12dp"
+                                android:inputType="textPersonName|textCapWords"
+                                android:autofillHints="name"
+                                android:hint="Name"/>
+                        </LinearLayout>
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -90,16 +148,13 @@
                             android:layout_weight="1"
                             android:orientation="vertical"
                             android:layout_marginEnd="10dp">
-                            <TextView style="@style/LabelText" android:text="Age (Years)"/>
-                            <EditText
-                                android:id="@+id/etProfileAge"
+                            <TextView style="@style/LabelText" android:text="Age"/>
+                            <Spinner
+                                android:id="@+id/spinnerProfileAge"
                                 android:layout_width="match_parent"
                                 android:layout_height="52dp"
                                 android:layout_marginTop="6dp"
-                                android:background="@drawable/bg_field"
-                                android:paddingHorizontal="12dp"
-                                android:inputType="number"
-                                android:hint="Age"/>
+                                android:background="@drawable/bg_field"/>
                         </LinearLayout>
 
                         <LinearLayout
@@ -108,16 +163,27 @@
                             android:layout_weight="1"
                             android:orientation="vertical"
                             android:layout_marginStart="10dp">
-                            <TextView style="@style/LabelText" android:text="Height (cm)"/>
-                            <EditText
-                                android:id="@+id/etProfileHeight"
+                            <TextView style="@style/LabelText" android:text="Height"/>
+                            <LinearLayout
                                 android:layout_width="match_parent"
-                                android:layout_height="52dp"
-                                android:layout_marginTop="6dp"
-                                android:background="@drawable/bg_field"
-                                android:paddingHorizontal="12dp"
-                                android:inputType="number"
-                                android:hint="Height"/>
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+                                <Spinner
+                                    android:id="@+id/spinnerProfileFeet"
+                                    android:layout_width="0dp"
+                                    android:layout_height="52dp"
+                                    android:layout_weight="1"
+                                    android:layout_marginTop="6dp"
+                                    android:background="@drawable/bg_field"/>
+                                <Spinner
+                                    android:id="@+id/spinnerProfileInches"
+                                    android:layout_width="0dp"
+                                    android:layout_height="52dp"
+                                    android:layout_weight="1.2"
+                                    android:layout_marginTop="6dp"
+                                    android:layout_marginStart="6dp"
+                                    android:background="@drawable/bg_field"/>
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
 
@@ -140,6 +206,14 @@
                         android:inputType="numberDecimal"
                         android:hint="Weight"/>
 
+                    <TextView style="@style/LabelText" android:text="Weight Goal" android:layout_marginTop="20dp"/>
+                    <Spinner
+                        android:id="@+id/spinnerWeightGoal"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"/>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -152,50 +226,63 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
-                            app:cardBackgroundColor="#00897B"
+                            app:cardBackgroundColor="@color/cardBg"
                             app:cardCornerRadius="18dp"
-                            app:cardElevation="0dp">
+                            app:cardElevation="2dp"
+                            app:strokeWidth="1dp"
+                            app:strokeColor="@color/strokeNutrition">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="108dp"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="14dp">
+                                android:orientation="horizontal">
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="BMI"
-                                    android:textColor="@android:color/white"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold" />
+                                <View
+                                    android:layout_width="6dp"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/healthNutrition" />
 
-                                <TextView
-                                    android:id="@+id/tvProfileBmiValue"
+                                <LinearLayout
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:ellipsize="end"
+                                    android:layout_height="match_parent"
                                     android:gravity="center"
-                                    android:maxLines="1"
-                                    android:text="--"
-                                    android:textColor="@android:color/white"
-                                    android:textSize="22sp"
-                                    android:textStyle="bold" />
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="14dp">
 
-                                <TextView
-                                    android:id="@+id/tvProfileBmiCategory"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:ellipsize="end"
-                                    android:gravity="center"
-                                    android:maxLines="1"
-                                    android:text="Category"
-                                    android:textColor="#E8FFFB"
-                                    android:textSize="12sp" />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="BMI"
+                                        android:textColor="@color/textSecondary"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvProfileBmiValue"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:ellipsize="end"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:text="--"
+                                        android:textColor="@color/textPrimary"
+                                        android:textSize="22sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvProfileBmiCategory"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:ellipsize="end"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:text="Category"
+                                        android:textColor="@color/textSecondary"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -204,50 +291,63 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_weight="1"
-                            app:cardBackgroundColor="#EC407A"
+                            app:cardBackgroundColor="@color/cardBg"
                             app:cardCornerRadius="18dp"
-                            app:cardElevation="0dp">
+                            app:cardElevation="2dp"
+                            app:strokeWidth="1dp"
+                            app:strokeColor="@color/strokeCalories">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="108dp"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:paddingHorizontal="12dp"
-                                android:paddingVertical="14dp">
+                                android:orientation="horizontal">
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="BMR"
-                                    android:textColor="@android:color/white"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold" />
+                                <View
+                                    android:layout_width="6dp"
+                                    android:layout_height="match_parent"
+                                    android:background="@color/healthCalories" />
 
-                                <TextView
-                                    android:id="@+id/tvProfileBmrValue"
+                                <LinearLayout
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:ellipsize="end"
+                                    android:layout_height="match_parent"
                                     android:gravity="center"
-                                    android:maxLines="1"
-                                    android:text="--"
-                                    android:textColor="@android:color/white"
-                                    android:textSize="22sp"
-                                    android:textStyle="bold" />
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="8dp"
+                                    android:paddingVertical="14dp">
 
-                                <TextView
-                                    android:id="@+id/tvProfileBmrCategory"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:ellipsize="end"
-                                    android:gravity="center"
-                                    android:maxLines="1"
-                                    android:text="kcal/day"
-                                    android:textColor="#FFEAF2"
-                                    android:textSize="12sp" />
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="BMR"
+                                        android:textColor="@color/textSecondary"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvProfileBmrValue"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="6dp"
+                                        android:ellipsize="end"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:text="--"
+                                        android:textColor="@color/textPrimary"
+                                        android:textSize="22sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:id="@+id/tvProfileBmrCategory"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="4dp"
+                                        android:ellipsize="end"
+                                        android:gravity="center"
+                                        android:maxLines="1"
+                                        android:text="kcal/day"
+                                        android:textColor="@color/textSecondary"
+                                        android:textSize="12sp" />
+                                </LinearLayout>
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
                     </LinearLayout>
@@ -294,9 +394,10 @@
                 android:textAllCaps="false"
                 android:textStyle="bold"
                 app:cornerRadius="16dp"
-                app:strokeColor="@color/primary"
+                android:textColor="@color/healthProfile"
+                app:strokeColor="@color/healthProfile"
                 app:icon="@drawable/ic_save"
-                app:iconTint="@color/primary"/>
+                app:iconTint="@color/healthProfile"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveProfile"
@@ -306,6 +407,8 @@
                 android:text="Save Changes"
                 android:textAllCaps="false"
                 android:textStyle="bold"
+                android:textColor="@color/textOnProfile"
+                app:backgroundTint="@color/healthProfile"
                 app:cornerRadius="16dp"/>
 
         </LinearLayout>

@@ -10,15 +10,17 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="4dp">
+        android:background="@color/m3_premium_surface"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/primary"
-            app:titleTextColor="@android:color/white"
-            app:title="@string/app_name"/>
+            app:titleTextColor="@color/textPrimary"
+            app:title="@string/app_name"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="@color/textPrimary"/>
 
 
     </com.google.android.material.appbar.AppBarLayout>
@@ -78,9 +80,9 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="24dp"
         android:text="Add Reminder"
-        android:textColor="@android:color/white"
+        android:textColor="@color/textOnReminder"
         app:icon="@drawable/ic_add"
-        app:iconTint="@android:color/white"
-        app:backgroundTint="@color/primary"/>
+        app:iconTint="@color/textOnReminder"
+        app:backgroundTint="@color/healthReminder"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

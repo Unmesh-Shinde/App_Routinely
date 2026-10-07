@@ -3,233 +3,219 @@ package com.dailyroutine.app
 import android.content.Context
 import com.google.gson.Gson
 import java.util.Locale
-import kotlin.math.roundToInt
+import kotlin.math.max
+
+fun MealNutritionInfo.hasDetailedNutrition(): Boolean {
+    return calories > 0 && carbsG > 0 && proteinG > 0 && fatG > 0
+}
 
 object CalorieEstimator {
 
-    private const val ASSET_NAME = "indian_food_calories.json"
+    private const val PREFS_LEARNED_MEALS = "learned_meal_nutrition_store"
+    private const val SIMILARITY_THRESHOLD = 0.95
+    private const val LEARNED_KEY_PREFIX = "learned|v2|t="
 
-    private data class FoodDatabase(
-        val version: Int = 1,
-        val source: String = "",
-        val entries: List<IndianFoodEntry> = emptyList()
-    )
-
-    private data class IndianFoodEntry(
-        val name: String = "",
-        val aliases: List<String> = emptyList(),
-        val category: String = "",
-        val subCategory: String = "",
-        val dietaryType: String = "",
-        val origin: String = "",
-        val cookingMethod: String = "",
-        val description: String = "",
-        val serving: String = "1 serving",
-        val servingGrams: Int = 0,
-        val calories: Int = 0,
-        val confidence: String = "estimated"
-    )
-
-    private data class FoodRule(
-        val keywords: List<String>,
-        val caloriesPerServing: Int,
-        val gramsPerServing: Int = 100
-    )
-
-    private var cachedDatabase: FoodDatabase? = null
-
-    private val basicFoods = listOf(
-        FoodRule(listOf("roti", "chapati", "phulka"), 105, 45),
-        FoodRule(listOf("naan"), 260, 100),
-        FoodRule(listOf("paratha"), 260, 90),
-        FoodRule(listOf("rice", "chawal"), 205, 160),
-        FoodRule(listOf("biriyani", "biryani"), 420, 300),
-        FoodRule(listOf("dal", "daal", "lentil"), 180, 200),
-        FoodRule(listOf("sabzi", "sabji", "vegetable curry", "veg curry"), 160, 180),
-        FoodRule(listOf("bhaji", "leafy vegetable", "saag", "amaranth bhaji"), 130, 150),
-        FoodRule(listOf("paneer"), 265, 100),
-        FoodRule(listOf("chicken curry"), 320, 250),
-        FoodRule(listOf("chicken"), 240, 150),
-        FoodRule(listOf("egg", "anda"), 78, 50),
-        FoodRule(listOf("milk"), 150, 250),
-        FoodRule(listOf("curd", "yogurt", "yoghurt", "dahi"), 120, 200),
-        FoodRule(listOf("tea", "chai"), 90, 180)
-    )
-
-    fun estimateMealCalories(context: Context, text: String): Int {
-        val normalized = normalize(text)
-        if (normalized.isBlank()) return 0
-
-        val databaseEstimate = estimateFromIndianDatabase(context, normalized)
-        if (databaseEstimate > 0) return databaseEstimate
-
-        return estimateMealCalories(text)
+    fun clearSmartCache(context: Context) {
+        context.getSharedPreferences(PREFS_LEARNED_MEALS, Context.MODE_PRIVATE).edit().clear().apply()
     }
 
-    fun estimateMealCalories(context: Context, title: String, description: String): Int {
-        val normalizedTitle = normalize(title)
-        val normalizedDescription = normalize(description)
-        if (normalizedTitle.isBlank() && normalizedDescription.isBlank()) return 0
+    fun saveLearnedMeal(context: Context, title: String, description: String, nutrition: MealNutritionInfo) {
+        if (nutrition.calories <= 0) return
+        val prefs = context.getSharedPreferences(PREFS_LEARNED_MEALS, Context.MODE_PRIVATE)
+        val jsonStr = Gson().toJson(nutrition)
+        val fullKey = buildNormalizedKey(title, description)
+        val titleKey = buildNormalizedKey(title, "")
 
-        if (normalizedDescription.isNotBlank()) {
-            val descriptionEstimate = estimateFromIndianDatabase(context, normalizedDescription)
-            if (descriptionEstimate > 0) return descriptionEstimate
-
-            val simpleDescriptionEstimate = estimateWithBasicFoods(normalizedDescription)
-            if (simpleDescriptionEstimate > 0) return simpleDescriptionEstimate.roundToInt().coerceIn(40, 2500)
+        val editor = prefs.edit().putString(fullKey, jsonStr)
+        if (titleKey.isNotBlank() && titleKey != fullKey) {
+            editor.putString(titleKey, jsonStr)
         }
-
-        val combined = listOf(normalizedTitle, normalizedDescription)
-            .filter { it.isNotBlank() }
-            .joinToString(" ")
-        return estimateMealCalories(context, combined)
+        editor.apply()
     }
 
-    fun estimateMealCalories(text: String): Int {
-        val normalized = normalize(text)
-        if (normalized.isBlank()) return 0
+    fun getLearnedMealNutrition(context: Context, title: String, description: String): MealNutritionInfo? {
+        val normTitle = normalize(title)
+        val normDesc = normalize(description)
+        if (normTitle.isBlank() && normDesc.isBlank()) return null
 
-        val basicEstimate = estimateWithBasicFoods(normalized)
-        if (basicEstimate > 0) return basicEstimate.roundToInt().coerceIn(40, 2500)
+        val prefs = context.getSharedPreferences(PREFS_LEARNED_MEALS, Context.MODE_PRIVATE)
+        val allEntries = prefs.all ?: return null
 
-        return estimateGenericMeal(normalized).roundToInt().coerceIn(40, 2500)
-    }
+        var bestMatch: MealNutritionInfo? = null
+        var highestScore = 0.0
 
-    private fun estimateWithBasicFoods(normalized: String): Double {
-        var total = 0.0
-        basicFoods.forEach { food ->
-            val matchedKeyword = food.keywords.firstOrNull { normalized.containsWholePhrase(it) }
-            if (matchedKeyword != null) {
-                total += estimateFoodCalories(normalized, matchedKeyword, food)
+        val targetCombined = buildCombinedQuery(normTitle, normDesc)
+
+        for ((key, rawValue) in allEntries) {
+            if (rawValue !is String) continue
+            val (storedTitle, storedDesc) = extractTitleAndDescFromKey(key)
+            val storedCombined = buildCombinedQuery(storedTitle, storedDesc)
+
+            val score = calculateSimilarity(targetCombined, storedCombined)
+            if (score >= SIMILARITY_THRESHOLD && score > highestScore) {
+                try {
+                    val parsed = Gson().fromJson(rawValue, MealNutritionInfo::class.java)
+                    if (parsed != null && parsed.hasDetailedNutrition()) {
+                        highestScore = score
+                        bestMatch = enrichMealNutrition(parsed)
+                    } else if (parsed != null) {
+                        prefs.edit().remove(key).apply()
+                    }
+                } catch (_: Exception) {}
             }
         }
 
-        return total
+        return bestMatch
     }
 
-    private fun estimateFromIndianDatabase(context: Context, normalizedText: String): Int {
-        val entries = loadDatabase(context).entries
-        if (entries.isEmpty()) return 0
-
-        val consumedRanges = mutableListOf<IntRange>()
-        var total = 0.0
-
-        entries
-            .flatMap { entry ->
-                (entry.aliases + entry.name)
-                    .filter { it.length >= 3 }
-                    .distinct()
-                    .map { alias -> entry to normalize(alias) }
-            }
-            .sortedByDescending { it.second.length }
-            .forEach { (entry, alias) ->
-                val match = findWholePhraseMatch(normalizedText, alias) ?: return@forEach
-                if (consumedRanges.any { it.overlaps(match.range) }) return@forEach
-
-                total += entry.calories * quantityMultiplier(normalizedText, alias, match.range.first)
-                consumedRanges.add(match.range)
-            }
-
-        return total.roundToInt().coerceIn(0, 3500)
+    fun getLearnedMealCalories(context: Context, title: String, description: String): Int? {
+        return getLearnedMealNutrition(context, title, description)?.calories
     }
 
-    private fun loadDatabase(context: Context): FoodDatabase {
-        cachedDatabase?.let { return it }
+    fun enrichMealNutrition(info: MealNutritionInfo): MealNutritionInfo {
+        if (info.calories <= 0) return info
+        val calories = info.calories
+        val hasMacros = info.carbsG > 0 || info.proteinG > 0 || info.fatG > 0
 
-        val loaded = try {
-            context.assets.open(ASSET_NAME).bufferedReader().use { reader ->
-                Gson().fromJson(reader, FoodDatabase::class.java) ?: FoodDatabase()
-            }
-        } catch (_: Exception) {
-            FoodDatabase()
+        val carbs = if (hasMacros) info.carbsG else Math.round((calories * 0.50 / 4.0) * 10.0) / 10.0
+        val protein = if (hasMacros) info.proteinG else Math.round((calories * 0.22 / 4.0) * 10.0) / 10.0
+        val fat = if (hasMacros) info.fatG else Math.round((calories * 0.28 / 9.0) * 10.0) / 10.0
+        val fiber = if (hasMacros) info.fiberG else Math.round((carbs * 0.12) * 10.0) / 10.0
+
+        val netCarbsG = Math.round((carbs - fiber).coerceAtLeast(0.0) * 10.0) / 10.0
+        val sugarsG = Math.round((carbs * 0.2) * 10.0) / 10.0
+        val satFatG = Math.round((fat * 0.3) * 10.0) / 10.0
+        val mufaG = Math.round((fat * 0.4) * 10.0) / 10.0
+        val pufaG = Math.round((fat * 0.3) * 10.0) / 10.0
+
+        val fatBreakdown = if (info.fatBreakdown.isEmpty()) {
+            mapOf(
+                "Saturated Fat" to "$satFatG g",
+                "Monounsaturated Fat" to "$mufaG g",
+                "Polyunsaturated Fat" to "$pufaG g",
+                "Trans Fat" to "0 g",
+                "Omega-6" to "${Math.round(pufaG * 0.8 * 10) / 10.0} g"
+            )
+        } else info.fatBreakdown
+
+        val carbBreakdown = if (info.carbBreakdown.isEmpty()) {
+            mapOf(
+                "Net Carbs" to "$netCarbsG g",
+                "Total Sugars" to "$sugarsG g",
+                "Added Sugars" to "0 g",
+                "Soluble Fiber" to "${Math.round(fiber * 0.4 * 10) / 10.0} g",
+                "Insoluble Fiber" to "${Math.round(fiber * 0.6 * 10) / 10.0} g"
+            )
+        } else info.carbBreakdown
+
+        // Micronutrients depend on the actual ingredients; never synthesize values from calories.
+        val vitamins = info.vitamins
+        val minerals = info.minerals
+
+        val aminoAcids = if (info.aminoAcids.isEmpty()) {
+            mapOf(
+                "Leucine" to "${Math.round(protein * 0.08 * 10) / 10.0} g",
+                "Isoleucine" to "${Math.round(protein * 0.04 * 10) / 10.0} g",
+                "Valine" to "${Math.round(protein * 0.05 * 10) / 10.0} g",
+                "Lysine" to "${Math.round(protein * 0.06 * 10) / 10.0} g",
+                "Methionine" to "${Math.round(protein * 0.025 * 10) / 10.0} g",
+                "Phenylalanine" to "${Math.round(protein * 0.045 * 10) / 10.0} g",
+                "Threonine" to "${Math.round(protein * 0.035 * 10) / 10.0} g",
+                "Tryptophan" to "${Math.round(protein * 0.012 * 10) / 10.0} g",
+                "Histidine" to "${Math.round(protein * 0.025 * 10) / 10.0} g"
+            )
+        } else {
+            val base = mapOf(
+                "Leucine" to "${Math.round(protein * 0.08 * 10) / 10.0} g",
+                "Isoleucine" to "${Math.round(protein * 0.04 * 10) / 10.0} g",
+                "Valine" to "${Math.round(protein * 0.05 * 10) / 10.0} g",
+                "Lysine" to "${Math.round(protein * 0.06 * 10) / 10.0} g",
+                "Methionine" to "${Math.round(protein * 0.025 * 10) / 10.0} g",
+                "Phenylalanine" to "${Math.round(protein * 0.045 * 10) / 10.0} g",
+                "Threonine" to "${Math.round(protein * 0.035 * 10) / 10.0} g",
+                "Tryptophan" to "${Math.round(protein * 0.012 * 10) / 10.0} g",
+                "Histidine" to "${Math.round(protein * 0.025 * 10) / 10.0} g"
+            )
+            base + info.aminoAcids
         }
 
-        cachedDatabase = loaded
-        return loaded
+        val antioxidants = if (info.antioxidants.isEmpty()) {
+            mapOf("Polyphenols" to "${Math.round(calories * 0.25).coerceIn(20, 500)} mg")
+        } else info.antioxidants
+
+        val otherNutrients = if (info.otherNutrients.isEmpty()) {
+            mapOf(
+                "Saturated Fat" to "$satFatG g",
+                "Cholesterol" to "${Math.round(protein * 1.5)} mg"
+            )
+        } else info.otherNutrients
+
+        return info.copy(
+            carbsG = carbs,
+            proteinG = protein,
+            fatG = fat,
+            fiberG = fiber,
+            fatBreakdown = fatBreakdown,
+            carbBreakdown = carbBreakdown,
+            vitamins = vitamins,
+            minerals = minerals,
+            aminoAcids = aminoAcids,
+            antioxidants = antioxidants,
+            otherNutrients = otherNutrients
+        )
     }
 
-    private fun quantityMultiplier(text: String, alias: String, aliasStart: Int): Double {
-        val before = text.substring(0, aliasStart).takeLast(24)
-        val after = text.substring((aliasStart + alias.length).coerceAtMost(text.length)).take(24)
+    fun calculateSimilarity(s1: String, s2: String): Double {
+        val norm1 = normalize(s1)
+        val norm2 = normalize(s2)
+        if (norm1 == norm2) return 1.0
+        if (norm1.isBlank() || norm2.isBlank()) return 0.0
 
-        val pieceCountBefore = Regex("""(\d+(?:\.\d+)?)\s*$""").find(before)?.groupValues?.getOrNull(1)?.toDoubleOrNull()
-        if (pieceCountBefore != null) return pieceCountBefore
-
-        val pieceCountAfter = Regex("""^\s*(\d+(?:\.\d+)?)\b""").find(after)?.groupValues?.getOrNull(1)?.toDoubleOrNull()
-        if (pieceCountAfter != null) return pieceCountAfter
-
-        val gramsBefore = Regex("""(\d+(?:\.\d+)?)\s*(g|gram|grams)\s*$""").find(before)?.groupValues?.getOrNull(1)?.toDoubleOrNull()
-        if (gramsBefore != null) return (gramsBefore / 100.0).coerceAtLeast(0.2)
-
-        val halfWords = listOf("half", "1/2")
-        if (halfWords.any { before.trim().endsWith(it) }) return 0.5
-
-        return 1.0
+        val dist = levenshteinDistance(norm1, norm2)
+        val maxLen = max(norm1.length, norm2.length)
+        if (maxLen == 0) return 1.0
+        return 1.0 - (dist.toDouble() / maxLen)
     }
 
-    private fun estimateFoodCalories(text: String, keyword: String, food: FoodRule): Double {
-        val grams = findQuantityBeforeKeyword(text, keyword, "(g|gram|grams)") ?: findQuantityAfterKeyword(text, keyword, "(g|gram|grams)")
-        if (grams != null) return food.caloriesPerServing * (grams / food.gramsPerServing)
-
-        val cups = findQuantityBeforeKeyword(text, keyword, "(cup|cups|bowl|bowls)") ?: findQuantityAfterKeyword(text, keyword, "(cup|cups|bowl|bowls)")
-        if (cups != null) return food.caloriesPerServing * cups
-
-        val pieces = findPlainCountBeforeKeyword(text, keyword) ?: findPlainCountAfterKeyword(text, keyword)
-        return food.caloriesPerServing * (pieces ?: 1.0)
-    }
-
-    private fun estimateGenericMeal(text: String): Double {
-        val explicitCalories = Regex("""(\d{2,4})\s*(kcal|calories|cal)\b""").find(text)
-            ?.groupValues
-            ?.getOrNull(1)
-            ?.toDoubleOrNull()
-        if (explicitCalories != null) return explicitCalories
-
-        val heavyWords = listOf("fried", "burger", "pizza", "thali", "combo", "large")
-        val lightWords = listOf("fruit", "salad", "soup", "plain", "small")
-        return when {
-            heavyWords.any { text.contains(it) } -> 650.0
-            lightWords.any { text.contains(it) } -> 180.0
-            else -> 350.0
+    private fun levenshteinDistance(s1: String, s2: String): Int {
+        val dp = IntArray(s2.length + 1) { it }
+        for (i in 1..s1.length) {
+            var prev = i - 1
+            dp[0] = i
+            for (j in 1..s2.length) {
+                val temp = dp[j]
+                val cost = if (s1[i - 1] == s2[j - 1]) 0 else 1
+                dp[j] = minOf(dp[j] + 1, dp[j - 1] + 1, prev + cost)
+                prev = temp
+            }
         }
+        return dp[s2.length]
     }
 
-    private fun normalize(value: String): String {
+    private fun buildCombinedQuery(title: String, description: String): String {
+        return listOf(title, description).filter { it.isNotBlank() }.joinToString(" ")
+    }
+
+    private fun buildNormalizedKey(title: String, description: String): String {
+        val normTitle = normalize(title)
+        val normDesc = normalize(description)
+        return "$LEARNED_KEY_PREFIX$normTitle|d=$normDesc"
+    }
+
+    private fun extractTitleAndDescFromKey(key: String): Pair<String, String> {
+        val prefix = LEARNED_KEY_PREFIX
+        if (!key.startsWith(prefix)) return Pair("", "")
+        val content = key.substring(prefix.length)
+        val parts = content.split("|d=")
+        val title = parts.getOrNull(0).orEmpty()
+        val desc = parts.getOrNull(1).orEmpty()
+        return Pair(title, desc)
+    }
+
+    fun normalize(value: String): String {
         return value.lowercase(Locale.US)
             .replace(Regex("[^a-z0-9. /-]"), " ")
             .replace(Regex("\\s+"), " ")
             .trim()
-    }
-
-    private fun String.containsWholePhrase(phrase: String): Boolean {
-        return findWholePhraseMatch(this, phrase) != null
-    }
-
-    private fun findWholePhraseMatch(text: String, phrase: String): MatchResult? {
-        return Regex("""(^|\s)${Regex.escape(phrase)}(\s|$)""").find(text)
-    }
-
-    private fun IntRange.overlaps(other: IntRange): Boolean {
-        return first <= other.last && other.first <= last
-    }
-
-    private fun findQuantityBeforeKeyword(text: String, keyword: String, unitPattern: String): Double? {
-        val pattern = Regex("""(\d+(?:\.\d+)?)\s*$unitPattern\s+${Regex.escape(keyword)}""")
-        return pattern.find(text)?.groupValues?.getOrNull(1)?.toDoubleOrNull()
-    }
-
-    private fun findQuantityAfterKeyword(text: String, keyword: String, unitPattern: String): Double? {
-        val pattern = Regex("""${Regex.escape(keyword)}\s+(\d+(?:\.\d+)?)\s*$unitPattern""")
-        return pattern.find(text)?.groupValues?.getOrNull(1)?.toDoubleOrNull()
-    }
-
-    private fun findPlainCountBeforeKeyword(text: String, keyword: String): Double? {
-        val pattern = Regex("""(\d+(?:\.\d+)?)\s+${Regex.escape(keyword)}""")
-        return pattern.find(text)?.groupValues?.getOrNull(1)?.toDoubleOrNull()
-    }
-
-    private fun findPlainCountAfterKeyword(text: String, keyword: String): Double? {
-        val pattern = Regex("""${Regex.escape(keyword)}\s+(\d+(?:\.\d+)?)""")
-        return pattern.find(text)?.groupValues?.getOrNull(1)?.toDoubleOrNull()
     }
 }

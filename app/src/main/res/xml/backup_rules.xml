@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Local app lock settings and PIN verifier material must never leave the device. -->
+    <exclude domain="sharedpref" path="user_settings.xml" />
+
+    <!-- Health/wellness data is privacy-sensitive and is resynced from Health Connect. -->
+    <exclude domain="sharedpref" path="health_data_pref.xml" />
+    <exclude domain="sharedpref" path="user_prefs.xml" />
+    <exclude domain="sharedpref" path="routine_progress_pref.xml" />
+    <exclude domain="sharedpref" path="reminders_pref.xml" />
+    <exclude domain="sharedpref" path="plans_pref.xml" />
+    <exclude domain="sharedpref" path="calorie_cache_pref.xml" />
+    <exclude domain="sharedpref" path="app_prefs.xml" />
+</full-backup-content>
+

@@ -13,6 +13,7 @@ class BootReceiver : BroadcastReceiver() {
         )
         if (intent.action in validActions) {
             ReminderManager(context).scheduleAllEnabled()
+            HealthSyncWorker.scheduleAutoSync(context)
         }
     }
 }

@@ -18,10 +18,10 @@ object RoutineIconMapper {
         ReminderType.EXERCISE -> R.drawable.bg_circle_workout
         ReminderType.HYDRATION -> R.drawable.bg_circle_water
         ReminderType.SLEEP -> R.drawable.bg_circle_sleep
-        ReminderType.MEDITATION -> R.drawable.bg_circle_walking
-        ReminderType.DAILY_TODOS -> R.drawable.bg_circle_reminders
-        ReminderType.WEEKEND_TASKS -> R.drawable.bg_circle_reminders
-        ReminderType.MONTHLY_TASKS -> R.drawable.bg_circle_reminders
+        ReminderType.MEDITATION -> R.drawable.bg_circle_meditation
+        ReminderType.DAILY_TODOS -> R.drawable.bg_circle_task
+        ReminderType.WEEKEND_TASKS -> R.drawable.bg_circle_home
+        ReminderType.MONTHLY_TASKS -> R.drawable.bg_circle_calendar
         ReminderType.CUSTOM -> R.drawable.bg_circle_reminders
     }
 

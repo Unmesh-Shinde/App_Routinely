@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -16,6 +17,15 @@ class WellnessWidget : AppWidgetProvider() {
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
+    }
+
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: android.os.Bundle
+    ) {
+        updateAppWidget(context, appWidgetManager, appWidgetId)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -48,21 +58,33 @@ class WellnessWidget : AppWidgetProvider() {
             val today = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
             
             // 1. Get Data
-            val steps = hdm.getSteps()
+            val stepsStr = hdm.getSteps().replace(",", "")
+            val stepsInt = stepsStr.toIntOrNull() ?: 0
+            val stepGoal = hdm.getDailyStepGoal().coerceAtLeast(1)
+            val progressPct = (stepsInt * 100 / stepGoal).coerceIn(0, 100)
+            
             val doneIds = RoutineProgressStore.getDoneIds(context)
             val waterFromReminders = ReminderManager(context).getAllReminders()
                 .filter { it.isEnabled && it.type == ReminderType.HYDRATION && it.id.toString() in doneIds }
                 .size * 0.25
             val water = hdm.getWaterIntake(today) + waterFromReminders
-            val stepsInt = steps.replace(",", "").toIntOrNull() ?: 0
-            val distance = hdm.calculateDistanceKm(stepsInt)
-            val todayLabel = SimpleDateFormat("EEE, MMM d", Locale.US).format(Date())
+            
+            // 1a. Distance Precedence: Synced vs Formula
+            val syncedDistance = hdm.getHistoricalDistance(today)
+            val distance = if (syncedDistance > 0.0) syncedDistance else hdm.calculateDistanceKm(stepsInt)
 
             // 2. Set Views
-            views.setTextViewText(R.id.tvWidgetDate, todayLabel)
-            views.setTextViewText(R.id.tvWidgetSteps, steps)
-            views.setTextViewText(R.id.tvWidgetDistance, String.format(Locale.US, "%.1f km", distance))
+            views.setTextViewText(R.id.tvWidgetSteps, String.format(Locale.US, "%,d", stepsInt))
+            views.setTextViewText(R.id.tvWidgetStepProgress, String.format(Locale.US, "/ %,d", stepGoal))
+            views.setProgressBar(R.id.pbWidgetSteps, 100, progressPct, false)
+            views.setTextViewText(R.id.tvWidgetDistance, String.format(Locale.US, "%.2f km", distance))
             views.setTextViewText(R.id.tvWidgetWater, String.format(Locale.US, "%.1f L", water))
+
+            // 3. Set Icon Tints (Compatibility Safe)
+            val walkingColor = ContextCompat.getColor(context, R.color.strokeWalking)
+            val hydrationColor = ContextCompat.getColor(context, R.color.strokeHydration)
+            views.setInt(R.id.ivWidgetStepsIcon, "setColorFilter", walkingColor)
+            views.setInt(R.id.ivWidgetWaterIcon, "setColorFilter", hydrationColor)
 
             // 4. Click Intents for Water
             val waterIntent = Intent(context, WellnessWidget::class.java).apply {

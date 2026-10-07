@@ -1,130 +1,474 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp">
-
-    <TextView
-        style="@style/LabelText"
-        android:text="Exercise Name"/>
-
-    <EditText
-        android:id="@+id/etExName"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="6dp"
-        android:hint="e.g. Push Ups"
-        android:background="@drawable/bg_field"
-        android:paddingHorizontal="12dp"
-        android:inputType="textCapSentences"/>
-
-    <TextView
-        style="@style/LabelText"
-        android:layout_marginTop="18dp"
-        android:text="Target Area"/>
-
-    <EditText
-        android:id="@+id/etExTarget"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="6dp"
-        android:hint="e.g. Chest, Legs, etc."
-        android:background="@drawable/bg_field"
-        android:paddingHorizontal="12dp"
-        android:inputType="textCapSentences"/>
-
-    <TextView
-        style="@style/LabelText"
-        android:layout_marginTop="18dp"
-        android:text="Intensity (%)"/>
-
-    <com.google.android.material.slider.Slider
-        android:id="@+id/sliderExIntensity"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:valueFrom="0"
-        android:valueTo="100"
-        android:stepSize="5"
-        app:thumbColor="#81C784"
-        app:trackColorActive="#81C784"/>
+    android:fillViewport="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="18dp">
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginEnd="8dp">
-            <TextView style="@style/LabelText" android:text="Sets"/>
-            <EditText
-                android:id="@+id/etExSets"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="6dp"
-                android:text="3"
-                android:gravity="center"
-                android:background="@drawable/bg_field"
-                android:inputType="number"/>
-        </LinearLayout>
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="14dp">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="8dp">
-            <TextView style="@style/LabelText" android:text="Reps/Duration"/>
-            <EditText
-                android:id="@+id/etExReps"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginTop="6dp"
-                android:text="10"
-                android:gravity="center"
-                android:background="@drawable/bg_field"
-                android:inputType="text"/>
-        </LinearLayout>
-    </LinearLayout>
+            <ImageView
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="@drawable/bg_circle_workout"
+                android:contentDescription="@string/workout_content_desc"
+                android:padding="11dp"
+                app:srcCompat="@drawable/ic_workout" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="18dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/workout_details_title"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/workout_details_desc"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/tvExTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="07:00"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary"/>
+            style="@style/LabelText"
+            android:text="@string/exercise_name_label" />
 
-        <Button
-            android:id="@+id/btnPickExTime"
-            android:layout_width="wrap_content"
+        <AutoCompleteTextView
+            android:id="@+id/etExName"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_field"
+            android:autofillHints="name"
+            android:hint="@string/exercise_name_hint"
+            android:inputType="textCapSentences"
+            android:paddingHorizontal="12dp" />
+
+        <TextView
+            style="@style/LabelText"
+            android:layout_marginTop="18dp"
+            android:text="@string/exercise_type_label" />
+
+        <Spinner
+            android:id="@+id/spinnerExType"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_field"
+            android:paddingHorizontal="8dp" />
+
+        <TextView
+            android:id="@+id/tvExerciseTypeHelp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Time"
-            android:backgroundTint="#81C784"
-            android:textColor="@android:color/white"/>
+            android:layout_marginTop="6dp"
+            android:text="@string/exercise_type_help_default"
+            android:textColor="@color/textSecondary"
+            android:textSize="12sp" />
+
+        <TextView
+            style="@style/LabelText"
+            android:layout_marginTop="18dp"
+            android:text="@string/exercise_target_label" />
+
+        <EditText
+            android:id="@+id/etExTarget"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_field"
+            android:autofillHints="name"
+            android:hint="@string/exercise_target_hint"
+            android:inputType="textCapSentences"
+            android:paddingHorizontal="12dp" />
+
+        <TextView
+            style="@style/LabelText"
+            android:layout_marginTop="18dp"
+            android:text="@string/exercise_effort_label" />
+
+        <Spinner
+            android:id="@+id/spinnerExEffort"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_field"
+            android:paddingHorizontal="8dp" />
+
+        <TextView
+            android:id="@+id/tvEstimatedBurn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:background="@drawable/bg_chip"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:text="@string/exercise_estimated_burn_empty"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvEstimatedBurnDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/exercise_estimated_burn_detail"
+            android:textColor="@color/textSecondary"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:id="@+id/sectionStrength"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_sets_label" />
+
+                    <EditText
+                        android:id="@+id/etExSets"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:gravity="center"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:text="@string/default_three" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_reps_label" />
+
+                    <EditText
+                        android:id="@+id/etExReps"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:gravity="center"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:text="@string/default_ten" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1.2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_rest_label" />
+
+                    <EditText
+                        android:id="@+id/etExRestSeconds"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:gravity="center"
+                        android:importantForAutofill="no"
+                        android:inputType="numberDecimal"
+                        android:text="@string/default_sixty" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_rest_unit_label" />
+
+                    <Spinner
+                        android:id="@+id/spinnerExRestUnit"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:paddingHorizontal="8dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/groupAddedWeight"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_added_kg_label" />
+
+                    <EditText
+                        android:id="@+id/etExAddedWeightKg"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:gravity="center"
+                        android:hint="@string/default_zero"
+                        android:importantForAutofill="no"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sectionDuration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/LabelText"
+                android:text="@string/exercise_duration_minutes_label" />
+
+            <EditText
+                android:id="@+id/etExDurationMinutes"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_field"
+                android:gravity="center"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal"
+                android:text="@string/default_ten" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sectionCardioMetrics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/LabelText"
+                android:text="@string/exercise_distance_km_label" />
+
+            <EditText
+                android:id="@+id/etExDistanceKm"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/bg_field"
+                android:gravity="center"
+                android:hint="@string/exercise_distance_km_hint"
+                android:importantForAutofill="no"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:id="@+id/tvPaceSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="@string/exercise_pace_summary_empty"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/sectionHiit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_rounds_label" />
+
+                    <EditText
+                        android:id="@+id/etExRounds"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:gravity="center"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:text="@string/default_four" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_work_sec_label" />
+
+                    <EditText
+                        android:id="@+id/etExWorkSeconds"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:gravity="center"
+                        android:importantForAutofill="no"
+                        android:inputType="number"
+                        android:text="@string/default_forty" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_rest_label" />
+
+                    <EditText
+                        android:id="@+id/etExHiitRestSeconds"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:gravity="center"
+                        android:importantForAutofill="no"
+                        android:inputType="numberDecimal"
+                        android:text="@string/default_twenty" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/LabelText"
+                        android:text="@string/exercise_rest_unit_label" />
+
+                    <Spinner
+                        android:id="@+id/spinnerExHiitRestUnit"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_field"
+                        android:paddingHorizontal="8dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvExTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/exercise_time_default"
+                android:textColor="@color/healthWorkout"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnPickExTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/healthWorkout"
+                android:text="@string/exercise_time_button"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/swExReminder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:checked="true"
+            android:text="@string/exercise_set_reminder" />
     </LinearLayout>
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/swExReminder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:text="Set Reminder"
-        android:checked="true"/>
-
-</LinearLayout>
+</ScrollView>

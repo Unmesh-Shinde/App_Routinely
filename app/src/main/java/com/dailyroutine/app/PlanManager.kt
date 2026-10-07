@@ -26,9 +26,27 @@ class PlanManager(context: Context) {
         private const val KEY_WORKOUT_TEMPLATES = "workout_templates"
         private const val KEY_APPLIED_MEAL_TEMPLATE_RANGES = "applied_meal_template_ranges"
         private const val KEY_APPLIED_WORKOUT_TEMPLATE_RANGES = "applied_workout_template_ranges"
+
+        private val LOCK = Any()
     }
 
     // --- Calendar-Based Diet Plan Management ---
+
+    fun clearDietData() {
+        prefs.edit()
+            .remove(KEY_DIET_CALENDAR)
+            .remove(KEY_MEAL_TEMPLATES)
+            .remove(KEY_APPLIED_MEAL_TEMPLATE_RANGES)
+            .apply()
+    }
+
+    fun clearWorkoutData() {
+        prefs.edit()
+            .remove(KEY_WORKOUT_CALENDAR)
+            .remove(KEY_WORKOUT_TEMPLATES)
+            .remove(KEY_APPLIED_WORKOUT_TEMPLATE_RANGES)
+            .apply()
+    }
 
     private fun getFullDietPlan(): DietPlan {
         val json = prefs.getString(KEY_DIET_CALENDAR, null)
@@ -41,25 +59,41 @@ class PlanManager(context: Context) {
     }
 
     fun getMealsForDate(date: String): MutableList<Meal> {
-        return getFullDietPlan().dailyMeals[date] ?: mutableListOf()
+        synchronized(LOCK) {
+            return getFullDietPlan().dailyMeals[date] ?: mutableListOf()
+        }
+    }
+
+    fun getAllDietMealsByDate(): Map<String, List<Meal>> {
+        synchronized(LOCK) {
+            return getFullDietPlan().dailyMeals.toMap()
+        }
+    }
+
+    private fun saveFullDietPlan(plan: DietPlan) {
+        prefs.edit().putString(KEY_DIET_CALENDAR, gson.toJson(plan)).apply()
     }
 
     fun saveMealForDate(date: String, meal: Meal) {
-        val plan = getFullDietPlan()
-        val list = plan.dailyMeals.getOrPut(date) { mutableListOf() }
-        val idx = list.indexOfFirst { it.id == meal.id }
-        if (idx >= 0) list[idx] = meal else list.add(meal)
+        synchronized(LOCK) {
+            val plan = getFullDietPlan()
+            val list = plan.dailyMeals.getOrPut(date) { mutableListOf() }
+            val idx = list.indexOfFirst { it.id == meal.id }
+            if (idx >= 0) list[idx] = meal else list.add(meal)
 
-        prefs.edit().putString(KEY_DIET_CALENDAR, gson.toJson(plan)).apply()
+            saveFullDietPlan(plan)
+        }
     }
 
     fun deleteMealForDate(date: String, meal: Meal) {
-        val plan = getFullDietPlan()
-        plan.dailyMeals[date]?.removeIf { it.id == meal.id }
-        if (plan.dailyMeals[date].isNullOrEmpty()) {
-            plan.dailyMeals.remove(date)
+        synchronized(LOCK) {
+            val plan = getFullDietPlan()
+            plan.dailyMeals[date]?.removeIf { it.id == meal.id }
+            if (plan.dailyMeals[date].isNullOrEmpty()) {
+                plan.dailyMeals.remove(date)
+            }
+            saveFullDietPlan(plan)
         }
-        prefs.edit().putString(KEY_DIET_CALENDAR, gson.toJson(plan)).apply()
     }
 
     fun hasMealsForDate(date: String): Boolean {
@@ -79,61 +113,67 @@ class PlanManager(context: Context) {
     fun listMealTemplates(): List<MealTemplate> = getMealTemplates().sortedBy { it.name.lowercase(Locale.US) }
 
     fun createMealTemplateFromRange(name: String, startDate: String, endDate: String, allowEmpty: Boolean): Boolean {
-        val cleanName = name.trim()
-        if (cleanName.isEmpty()) return false
+        synchronized(LOCK) {
+            val cleanName = name.trim()
+            if (cleanName.isEmpty()) return false
 
-        val start = parseDate(startDate)
-        val end = parseDate(endDate)
-        if (end.before(start)) return false
+            val start = parseDate(startDate)
+            val end = parseDate(endDate)
+            if (end.before(start)) return false
 
-        val totalDays = daysBetweenInclusive(start, end)
-        val templates = getMealTemplates()
-        val payload = mutableMapOf<Int, MutableList<Meal>>()
+            val totalDays = daysBetweenInclusive(start, end)
+            val templates = getMealTemplates()
+            val payload = mutableMapOf<Int, MutableList<Meal>>()
 
-        for (offset in 0 until totalDays) {
-            val date = formatDate(addDays(start, offset))
-            val meals = getMealsForDate(date)
-            if (meals.isNotEmpty()) {
-                payload[offset] = meals.map { it.copy() }.toMutableList()
+            for (offset in 0 until totalDays) {
+                val date = formatDate(addDays(start, offset))
+                val meals = getMealsForDate(date)
+                if (meals.isNotEmpty()) {
+                    payload[offset] = meals.map { it.copy() }.toMutableList()
+                }
             }
-        }
 
-        if (!allowEmpty && payload.isEmpty()) return false
+            if (!allowEmpty && payload.isEmpty()) return false
 
-        templates.add(
-            MealTemplate(
-                id = UUID.randomUUID().toString(),
-                name = cleanName,
-                durationDays = totalDays,
-                mealsByDayOffset = payload
+            templates.add(
+                MealTemplate(
+                    id = UUID.randomUUID().toString(),
+                    name = cleanName,
+                    durationDays = totalDays,
+                    mealsByDayOffset = payload
+                )
             )
-        )
-        saveMealTemplates(templates)
-        return true
+            saveMealTemplates(templates)
+            return true
+        }
     }
 
     fun renameMealTemplate(templateId: String, newName: String): Boolean {
-        val templates = getMealTemplates()
-        val idx = templates.indexOfFirst { it.id == templateId }
-        if (idx < 0) return false
-        val cleanName = newName.trim()
-        if (cleanName.isEmpty()) return false
-        templates[idx] = templates[idx].copy(name = cleanName)
-        saveMealTemplates(templates)
-        val ranges = getAppliedMealTemplateRanges().map { range ->
-            if (range.templateId == templateId) range.copy(templateName = cleanName) else range
+        synchronized(LOCK) {
+            val templates = getMealTemplates()
+            val idx = templates.indexOfFirst { it.id == templateId }
+            if (idx < 0) return false
+            val cleanName = newName.trim()
+            if (cleanName.isEmpty()) return false
+            templates[idx] = templates[idx].copy(name = cleanName)
+            saveMealTemplates(templates)
+            val ranges = getAppliedMealTemplateRanges().map { range ->
+                if (range.templateId == templateId) range.copy(templateName = cleanName) else range
+            }
+            saveAppliedMealTemplateRanges(ranges)
+            return true
         }
-        saveAppliedMealTemplateRanges(ranges)
-        return true
     }
 
     fun deleteMealTemplate(templateId: String) {
-        val templates = getMealTemplates().toMutableList()
-        templates.removeAll { it.id == templateId }
-        saveMealTemplates(templates)
-        val ranges = getAppliedMealTemplateRanges().toMutableList()
-        ranges.removeAll { it.templateId == templateId }
-        saveAppliedMealTemplateRanges(ranges)
+        synchronized(LOCK) {
+            val templates = getMealTemplates().toMutableList()
+            templates.removeAll { it.id == templateId }
+            saveMealTemplates(templates)
+            val ranges = getAppliedMealTemplateRanges().toMutableList()
+            ranges.removeAll { it.templateId == templateId }
+            saveAppliedMealTemplateRanges(ranges)
+        }
     }
 
     private fun getAppliedMealTemplateRanges(): MutableList<AppliedTemplateRange> {
@@ -151,12 +191,14 @@ class PlanManager(context: Context) {
     }
 
     fun removeAppliedMealTemplateRange(startDate: String, endDate: String): Boolean {
-        val ranges = getAppliedMealTemplateRanges().toMutableList()
-        val removed = ranges.removeAll { it.startDate == startDate && it.endDate == endDate }
-        if (removed) {
-            saveAppliedMealTemplateRanges(ranges)
+        synchronized(LOCK) {
+            val ranges = getAppliedMealTemplateRanges().toMutableList()
+            val removed = ranges.removeAll { it.startDate == startDate && it.endDate == endDate }
+            if (removed) {
+                saveAppliedMealTemplateRanges(ranges)
+            }
+            return removed
         }
-        return removed
     }
 
     fun isDateInAppliedMealTemplateRange(date: String): Boolean {
@@ -169,47 +211,51 @@ class PlanManager(context: Context) {
     }
 
     fun applyMealTemplateToRange(templateId: String, startDate: String, endDate: String): TemplateApplyResult {
-        val template = getMealTemplates().firstOrNull { it.id == templateId }
-            ?: return TemplateApplyResult(applied = false)
+        synchronized(LOCK) {
+            val template = getMealTemplates().firstOrNull { it.id == templateId }
+                ?: return TemplateApplyResult(applied = false)
 
-        val start = parseDate(startDate)
-        val end = parseDate(endDate)
-        if (end.before(start)) return TemplateApplyResult(applied = false)
+            val start = parseDate(startDate)
+            val end = parseDate(endDate)
+            if (end.before(start)) return TemplateApplyResult(applied = false)
 
-        val totalDays = daysBetweenInclusive(start, end)
-        if (totalDays > template.durationDays) {
-            return TemplateApplyResult(
-                applied = false,
-                failureReason = "Selected range is $totalDays days, but '${template.name}' is a ${template.durationDays}-day template. Choose a range up to ${template.durationDays} days."
-            )
-        }
-
-        val conflict = findOverlap(getAppliedMealTemplateRanges(), start, end)
-        if (conflict != null) {
-            return TemplateApplyResult(applied = false, conflictRange = conflict)
-        }
-
-        for (offset in 0 until totalDays) {
-            val templateOffset = offset % template.durationDays
-            val meals = template.mealsByDayOffset[templateOffset] ?: emptyList()
-            val targetDate = formatDate(addDays(start, offset))
-            meals.forEach { original ->
-                val cloned = original.copy(id = generateItemId())
-                saveMealForDate(targetDate, cloned)
+            val totalDays = daysBetweenInclusive(start, end)
+            if (totalDays > template.durationDays) {
+                return TemplateApplyResult(
+                    applied = false,
+                    failureReason = "Selected range is $totalDays days, but '${template.name}' is a ${template.durationDays}-day template. Choose a range up to ${template.durationDays} days."
+                )
             }
-        }
 
-        val ranges = getAppliedMealTemplateRanges().toMutableList()
-        ranges.add(
-            AppliedTemplateRange(
-                templateId = template.id,
-                templateName = template.name,
-                startDate = formatDate(start),
-                endDate = formatDate(end)
+            val conflict = findOverlap(getAppliedMealTemplateRanges(), start, end)
+            if (conflict != null) {
+                return TemplateApplyResult(applied = false, conflictRange = conflict)
+            }
+
+            val plan = getFullDietPlan()
+            for (offset in 0 until totalDays) {
+                val templateOffset = offset % template.durationDays
+                val meals = template.mealsByDayOffset[templateOffset] ?: emptyList()
+                val targetDate = formatDate(addDays(start, offset))
+                val targetMeals = plan.dailyMeals.getOrPut(targetDate) { mutableListOf() }
+                meals.forEach { original ->
+                    targetMeals.add(original.copy(id = generateItemId()))
+                }
+            }
+            saveFullDietPlan(plan)
+
+            val ranges = getAppliedMealTemplateRanges().toMutableList()
+            ranges.add(
+                AppliedTemplateRange(
+                    templateId = template.id,
+                    templateName = template.name,
+                    startDate = formatDate(start),
+                    endDate = formatDate(end)
+                )
             )
-        )
-        saveAppliedMealTemplateRanges(ranges)
-        return TemplateApplyResult(applied = true, appliedEndDate = formatDate(end))
+            saveAppliedMealTemplateRanges(ranges)
+            return TemplateApplyResult(applied = true, appliedEndDate = formatDate(end))
+        }
     }
 
     // --- Calendar-Based Workout Plan Management ---
@@ -225,24 +271,34 @@ class PlanManager(context: Context) {
     }
 
     fun getExercisesForDate(date: String): MutableList<Exercise> {
-        return getFullWorkoutPlan().dailyExercises[date] ?: mutableListOf()
+        synchronized(LOCK) {
+            return getFullWorkoutPlan().dailyExercises[date] ?: mutableListOf()
+        }
+    }
+
+    private fun saveFullWorkoutPlan(plan: WorkoutPlan) {
+        prefs.edit().putString(KEY_WORKOUT_CALENDAR, gson.toJson(plan)).apply()
     }
 
     fun saveExerciseForDate(date: String, ex: Exercise) {
-        val plan = getFullWorkoutPlan()
-        val list = plan.dailyExercises.getOrPut(date) { mutableListOf() }
-        val idx = list.indexOfFirst { it.id == ex.id }
-        if (idx >= 0) list[idx] = ex else list.add(ex)
-        prefs.edit().putString(KEY_WORKOUT_CALENDAR, gson.toJson(plan)).apply()
+        synchronized(LOCK) {
+            val plan = getFullWorkoutPlan()
+            val list = plan.dailyExercises.getOrPut(date) { mutableListOf() }
+            val idx = list.indexOfFirst { it.id == ex.id }
+            if (idx >= 0) list[idx] = ex else list.add(ex)
+            saveFullWorkoutPlan(plan)
+        }
     }
 
     fun deleteExerciseForDate(date: String, ex: Exercise) {
-        val plan = getFullWorkoutPlan()
-        plan.dailyExercises[date]?.removeIf { it.id == ex.id }
-        if (plan.dailyExercises[date].isNullOrEmpty()) {
-            plan.dailyExercises.remove(date)
+        synchronized(LOCK) {
+            val plan = getFullWorkoutPlan()
+            plan.dailyExercises[date]?.removeIf { it.id == ex.id }
+            if (plan.dailyExercises[date].isNullOrEmpty()) {
+                plan.dailyExercises.remove(date)
+            }
+            saveFullWorkoutPlan(plan)
         }
-        prefs.edit().putString(KEY_WORKOUT_CALENDAR, gson.toJson(plan)).apply()
     }
 
     fun hasExercisesForDate(date: String): Boolean {
@@ -262,61 +318,67 @@ class PlanManager(context: Context) {
     fun listWorkoutTemplates(): List<WorkoutTemplate> = getWorkoutTemplates().sortedBy { it.name.lowercase(Locale.US) }
 
     fun createWorkoutTemplateFromRange(name: String, startDate: String, endDate: String, allowEmpty: Boolean): Boolean {
-        val cleanName = name.trim()
-        if (cleanName.isEmpty()) return false
+        synchronized(LOCK) {
+            val cleanName = name.trim()
+            if (cleanName.isEmpty()) return false
 
-        val start = parseDate(startDate)
-        val end = parseDate(endDate)
-        if (end.before(start)) return false
+            val start = parseDate(startDate)
+            val end = parseDate(endDate)
+            if (end.before(start)) return false
 
-        val totalDays = daysBetweenInclusive(start, end)
-        val templates = getWorkoutTemplates()
-        val payload = mutableMapOf<Int, MutableList<Exercise>>()
+            val totalDays = daysBetweenInclusive(start, end)
+            val templates = getWorkoutTemplates()
+            val payload = mutableMapOf<Int, MutableList<Exercise>>()
 
-        for (offset in 0 until totalDays) {
-            val date = formatDate(addDays(start, offset))
-            val exercises = getExercisesForDate(date)
-            if (exercises.isNotEmpty()) {
-                payload[offset] = exercises.map { it.copy() }.toMutableList()
+            for (offset in 0 until totalDays) {
+                val date = formatDate(addDays(start, offset))
+                val exercises = getExercisesForDate(date)
+                if (exercises.isNotEmpty()) {
+                    payload[offset] = exercises.map { it.copy() }.toMutableList()
+                }
             }
-        }
 
-        if (!allowEmpty && payload.isEmpty()) return false
+            if (!allowEmpty && payload.isEmpty()) return false
 
-        templates.add(
-            WorkoutTemplate(
-                id = UUID.randomUUID().toString(),
-                name = cleanName,
-                durationDays = totalDays,
-                exercisesByDayOffset = payload
+            templates.add(
+                WorkoutTemplate(
+                    id = UUID.randomUUID().toString(),
+                    name = cleanName,
+                    durationDays = totalDays,
+                    exercisesByDayOffset = payload
+                )
             )
-        )
-        saveWorkoutTemplates(templates)
-        return true
+            saveWorkoutTemplates(templates)
+            return true
+        }
     }
 
     fun renameWorkoutTemplate(templateId: String, newName: String): Boolean {
-        val templates = getWorkoutTemplates()
-        val idx = templates.indexOfFirst { it.id == templateId }
-        if (idx < 0) return false
-        val cleanName = newName.trim()
-        if (cleanName.isEmpty()) return false
-        templates[idx] = templates[idx].copy(name = cleanName)
-        saveWorkoutTemplates(templates)
-        val ranges = getAppliedWorkoutTemplateRanges().map { range ->
-            if (range.templateId == templateId) range.copy(templateName = cleanName) else range
+        synchronized(LOCK) {
+            val templates = getWorkoutTemplates()
+            val idx = templates.indexOfFirst { it.id == templateId }
+            if (idx < 0) return false
+            val cleanName = newName.trim()
+            if (cleanName.isEmpty()) return false
+            templates[idx] = templates[idx].copy(name = cleanName)
+            saveWorkoutTemplates(templates)
+            val ranges = getAppliedWorkoutTemplateRanges().map { range ->
+                if (range.templateId == templateId) range.copy(templateName = cleanName) else range
+            }
+            saveAppliedWorkoutTemplateRanges(ranges)
+            return true
         }
-        saveAppliedWorkoutTemplateRanges(ranges)
-        return true
     }
 
     fun deleteWorkoutTemplate(templateId: String) {
-        val templates = getWorkoutTemplates().toMutableList()
-        templates.removeAll { it.id == templateId }
-        saveWorkoutTemplates(templates)
-        val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
-        ranges.removeAll { it.templateId == templateId }
-        saveAppliedWorkoutTemplateRanges(ranges)
+        synchronized(LOCK) {
+            val templates = getWorkoutTemplates().toMutableList()
+            templates.removeAll { it.id == templateId }
+            saveWorkoutTemplates(templates)
+            val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
+            ranges.removeAll { it.templateId == templateId }
+            saveAppliedWorkoutTemplateRanges(ranges)
+        }
     }
 
     private fun getAppliedWorkoutTemplateRanges(): MutableList<AppliedTemplateRange> {
@@ -334,12 +396,14 @@ class PlanManager(context: Context) {
     }
 
     fun removeAppliedWorkoutTemplateRange(startDate: String, endDate: String): Boolean {
-        val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
-        val removed = ranges.removeAll { it.startDate == startDate && it.endDate == endDate }
-        if (removed) {
-            saveAppliedWorkoutTemplateRanges(ranges)
+        synchronized(LOCK) {
+            val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
+            val removed = ranges.removeAll { it.startDate == startDate && it.endDate == endDate }
+            if (removed) {
+                saveAppliedWorkoutTemplateRanges(ranges)
+            }
+            return removed
         }
-        return removed
     }
 
     fun isDateInAppliedWorkoutTemplateRange(date: String): Boolean {
@@ -352,47 +416,51 @@ class PlanManager(context: Context) {
     }
 
     fun applyWorkoutTemplateToRange(templateId: String, startDate: String, endDate: String): TemplateApplyResult {
-        val template = getWorkoutTemplates().firstOrNull { it.id == templateId }
-            ?: return TemplateApplyResult(applied = false)
+        synchronized(LOCK) {
+            val template = getWorkoutTemplates().firstOrNull { it.id == templateId }
+                ?: return TemplateApplyResult(applied = false)
 
-        val start = parseDate(startDate)
-        val end = parseDate(endDate)
-        if (end.before(start)) return TemplateApplyResult(applied = false)
+            val start = parseDate(startDate)
+            val end = parseDate(endDate)
+            if (end.before(start)) return TemplateApplyResult(applied = false)
 
-        val totalDays = daysBetweenInclusive(start, end)
-        if (totalDays > template.durationDays) {
-            return TemplateApplyResult(
-                applied = false,
-                failureReason = "Selected range is $totalDays days, but '${template.name}' is a ${template.durationDays}-day template. Choose a range up to ${template.durationDays} days."
-            )
-        }
-
-        val conflict = findOverlap(getAppliedWorkoutTemplateRanges(), start, end)
-        if (conflict != null) {
-            return TemplateApplyResult(applied = false, conflictRange = conflict)
-        }
-
-        for (offset in 0 until totalDays) {
-            val templateOffset = offset % template.durationDays
-            val exercises = template.exercisesByDayOffset[templateOffset] ?: emptyList()
-            val targetDate = formatDate(addDays(start, offset))
-            exercises.forEach { original ->
-                val cloned = original.copy(id = generateItemId())
-                saveExerciseForDate(targetDate, cloned)
+            val totalDays = daysBetweenInclusive(start, end)
+            if (totalDays > template.durationDays) {
+                return TemplateApplyResult(
+                    applied = false,
+                    failureReason = "Selected range is $totalDays days, but '${template.name}' is a ${template.durationDays}-day template. Choose a range up to ${template.durationDays} days."
+                )
             }
-        }
 
-        val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
-        ranges.add(
-            AppliedTemplateRange(
-                templateId = template.id,
-                templateName = template.name,
-                startDate = formatDate(start),
-                endDate = formatDate(end)
+            val conflict = findOverlap(getAppliedWorkoutTemplateRanges(), start, end)
+            if (conflict != null) {
+                return TemplateApplyResult(applied = false, conflictRange = conflict)
+            }
+
+            val plan = getFullWorkoutPlan()
+            for (offset in 0 until totalDays) {
+                val templateOffset = offset % template.durationDays
+                val exercises = template.exercisesByDayOffset[templateOffset] ?: emptyList()
+                val targetDate = formatDate(addDays(start, offset))
+                val targetExercises = plan.dailyExercises.getOrPut(targetDate) { mutableListOf() }
+                exercises.forEach { original ->
+                    targetExercises.add(original.copy(id = generateItemId()))
+                }
+            }
+            saveFullWorkoutPlan(plan)
+
+            val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
+            ranges.add(
+                AppliedTemplateRange(
+                    templateId = template.id,
+                    templateName = template.name,
+                    startDate = formatDate(start),
+                    endDate = formatDate(end)
+                )
             )
-        )
-        saveAppliedWorkoutTemplateRanges(ranges)
-        return TemplateApplyResult(applied = true, appliedEndDate = formatDate(end))
+            saveAppliedWorkoutTemplateRanges(ranges)
+            return TemplateApplyResult(applied = true, appliedEndDate = formatDate(end))
+        }
     }
 
 

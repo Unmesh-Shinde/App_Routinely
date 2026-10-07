@@ -23,14 +23,14 @@ object WorkoutMetSearchEngine {
         val cache = context.getSharedPreferences(PREFS_CACHE, Context.MODE_PRIVATE)
         val cacheKey = cacheKeyFor(exercise)
         val cachedMet = cache.getFloat(cacheKey, -1f)
-        if (cachedMet > 0f) {
+        if (WellnessEngine.isValidEnrichedWorkoutMet(exercise, cachedMet.toDouble())) {
             onResult(exercise.copy(estimatedMet = cachedMet.toDouble(), metSource = "gemini_cache"))
             return
         }
 
         scope.launch {
             val geminiMet = GeminiClient.getMetForWorkout(exercise)
-            val enriched = if (geminiMet in 1.0..15.0) {
+            val enriched = if (WellnessEngine.isValidEnrichedWorkoutMet(exercise, geminiMet)) {
                 cache.edit().putFloat(cacheKey, geminiMet.toFloat()).apply()
                 exercise.copy(estimatedMet = geminiMet, metSource = "gemini")
             } else {
@@ -46,6 +46,8 @@ object WorkoutMetSearchEngine {
     private fun cacheKeyFor(exercise: Exercise): String {
         val normalizedName = exercise.name.lowercase(Locale.US).trim()
         val normalizedTarget = exercise.targetArea.lowercase(Locale.US).trim()
-        return "v1|name=$normalizedName|target=$normalizedTarget"
+        val normalizedType = exercise.exerciseType.orEmpty().lowercase(Locale.US).trim()
+        val normalizedEffort = exercise.effortLabel.orEmpty().lowercase(Locale.US).trim()
+        return "v2|name=$normalizedName|target=$normalizedTarget|type=$normalizedType|effort=$normalizedEffort|load=${exercise.addedWeightKg}|distance=${exercise.distanceKm}"
     }
 }

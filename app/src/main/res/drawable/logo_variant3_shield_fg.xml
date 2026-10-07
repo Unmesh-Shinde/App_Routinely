@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Rounded Vitality Shield Container -->
+    <path
+        android:fillColor="#151E40AF"
+        android:pathData="M54,26 C70,26 80,30 80,48 C80,68 58,80 54,82 C50,80 28,68 28,48 C28,30 38,26 54,26 Z"
+        android:strokeColor="#3B82F6"
+        android:strokeWidth="5" />
+
+    <!-- Dynamic Pulse Wave (Spring Green & Soft Gold) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M34,54 L44,54 L48,42 L52,64 L57,48 L62,56 L66,54 L74,54"
+        android:strokeColor="#00F0A8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeWidth="6" />
+
+    <!-- Gold Energy Spark Peak -->
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M52,38 L53.2,40.8 L56,42 L53.2,43.2 L52,46 L50.8,43.2 L48,42 L50.8,40.8 Z" />
+</vector>

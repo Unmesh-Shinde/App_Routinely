@@ -10,6 +10,8 @@ object UserPreferencesStore {
     private const val KEY_USER_HEIGHT = "user_height"
     private const val KEY_USER_WEIGHT = "user_weight"
     private const val KEY_USER_GENDER = "user_gender"
+    private const val KEY_USER_GOAL = "user_goal"
+    private const val KEY_USER_AVATAR_ID = "user_avatar_id"
     private const val KEY_IS_SIGNED_UP = "is_signed_up"
 
     // Wellness Score Weights
@@ -41,14 +43,31 @@ object UserPreferencesStore {
     fun getUserAge(context: Context): Int = getPrefs(context).getInt(KEY_USER_AGE, 25)
     fun setUserAge(context: Context, age: Int) = getPrefs(context).edit().putInt(KEY_USER_AGE, age).apply()
 
-    fun getUserHeight(context: Context): Int = getPrefs(context).getInt(KEY_USER_HEIGHT, 170)
-    fun setUserHeight(context: Context, height: Int) = getPrefs(context).edit().putInt(KEY_USER_HEIGHT, height).apply()
+    fun getUserHeight(context: Context): Double {
+        val p = getPrefs(context)
+        return try {
+            p.getFloat(KEY_USER_HEIGHT, 170.0f).toDouble()
+        } catch (e: ClassCastException) {
+            // Migration: Read legacy Int and convert to Float/Double
+            val legacy = p.getInt(KEY_USER_HEIGHT, 170)
+            val converted = legacy.toFloat()
+            p.edit().putFloat(KEY_USER_HEIGHT, converted).apply()
+            converted.toDouble()
+        }
+    }
+    fun setUserHeight(context: Context, height: Double) = getPrefs(context).edit().putFloat(KEY_USER_HEIGHT, height.toFloat()).apply()
 
     fun getUserWeight(context: Context): Double = getPrefs(context).getFloat(KEY_USER_WEIGHT, 70.0f).toDouble()
     fun setUserWeight(context: Context, weight: Double) = getPrefs(context).edit().putFloat(KEY_USER_WEIGHT, weight.toFloat()).apply()
 
     fun getUserGender(context: Context): String = getPrefs(context).getString(KEY_USER_GENDER, "Male") ?: "Male"
     fun setUserGender(context: Context, gender: String) = getPrefs(context).edit().putString(KEY_USER_GENDER, gender).apply()
+
+    fun getUserGoal(context: Context): String = getPrefs(context).getString(KEY_USER_GOAL, "Maintain Weight") ?: "Maintain Weight"
+    fun setUserGoal(context: Context, goal: String) = getPrefs(context).edit().putString(KEY_USER_GOAL, goal).apply()
+
+    fun getUserAvatarId(context: Context): Int = getPrefs(context).getInt(KEY_USER_AVATAR_ID, 1)
+    fun setUserAvatarId(context: Context, avatarId: Int) = getPrefs(context).edit().putInt(KEY_USER_AVATAR_ID, avatarId).apply()
 
 
     // Wellness Score Weight Accessors

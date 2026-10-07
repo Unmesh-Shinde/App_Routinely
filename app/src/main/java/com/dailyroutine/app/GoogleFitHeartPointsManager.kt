@@ -24,7 +24,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
-class GoogleFitHeartPointsManager(private val context: Context) {
+open class GoogleFitHeartPointsManager(private val context: Context) : IGoogleFitHeartPointsManager {
 
     companion object {
         const val GOOGLE_FIT_PACKAGE = "com.google.android.apps.fitness"
@@ -44,19 +44,19 @@ class GoogleFitHeartPointsManager(private val context: Context) {
             .build()
     }
 
-    fun hasReadPermission(activity: Activity): Boolean {
+    override fun hasReadPermission(activity: Activity): Boolean {
         return signedInOrExtensionAccount(activity)?.let { account ->
             GoogleSignIn.hasPermissions(account, fitnessOptions)
         } ?: false
     }
 
-    fun hasReadPermission(): Boolean {
+    override fun hasReadPermission(): Boolean {
         return signedInOrExtensionAccount(context)?.let { account ->
             GoogleSignIn.hasPermissions(account, fitnessOptions)
         } ?: false
     }
 
-    fun requestReadPermission(activity: Activity) {
+    override fun requestReadPermission(activity: Activity) {
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .addExtension(fitnessOptions)
@@ -67,7 +67,7 @@ class GoogleFitHeartPointsManager(private val context: Context) {
         )
     }
 
-    fun handlePermissionResult(data: Intent?): PermissionResult {
+    override fun handlePermissionResult(data: Intent?): PermissionResult {
         return try {
             val account = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException::class.java)
             if (account != null && GoogleSignIn.hasPermissions(account, fitnessOptions)) {
@@ -84,9 +84,9 @@ class GoogleFitHeartPointsManager(private val context: Context) {
         }
     }
 
-    fun signedInEmail(): String? = signedInOrExtensionAccount(context)?.email
+    override fun signedInEmail(): String? = signedInOrExtensionAccount(context)?.email
 
-    suspend fun readHeartPoints(startTime: Instant, endTime: Instant): Double {
+    override suspend fun readHeartPoints(startTime: Instant, endTime: Instant): Double {
         return withContext(Dispatchers.IO) {
             try {
                 val account = signedInOrExtensionAccount(context)
@@ -98,6 +98,7 @@ class GoogleFitHeartPointsManager(private val context: Context) {
                 val request = DataReadRequest.Builder()
                     .read(DataType.TYPE_HEART_POINTS)
                     .setTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli(), TimeUnit.MILLISECONDS)
+                    .enableServerQueries()
                     .build()
 
                 val response = Tasks.await(Fitness.getHistoryClient(context, account).readData(request))
@@ -118,10 +119,10 @@ class GoogleFitHeartPointsManager(private val context: Context) {
         }
     }
 
-    suspend fun readDailyHeartPoints(
-        oldestDate: LocalDate,
+    override suspend fun readDailyHeartPoints(
+        startDate: LocalDate,
         endTime: Instant,
-        zoneId: ZoneId = ZoneId.systemDefault()
+        zoneId: ZoneId
     ): Map<String, Double> {
         return withContext(Dispatchers.IO) {
             try {
@@ -131,10 +132,21 @@ class GoogleFitHeartPointsManager(private val context: Context) {
                     return@withContext emptyMap()
                 }
 
-                val startTime = oldestDate.atStartOfDay(zoneId).toInstant()
+                val aggregateValues = runCatching {
+                    readDailyAggregateHeartPoints(startDate, endTime, zoneId)
+                }.getOrElse { error ->
+                    Log.w("GoogleFitHeartPoints", "Daily aggregate Heart Points read failed; trying raw read", error)
+                    emptyMap()
+                }
+                if (aggregateValues.isNotEmpty()) {
+                    return@withContext aggregateValues
+                }
+
+                val startTime = startDate.atStartOfDay(zoneId).toInstant()
                 val request = DataReadRequest.Builder()
                     .read(DataType.TYPE_HEART_POINTS)
                     .setTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli(), TimeUnit.MILLISECONDS)
+                    .enableServerQueries()
                     .build()
 
                 val response = Tasks.await(Fitness.getHistoryClient(context, account).readData(request))
@@ -144,10 +156,6 @@ class GoogleFitHeartPointsManager(private val context: Context) {
                     dataSet.dataPoints.forEach { dataPoint ->
                         addRawPointToDailyValues(values, dataPoint, zoneId)
                     }
-                }
-
-                if (values.isEmpty() || values.values.all { it == 0.0 }) {
-                    return@withContext readDailyAggregateHeartPoints(oldestDate, endTime, zoneId)
                 }
 
                 Log.d("GoogleFitHeartPoints", "Fetched daily Google Fit Heart Points for ${values.size} buckets")
@@ -164,6 +172,7 @@ class GoogleFitHeartPointsManager(private val context: Context) {
         val request = DataReadRequest.Builder()
             .aggregate(DataType.TYPE_HEART_POINTS, DataType.AGGREGATE_HEART_POINTS)
             .setTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli(), TimeUnit.MILLISECONDS)
+            .enableServerQueries()
             .build()
 
         val response = Tasks.await(Fitness.getHistoryClient(context, account).readData(request))
@@ -183,6 +192,7 @@ class GoogleFitHeartPointsManager(private val context: Context) {
             .aggregate(DataType.TYPE_HEART_POINTS, DataType.AGGREGATE_HEART_POINTS)
             .setTimeRange(startTime.toEpochMilli(), endTime.toEpochMilli(), TimeUnit.MILLISECONDS)
             .bucketByTime(1, TimeUnit.DAYS)
+            .enableServerQueries()
             .build()
 
         val response = Tasks.await(Fitness.getHistoryClient(context, account).readData(request))
@@ -193,6 +203,12 @@ class GoogleFitHeartPointsManager(private val context: Context) {
                 dataSet.dataPoints.sumOf { dataPoint -> pointsFromAggregateDataPoint(dataPoint) }
             }
             values[key] = (values[key] ?: 0.0) + points
+        }
+        var date = oldestDate
+        val lastDate = endTime.atZone(zoneId).toLocalDate()
+        while (!date.isAfter(lastDate)) {
+            values.putIfAbsent(date.format(DateTimeFormatter.ISO_LOCAL_DATE), 0.0)
+            date = date.plusDays(1)
         }
         Log.d("GoogleFitHeartPoints", "Fetched daily aggregate Google Fit Heart Points for ${values.size} buckets")
         return values

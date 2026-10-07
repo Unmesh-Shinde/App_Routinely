@@ -8,20 +8,22 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/m3_premium_surface"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/nutritionHeaderBg"
-            app:title="Nutrition Calendar"
-            app:titleTextColor="@android:color/white"/>
+            app:title="Nutrition"
+            app:titleTextColor="@color/textPrimary"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="@color/textPrimary"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/nutritionHeaderBg"
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
             android:paddingBottom="12dp"
@@ -33,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="October 10, 2024"
-                android:textColor="@android:color/white"
+                android:textColor="@color/textPrimary"
                 android:textStyle="bold"
                 android:textSize="18sp"/>
 
@@ -43,9 +45,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Change"
-                android:textColor="@android:color/white"
+                android:textColor="@color/primary"
                 app:icon="@drawable/ic_calendar"
-                app:iconTint="@android:color/white"/>
+                app:iconTint="@color/primary"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnTemplatesDiet"
@@ -53,15 +55,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Templates"
-                android:textColor="@android:color/white"
+                android:textColor="@color/primary"
                 app:icon="@drawable/ic_reminder"
-                app:iconTint="@android:color/white"/>
+                app:iconTint="@color/primary"/>
         </LinearLayout>
 
         <HorizontalScrollView
+            android:id="@+id/hsvDays"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/nutritionDayStripBg"
+            android:background="@color/m3_premium_container"
             android:scrollbars="none">
             <LinearLayout
                 android:id="@+id/llDays"
@@ -75,7 +78,7 @@
             android:id="@+id/llMealTemplateLegend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/nutritionLegendBg"
+            android:background="@color/m3_premium_container"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
@@ -84,7 +87,7 @@
             <View
                 android:layout_width="14dp"
                 android:layout_height="14dp"
-                android:background="#D50000" />
+                android:background="@color/nutritionTemplateMarker" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -99,7 +102,7 @@
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_marginStart="16dp"
-                android:background="#D32F2F" />
+                android:background="@color/nutritionMealMarker" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -113,7 +116,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFEBEE"
+            android:background="@color/m3_premium_container"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"
             android:orientation="horizontal"
@@ -159,7 +162,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="24dp"
         android:src="@drawable/ic_add"
-        app:backgroundTint="#E57373"
+        app:backgroundTint="@color/healthNutrition"
         app:tint="@android:color/white"
         android:contentDescription="Add Meal"/>
 

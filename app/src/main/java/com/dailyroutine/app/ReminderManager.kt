@@ -20,14 +20,20 @@ class ReminderManager(context: Context) {
         this.context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     fun getAllReminders(): MutableList<Reminder> {
+        synchronized(LOCK) {
+            return getAllRemindersLocked()
+        }
+    }
+
+    private fun getAllRemindersLocked(): MutableList<Reminder> {
         val json = prefs.getString(KEY_LIST, null) ?: return mutableListOf()
         return try {
             val type = object : TypeToken<MutableList<Reminder>>() {}.type
             val rawList: MutableList<Reminder>? = gson.fromJson(json, type)
-            
+
             // 1. Clean the list: Filter out any nulls or entries with missing critical data
-            val cleanedList = rawList?.filterNotNull()?.filter { it.type != null } ?: mutableListOf()
-            
+            val cleanedList = rawList?.filterNotNull() ?: mutableListOf()
+
             // 2. Sort safely
             cleanedList.sortedWith(
                 compareBy<Reminder> { !it.isEnabled }
@@ -45,19 +51,23 @@ class ReminderManager(context: Context) {
     fun getReminderById(id: Int): Reminder? = getAllReminders().find { it.id == id }
 
     fun saveReminder(reminder: Reminder) {
-        val list = getAllReminders()
-        val idx = list.indexOfFirst { it.id == reminder.id }
-        if (idx >= 0) list[idx] = reminder else list.add(reminder)
-        persistList(list)
+        synchronized(LOCK) {
+            val list = getAllRemindersLocked()
+            val idx = list.indexOfFirst { it.id == reminder.id }
+            if (idx >= 0) list[idx] = reminder else list.add(reminder)
+            persistListLocked(list)
+        }
         cancelReminder(reminder)
         if (reminder.isEnabled) scheduleReminder(reminder)
     }
 
     fun deleteReminder(reminder: Reminder) {
         cancelReminder(reminder)
-        val list = getAllReminders()
-        list.removeAll { it.id == reminder.id }
-        persistList(list)
+        synchronized(LOCK) {
+            val list = getAllRemindersLocked()
+            list.removeAll { it.id == reminder.id }
+            persistListLocked(list)
+        }
     }
 
     fun toggleReminder(reminder: Reminder) {
@@ -71,7 +81,7 @@ class ReminderManager(context: Context) {
             nextFixedTriggerMs(reminder)
         }
 
-    private fun persistList(list: List<Reminder>) {
+    private fun persistListLocked(list: List<Reminder>) {
         prefs.edit().putString(KEY_LIST, gson.toJson(list)).apply()
     }
 
@@ -194,6 +204,8 @@ class ReminderManager(context: Context) {
     }
 
     companion object {
+        private val LOCK = Any()
+
         private const val KEY_LIST = "reminder_list"
         private const val FIXED_REQUEST_CODE = 1000
         private const val INTERVAL_REQUEST_CODE = 5000

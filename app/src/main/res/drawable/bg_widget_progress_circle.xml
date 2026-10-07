@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background Ring - Sized for 140dp diameter -->
+    <item android:id="@android:id/background">
+        <shape
+            android:shape="ring"
+            android:innerRadius="60dp"
+            android:thickness="8dp"
+            android:useLevel="false">
+            <solid android:color="#D1D5DB" />
+        </shape>
+    </item>
+    <!-- Progress Ring - Clockwise sweep with DARKER color -->
+    <item android:id="@android:id/progress">
+        <rotate
+            android:fromDegrees="270"
+            android:toDegrees="270"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <shape
+                android:shape="ring"
+                android:innerRadius="60dp"
+                android:thickness="8dp"
+                android:useLevel="true">
+                <solid android:color="@color/strokeWalking" />
+            </shape>
+        </rotate>
+    </item>
+</layer-list>

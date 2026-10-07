@@ -1,24 +1,25 @@
 package com.dailyroutine.app
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import java.util.*
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Build
+import android.util.TypedValue
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,13 +47,16 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_reminders)
         InsetHelper.applyTopPadding(findViewById(R.id.appBar))
 
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        findViewById<Toolbar>(R.id.toolbar).setNavigationOnClickListener { finish() }
+        toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, R.color.textPrimary))
+        toolbar.setNavigationOnClickListener { finish() }
 
         mgr = ReminderManager(this)
         adapter = ReminderAdapter(this)
@@ -71,7 +75,6 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
 
         requestNotificationPermission()
         requestExactAlarmPermission()
-        addDefaultsOnFirstRun()
     }
 
     override fun onResume() {
@@ -94,6 +97,64 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
             .setMessage("Are you sure you want to remove '${reminder.title}'?")
             .setPositiveButton("Delete") { _, _ ->
                 mgr.deleteReminder(reminder)
+                refresh()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    override fun onSelectionChanged(count: Int) {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        if (count > 0) {
+            toolbar.title = "$count selected"
+            val isNightMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            toolbar.setBackgroundColor(if (isNightMode) Color.parseColor("#1A237E") else Color.parseColor("#E8EAF6"))
+
+            val typedValue = TypedValue()
+            theme.resolveAttribute(androidx.appcompat.R.attr.actionModeCloseDrawable, typedValue, true)
+            if (typedValue.resourceId != 0) {
+                toolbar.setNavigationIcon(typedValue.resourceId)
+            }
+            toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, R.color.textPrimary))
+            toolbar.setNavigationOnClickListener { adapter.clearSelection() }
+
+            if (toolbar.menu.findItem(1) == null) {
+                toolbar.menu.add(Menu.NONE, 1, Menu.NONE, "Delete")
+                    .setIcon(android.R.drawable.ic_menu_delete)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                toolbar.setOnMenuItemClickListener {
+                    if (it.itemId == 1) {
+                        deleteSelectedReminders()
+                        true
+                    } else false
+                }
+            }
+        } else {
+            toolbar.title = "Reminders"
+            toolbar.setBackgroundColor(Color.TRANSPARENT)
+
+            val typedValue = TypedValue()
+            theme.resolveAttribute(androidx.appcompat.R.attr.homeAsUpIndicator, typedValue, true)
+            toolbar.setNavigationIcon(typedValue.resourceId)
+            toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, R.color.textPrimary))
+            toolbar.setNavigationOnClickListener { finish() }
+
+            toolbar.menu.clear()
+        }
+    }
+
+    private fun deleteSelectedReminders() {
+        val selectedIds = adapter.getSelectedIds()
+        val reminders = mgr.getAllReminders().filter { selectedIds.contains(it.id) }
+
+        AlertDialog.Builder(this)
+            .setTitle("Delete Reminders?")
+            .setMessage("Remove ${reminders.size} selected reminders?")
+            .setPositiveButton("Delete") { _, _ ->
+                reminders.forEach { reminder ->
+                    mgr.deleteReminder(reminder)
+                }
+                adapter.clearSelection()
                 refresh()
             }
             .setNegativeButton("Cancel", null)
@@ -124,15 +185,6 @@ class RemindersActivity : AppCompatActivity(), ReminderAdapter.OnReminderListene
         }
     }
 
-    private fun addDefaultsOnFirstRun() {
-        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
-        if (prefs.getBoolean("is_first_run", true)) {
-            mgr.saveReminder(Reminder(title = "Drink Water", type = ReminderType.HYDRATION, isIntervalBased = true, intervalMinutes = 120))
-            mgr.saveReminder(Reminder(title = "Meditation", type = ReminderType.MEDITATION, hour = 8, minute = 0))
-            prefs.edit().putBoolean("is_first_run", false).apply()
-            refresh()
-        }
-    }
 
     private fun showDialog(existing: Reminder?) {
         ReminderDialogHelper.showDialog(

@@ -10,32 +10,53 @@
     <TextView
         android:id="@+id/tvBarValue"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="32dp"
         android:text="1200"
         android:textSize="10sp"
         android:textColor="@color/textSecondary"
-        android:layout_marginBottom="4dp"/>
+        android:gravity="center"
+        android:layout_marginBottom="2dp"/>
 
-    <View
-        android:id="@+id/viewBar"
-        android:layout_width="32dp"
+    <FrameLayout
+        android:id="@+id/barAreaContainer"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/bg_calorie_bar" />
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/tvEmptyError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="NO DATA"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:textColor="@color/textSecondary"
+            android:rotation="-90"
+            android:visibility="gone"/>
+
+        <View
+            android:id="@+id/viewBar"
+            android:layout_width="32dp"
+            android:layout_height="0dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@drawable/bg_calorie_bar" />
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvBarLabel"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="18dp"
         android:text="Mon"
         android:textSize="10sp"
         android:textStyle="bold"
         android:textColor="@color/textPrimary"
-        android:layout_marginTop="6dp"/>
+        android:layout_marginTop="4dp"/>
 
     <TextView
         android:id="@+id/tvBarDate"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="16dp"
         android:text="12 Oct"
         android:textSize="9sp"
         android:textColor="@color/textSecondary"

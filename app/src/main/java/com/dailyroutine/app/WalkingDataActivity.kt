@@ -1,23 +1,42 @@
 package com.dailyroutine.app
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
 class WalkingDataActivity : AppCompatActivity() {
 
     private lateinit var healthDataManager: HealthDataManager
+    private lateinit var weeklyAdapter: WeeklyGraphAdapter
+    private val monthlySnapHelper = androidx.recyclerview.widget.PagerSnapHelper()
     private var stepGoal: Int = 10000
 
+    private companion object {
+        private const val BAR_MAX_HEIGHT_DP = 200
+        private const val WEEKLY_STEPS_BAR_SCALE = 20_000
+        private const val WEEKLY_HEART_POINTS_BAR_SCALE = 135
+        private const val MONTHLY_STEPS_BAR_SCALE = 140_000
+        private const val MONTHLY_HEART_POINTS_BAR_SCALE = 700
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_walking_data)
         InsetHelper.applyTopPadding(findViewById(R.id.appBar))
@@ -26,6 +45,7 @@ class WalkingDataActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, R.color.textPrimary))
         toolbar.setNavigationOnClickListener { finish() }
 
         healthDataManager = HealthDataManager(this)
@@ -34,9 +54,49 @@ class WalkingDataActivity : AppCompatActivity() {
         updateGoalDisplay()
 
         findViewById<Button>(R.id.btnEditStepGoal).setOnClickListener { showStepGoalDialog() }
+        findViewById<View>(R.id.cardDistance).setOnClickListener {
+            startActivity(Intent(this, DistanceActivity::class.java))
+        }
+
+        // Navigation shortcuts to Weekly tab
+        findViewById<View>(R.id.tvCurrentSteps).setOnClickListener {
+            findViewById<TabLayout>(R.id.tabLayout).getTabAt(1)?.select()
+        }
+        findViewById<View>(R.id.cardHeartPoints).setOnClickListener {
+            findViewById<TabLayout>(R.id.tabLayout).getTabAt(1)?.select()
+        }
 
         setupTabs()
+        setupWeeklyGraph()
+        setupMonthlyGraph()
         refreshTodayView()
+    }
+
+    private fun setupMonthlyGraph() {
+        val rv = findViewById<RecyclerView>(R.id.rvMonthlySteps)
+        if (rv.onFlingListener == null) {
+            monthlySnapHelper.attachToRecyclerView(rv)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::healthDataManager.isInitialized) {
+            stepGoal = healthDataManager.getDailyStepGoal()
+            updateGoalDisplay()
+            when (findViewById<TabLayout>(R.id.tabLayout).selectedTabPosition) {
+                0 -> refreshTodayView()
+                1 -> refreshWeeklyView()
+                2 -> refreshMonthlyView()
+            }
+        }
+    }
+
+    private fun setupWeeklyGraph() {
+        val rv = findViewById<RecyclerView>(R.id.rvWeeklyStepsGraph)
+        rv.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        weeklyAdapter = WeeklyGraphAdapter()
+        rv.adapter = weeklyAdapter
     }
 
     private fun showStepGoalDialog() {
@@ -54,13 +114,17 @@ class WalkingDataActivity : AppCompatActivity() {
                 stepGoal = goal
                 healthDataManager.setDailyStepGoal(goal)
                 updateGoalDisplay()
+                when (findViewById<TabLayout>(R.id.tabLayout).selectedTabPosition) {
+                    1 -> refreshWeeklyView()
+                    2 -> refreshMonthlyView()
+                }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
     private fun updateGoalDisplay() {
-        findViewById<TextView>(R.id.tvStepGoal).text = "%,d steps".format(stepGoal)
+        findViewById<TextView>(R.id.tvStepGoal).text = getString(R.string.step_goal_value, stepGoal)
     }
 
     private fun setupTabs() {
@@ -87,16 +151,20 @@ class WalkingDataActivity : AppCompatActivity() {
     }
 
     private fun refreshTodayView() {
+        val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
         val stepsStr = healthDataManager.getSteps().replace(",", "")
         val steps = stepsStr.toIntOrNull() ?: 0
         
         findViewById<TextView>(R.id.tvCurrentSteps).text = "%,d".format(steps)
         
-        val distance = healthDataManager.calculateDistanceKm(steps)
-        findViewById<TextView>(R.id.tvDistance).text = "%.2f km".format(distance)
+        // 1. Priority: Synced Distance from Google Fit/Health Connect
+        val syncedDistance = healthDataManager.getHistoricalDistance(todayStr)
+        val distance = if (syncedDistance > 0.0) syncedDistance else healthDataManager.calculateDistanceKm(steps)
         
+        findViewById<TextView>(R.id.tvDistance).text = getString(R.string.distance_km_value, distance)
+
         val duration = healthDataManager.calculateDurationMin(steps)
-        findViewById<TextView>(R.id.tvDuration).text = "%d min".format(duration)
+        findViewById<TextView>(R.id.tvDuration).text = getString(R.string.duration_min_value, duration)
 
         val heartPoints = healthDataManager.getHeartPoints()
         val isConnected = healthDataManager.isConnected()
@@ -107,63 +175,77 @@ class WalkingDataActivity : AppCompatActivity() {
     }
 
     private fun refreshWeeklyView() {
-        val container = findViewById<LinearLayout>(R.id.llWeeklyStepsGraph)
-        container.removeAllViews()
+        lifecycleScope.launch {
+            val today = Calendar.getInstance()
+            val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(today.time)
+            val startRange = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1)) }
+            val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            
+            // 🚀 BATCH FETCH
+            val metricsMap = healthDataManager.getMetricsMap(dateFormatter.format(startRange.time), dateFormatter.format(today.time))
 
-        val weekGroups = HistoryDateOrder.monthBoundedWeeklyGroups(HealthDataManager.SYNC_HISTORY_DAYS)
+            val weekGroups = HistoryDateOrder.monthBoundedWeeklyGroups(HealthDataManager.SYNC_HISTORY_DAYS)
+            val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
+            val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
 
-        val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
-        val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
-        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val graphItems = mutableListOf<WeeklyGraphItem>()
+            val stepGraphColor = ContextCompat.getColor(this@WalkingDataActivity, R.color.graphSteps)
+            val hpGraphColor = ContextCompat.getColor(this@WalkingDataActivity, R.color.healthCalories)
 
-        weekGroups.forEachIndexed { weekIndex, weekDates ->
-            weekDates.forEach { calendar ->
-                val dateStr = dateFormatter.format(calendar.time)
+            weekGroups.forEachIndexed { weekIndex, weekDates ->
+                weekDates.forEach { calendar ->
+                    val dateStr = dateFormatter.format(calendar.time)
+                    val metrics = metricsMap[dateStr]
+                    val isConnected = healthDataManager.isConnected()
+                    
+                    val dailySteps = if (dateStr == todayStr) {
+                        healthDataManager.getSteps().replace(",", "").toIntOrNull() ?: 0
+                    } else if (isConnected) {
+                        metrics?.steps?.toInt() ?: healthDataManager.getHistoricalSteps(dateStr).toInt()
+                    } else 0
+                    
+                    // The weekly heart-points bar must reflect an explicit synced
+                    // value for that date. Do not fall back to legacy cached values:
+                    // they can belong to an earlier sync and create a false bar.
+                    val dailyHP = if (isConnected) {
+                        metrics?.heartPoints?.toInt()?.coerceAtLeast(0) ?: 0
+                    } else 0
+                    
+                    val hasSignal = dailySteps >= 200 || dailyHP > 0
 
-            // Filter: Only show data if health is connected and there's a signal
-                val isConnected = healthDataManager.isConnected()
-                val dailySteps = if (isConnected) healthDataManager.getHistoricalSteps(dateStr).toInt() else 0
-                val dailyHP = if (isConnected) healthDataManager.getHistoricalHeartPoints(dateStr).toInt() else 0
+                    val sHeight = if (hasSignal && dailySteps > 0) (dailySteps.toDouble() * BAR_MAX_HEIGHT_DP.toDouble() / WEEKLY_STEPS_BAR_SCALE).toInt().coerceAtLeast(2) else 0
+                    val hHeight = if (hasSignal && dailyHP > 0) (dailyHP.toDouble() * BAR_MAX_HEIGHT_DP.toDouble() / WEEKLY_HEART_POINTS_BAR_SCALE).toInt().coerceAtLeast(2) else 0
 
-                val hasSignal = dailySteps >= 200 || dailyHP > 0
-                if (dailyHP > 0) {
-                    android.util.Log.d("WalkingDataActivity", "Weekly - Date: $dateStr, Steps: $dailySteps, HP: $dailyHP")
+                    graphItems.add(WeeklyGraphItem(
+                        dayLabel = dayLabelFormatter.format(calendar.time),
+                        dateLabel = dateBarFormatter.format(calendar.time),
+                        primaryValue = if (dailySteps > 0) formatStepText(dailySteps) else "0",
+                        primaryHeightPx = dpToPx(sHeight.coerceAtMost(BAR_MAX_HEIGHT_DP)),
+                        primaryColor = stepGraphColor,
+                        primaryBackgroundRes = R.drawable.bg_step_bar_rounded,
+                        // Keep the zero label, while hiding the zero-value heart-points bar.
+                        secondaryValue = dailyHP.toString(),
+                        secondaryHeightPx = dpToPx(hHeight.coerceAtMost(BAR_MAX_HEIGHT_DP)),
+                        secondaryColor = hpGraphColor,
+                        secondaryBackgroundRes = R.drawable.bg_calorie_bar,
+                        showSecondaryBar = dailyHP > 0,
+                        hasSignal = hasSignal
+                    ))
                 }
 
-                val barView = LayoutInflater.from(this).inflate(R.layout.item_step_heart_bar, container, false)
-                barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-
-                val tvSteps = barView.findViewById<TextView>(R.id.tvStepValue)
-                val tvHP = barView.findViewById<TextView>(R.id.tvHeartValue)
-
-                tvSteps.text = if (hasSignal && dailySteps > 0) formatStepText(dailySteps) else "-"
-                tvHP.text = if (hasSignal && dailyHP > 0) dailyHP.toString() else "-"
-
-                val viewStepBar = barView.findViewById<View>(R.id.viewStepBar)
-                val viewHeartBar = barView.findViewById<View>(R.id.viewHeartBar)
-
-                val stepParams = viewStepBar.layoutParams as LinearLayout.LayoutParams
-                val sHeight = if (hasSignal && dailySteps > 0) (dailySteps * 250 / 15000).coerceAtLeast(2) else 0
-                stepParams.height = dpToPx(sHeight.coerceAtMost(250))
-                viewStepBar.layoutParams = stepParams
-
-                val heartParams = viewHeartBar.layoutParams as LinearLayout.LayoutParams
-                val hHeight = if (hasSignal && dailyHP > 0) (dailyHP * 250 / 100).coerceAtLeast(2) else 0
-                heartParams.height = dpToPx(hHeight.coerceAtMost(250))
-                viewHeartBar.layoutParams = heartParams
-
-                container.addView(barView)
+                if (weekIndex != weekGroups.lastIndex) {
+                    graphItems.add(WeeklyGraphItem(
+                        dayLabel = "", dateLabel = "", primaryValue = "", primaryHeightPx = 0, primaryColor = 0, isDivider = true
+                    ))
+                }
             }
 
-            if (weekIndex != weekGroups.lastIndex) {
-                val divider = View(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
-                        setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
-                    }
-                    setBackgroundColor(0xFF455A64.toInt())
+            withContext(Dispatchers.Main) {
+                findViewById<GoalLineOverlayView>(R.id.weeklyStepsGoalOverlay).apply {
+                    visibility = View.VISIBLE
+                    setGoalLines(stepsGoalLines(stepGoal.toDouble(), WEEKLY_STEPS_BAR_SCALE.toDouble()))
                 }
-                container.addView(divider)
+                weeklyAdapter.submitList(graphItems)
             }
         }
     }
@@ -173,129 +255,150 @@ class WalkingDataActivity : AppCompatActivity() {
     }
 
     private fun refreshMonthlyView() {
-        val rv = findViewById<RecyclerView>(R.id.rvMonthlySteps)
-        val monthDataList = mutableListOf<MonthData>()
-        
-        val today = Calendar.getInstance()
-        val oldestSyncedDay = Calendar.getInstance().apply {
-            add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
-        }
-        val calendar = oldestSyncedDay.clone() as Calendar
-        calendar.firstDayOfWeek = Calendar.MONDAY
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-
-        val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
-        val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
-        val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
-        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-
-        while (!calendar.after(today)) {
-            val monthName = monthFormatter.format(calendar.time)
-            val yearName = yearFormatter.format(calendar.time)
-            val currentMonth = calendar.get(Calendar.MONTH)
-            val isCurrentMonth = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) && currentMonth == today.get(Calendar.MONTH)
+        lifecycleScope.launch {
+            val rv = findViewById<RecyclerView>(R.id.rvMonthlySteps)
+            val today = Calendar.getInstance()
+            val startRange = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1)) }
+            val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             
-            val barItems = mutableListOf<BarItem>()
-            var weekIndex = 1
+            // 🚀 BATCH FETCH
+            val metricsMap = healthDataManager.getMetricsMap(dateFormatter.format(startRange.time), dateFormatter.format(today.time))
 
-            if (isCurrentMonth) {
-                HistoryDateOrder.monthWeeksForMonthlyView(calendar, today).forEach { week ->
+            // 🚀 BACKGROUND PRE-CALCULATION
+            val monthDataList = mutableListOf<MonthData>()
+            val oldestSyncedDay = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
+            }
+            val calendar = oldestSyncedDay.clone() as Calendar
+            calendar.firstDayOfWeek = Calendar.MONDAY
+            calendar.set(Calendar.DAY_OF_MONTH, 1)
+
+            val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
+            val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
+            val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
+            val stepGraphColor = ContextCompat.getColor(this@WalkingDataActivity, R.color.graphSteps)
+
+            while (!calendar.after(today)) {
+                val monthName = monthFormatter.format(calendar.time)
+                val yearName = yearFormatter.format(calendar.time)
+                val currentMonth = calendar.get(Calendar.MONTH)
+                val isCurrentMonth = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) && currentMonth == today.get(Calendar.MONTH)
+
+                val barItems = mutableListOf<BarItem>()
+                var weekIndex = 1
+
+                if (isCurrentMonth) {
+                    HistoryDateOrder.monthWeeksForMonthlyView(calendar, today).forEach { week ->
+                        var weekSteps = 0L
+                        var weekHP = 0L
+
+                        if (week.isComplete) {
+                            week.dates.forEach { day ->
+                                val dateKey = dateFormatter.format(day.time)
+                                if (!day.before(oldestSyncedDay) && !day.after(today)) {
+                                    val m = metricsMap[dateKey]
+                                    weekSteps += m?.steps ?: healthDataManager.getHistoricalSteps(dateKey)
+                                    weekHP += (m?.heartPoints?.toLong() ?: healthDataManager.getHistoricalHeartPoints(dateKey).toLong())
+                                }
+                            }
+                        }
+
+                        // Standardized 200dp logic
+                        val heightSteps = (weekSteps.toDouble() * 200.0 / MONTHLY_STEPS_BAR_SCALE.toDouble()).toInt().coerceIn(if (weekSteps > 0) 2 else 0, 200)
+                        val heightHP = (weekHP.toDouble() * 200.0 / MONTHLY_HEART_POINTS_BAR_SCALE.toDouble()).toInt().coerceIn(if (weekHP > 0) 2 else 0, 200)
+
+                        barItems.add(BarItem(BarData(
+                            label = "Week $weekIndex",
+                            date = rangeFormatter.format(week.start.time),
+                            valueDisplay = if (weekSteps > 0) formatStepText(weekSteps.toInt()) else "0",
+                            heightPx = dpToPx(heightSteps),
+                            color = stepGraphColor,
+                            backgroundRes = R.drawable.bg_step_bar_rounded,
+                            isDoubleBar = true,
+                            secondaryValueDisplay = if (weekHP > 0) weekHP.toString() else "0",
+                            secondaryHeightPx = dpToPx(heightHP),
+                            secondaryBackgroundRes = R.drawable.bg_calorie_bar,
+                            isEmpty = weekSteps < 200 && weekHP == 0L
+                        )))
+                        weekIndex++
+                    }
+
+                    calendar.add(Calendar.MONTH, 1)
+                    calendar.set(Calendar.DAY_OF_MONTH, 1)
+                    if (barItems.isNotEmpty()) {
+                        monthDataList.add(MonthData(monthName, yearName, barItems, stepsGoalLines(stepGoal * 7.0, MONTHLY_STEPS_BAR_SCALE.toDouble())))
+                    }
+                    continue
+                }
+
+                while (calendar.get(Calendar.MONTH) == currentMonth) {
                     var weekSteps = 0L
                     var weekHP = 0L
+                    val weekStart = calendar.time
 
-                    if (week.isComplete) {
-                        week.dates.forEach { day ->
-                            val dateKey = dateFormatter.format(day.time)
-                            if (!day.before(oldestSyncedDay) && !day.after(today)) {
-                                weekSteps += healthDataManager.getHistoricalSteps(dateKey)
-                                weekHP += healthDataManager.getHistoricalHeartPoints(dateKey).toLong()
-                            }
+                    var isWeekOver = false
+                    while (!isWeekOver) {
+                        val dateKey = dateFormatter.format(calendar.time)
+                        if (!calendar.before(oldestSyncedDay) && !calendar.after(today)) {
+                            val m = metricsMap[dateKey]
+                            weekSteps += m?.steps ?: healthDataManager.getHistoricalSteps(dateKey)
+                            weekHP += (m?.heartPoints?.toLong() ?: healthDataManager.getHistoricalHeartPoints(dateKey).toLong())
+                        }
+
+                        val isSunday = (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
+
+                        calendar.add(Calendar.DAY_OF_YEAR, 1)
+                        val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
+                        val isAfterToday = calendar.after(today)
+
+                        if (isSunday || isNewMonth || isAfterToday) {
+                            isWeekOver = true
                         }
                     }
 
-                    val heightSteps = (weekSteps * 250 / 100000).toInt().coerceIn(if (weekSteps > 0) 2 else 0, 250)
-                    val heightHP = (weekHP * 250 / 500).toInt().coerceIn(if (weekHP > 0) 2 else 0, 250)
+                    val displayValSteps = if (weekSteps > 0) formatStepText(weekSteps.toInt()) else "-"
+                    val displayValHP = if (weekHP > 0) weekHP.toString() else "-"
+
+                    // Standardized 200dp logic
+                    val heightSteps = (weekSteps.toDouble() * 200.0 / MONTHLY_STEPS_BAR_SCALE.toDouble()).toInt().coerceIn(if (weekSteps > 0) 2 else 0, 200)
+                    val heightHP = (weekHP.toDouble() * 200.0 / MONTHLY_HEART_POINTS_BAR_SCALE.toDouble()).toInt().coerceIn(if (weekHP > 0) 2 else 0, 200)
 
                     barItems.add(BarItem(BarData(
                         label = "Week $weekIndex",
-                        date = rangeFormatter.format(week.start.time),
-                        valueDisplay = if (weekSteps > 0) formatStepText(weekSteps.toInt()) else "-",
+                        date = rangeFormatter.format(weekStart),
+                        valueDisplay = displayValSteps,
                         heightPx = dpToPx(heightSteps),
-                        color = 0xFF009688.toInt(),
+                        color = stepGraphColor,
+                        backgroundRes = R.drawable.bg_step_bar_rounded,
                         isDoubleBar = true,
-                        secondaryValueDisplay = if (weekHP > 0) weekHP.toString() else "-",
-                        secondaryHeightPx = dpToPx(heightHP)
+                        secondaryValueDisplay = displayValHP,
+                        secondaryHeightPx = dpToPx(heightHP),
+                        secondaryBackgroundRes = R.drawable.bg_calorie_bar
                     )))
                     weekIndex++
                 }
 
-                calendar.add(Calendar.MONTH, 1)
-                calendar.set(Calendar.DAY_OF_MONTH, 1)
                 if (barItems.isNotEmpty()) {
-                    monthDataList.add(MonthData(monthName, yearName, barItems))
+                    monthDataList.add(MonthData(monthName, yearName, barItems, stepsGoalLines(stepGoal * 7.0, MONTHLY_STEPS_BAR_SCALE.toDouble())))
                 }
-                continue
             }
 
-            while (calendar.get(Calendar.MONTH) == currentMonth) {
-                var weekSteps = 0L
-                var weekHP = 0L
-                val weekStart = calendar.time
-                val weekDates = mutableListOf<String>()
-                
-                var isWeekOver = false
-                while (!isWeekOver) {
-                    val dateKey = dateFormatter.format(calendar.time)
-                    if (!calendar.before(oldestSyncedDay) && !calendar.after(today)) {
-                        weekSteps += healthDataManager.getHistoricalSteps(dateKey)
-                        weekHP += healthDataManager.getHistoricalHeartPoints(dateKey).toLong()
-                        weekDates.add(dateKey)
-                    }
-                    
-                    val isSunday = (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
-                    
-                    calendar.add(Calendar.DAY_OF_YEAR, 1)
-                    val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
-                    val isAfterToday = calendar.after(today)
-                    
-                    if (isSunday || isNewMonth || isAfterToday) {
-                        isWeekOver = true
-                    }
-                }
-
-                // For monthly view, we reuse MonthGraphAdapter but it only supports single bars.
-                // We'll calculate a combined "Activity" score or just show Steps for now,
-                // OR update MonthGraphAdapter to handle double bars.
-                // I'll stick to a combined view or just steps to maintain pattern if adapter is shared.
-
-                val displayValSteps = if (weekSteps > 0) formatStepText(weekSteps.toInt()) else "-"
-                val displayValHP = if (weekHP > 0) weekHP.toString() else "-"
-
-                val heightSteps = (weekSteps * 250 / 100000).toInt().coerceIn(if (weekSteps > 0) 2 else 0, 250)
-                val heightHP = (weekHP * 250 / 500).toInt().coerceIn(if (weekHP > 0) 2 else 0, 250)
-
-                barItems.add(BarItem(BarData(
-                    label = "Week $weekIndex",
-                    date = rangeFormatter.format(weekStart),
-                    valueDisplay = displayValSteps,
-                    heightPx = dpToPx(heightSteps),
-                    color = 0xFF009688.toInt(),
-                    isDoubleBar = true,
-                    secondaryValueDisplay = displayValHP,
-                    secondaryHeightPx = dpToPx(heightHP)
-                )))
-                weekIndex++
-            }
-
-            if (barItems.isNotEmpty()) {
-                monthDataList.add(MonthData(monthName, yearName, barItems))
+            withContext(Dispatchers.Main) {
+                rv.adapter = MonthGraphAdapter(monthDataList.asReversed())
             }
         }
-
-        rv.adapter = MonthGraphAdapter(monthDataList.asReversed())
-        rv.onFlingListener = null
-        androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
     }
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
+
+    private fun stepsGoalLines(goal: Double, maxValue: Double): List<GoalLineSpec> {
+        return if (goal > 0.0) listOf(
+            GoalLineSpec(
+                value = goal,
+                maxValue = maxValue,
+                label = "Steps Goal: %,d".format(Locale.US, goal.toLong()),
+                color = ContextCompat.getColor(this, R.color.graphSteps)
+            )
+        ) else emptyList()
+    }
 }

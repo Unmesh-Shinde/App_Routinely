@@ -9,23 +9,26 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/healthSleep">
+        android:background="@color/m3_premium_surface"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="Sleep Tracker"
-            app:titleTextColor="@android:color/white"/>
+            app:titleTextColor="@color/textPrimary"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="@color/textPrimary"/>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayoutSleep"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/healthSleep"
-            app:tabTextColor="#B3E5FC"
-            app:tabSelectedTextColor="@android:color/white"
-            app:tabIndicatorColor="@android:color/white"
+            android:background="@color/m3_premium_surface"
+            app:tabTextColor="@color/textSecondary"
+            app:tabSelectedTextColor="@color/primary"
+            app:tabIndicatorColor="@color/primary"
             app:tabMode="fixed"
             android:visibility="gone">
             <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weekly"/>
@@ -116,28 +119,28 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
-                    <HorizontalScrollView
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="320dp"
-                        android:scrollbars="none">
-                        <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent">
+                        android:layout_height="280dp"
+                        android:paddingTop="16dp">
 
-                            <com.dailyroutine.app.GoalLineOverlayView
-                                android:id="@+id/weeklySleepGoalOverlay"
-                                android:layout_width="2000dp"
-                                android:layout_height="match_parent" />
+                        <com.dailyroutine.app.GoalLineOverlayView
+                            android:id="@+id/weeklySleepGoalOverlay"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginBottom="40dp" />
 
-                            <LinearLayout
-                                android:id="@+id/llWeeklySleepGraph"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:orientation="horizontal"
-                                android:padding="16dp"
-                                android:gravity="bottom"/>
-                        </RelativeLayout>
-                    </HorizontalScrollView>
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rvWeeklySleepGraph"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clipToPadding="false"
+                            android:paddingHorizontal="16dp"
+                            android:scrollbars="none"
+                            android:orientation="horizontal"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                    </FrameLayout>
 
                     <TextView
                         android:id="@+id/tvWeeklySleepWarning"

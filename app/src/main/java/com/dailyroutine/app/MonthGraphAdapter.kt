@@ -3,6 +3,7 @@ package com.dailyroutine.app
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +24,15 @@ data class BarData(
     val backgroundRes: Int? = null,
     val isDoubleBar: Boolean = false,
     val secondaryValueDisplay: String? = null,
-    val secondaryHeightPx: Int = 0
+    val secondaryHeightPx: Int = 0,
+    val secondaryColor: Int? = null,
+    val secondaryBackgroundRes: Int? = null,
+    val isSecondaryStacked: Boolean = false,
+    val secondaryBottomHeightPx: Int = 0,
+    val secondaryBottomColor: Int? = null,
+    val secondaryTopHeightPx: Int = 0,
+    val secondaryTopBackgroundRes: Int? = null,
+    val isEmpty: Boolean = false
 )
 
 // Simplified Bar Item for the Horizontal Layout
@@ -50,40 +59,92 @@ class MonthGraphAdapter(private val items: List<MonthData>) : RecyclerView.Adapt
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = bar.data.label
                 barView.findViewById<TextView>(R.id.tvBarDate).text = bar.data.date
 
+                val tvEmpty = barView.findViewById<TextView>(R.id.tvEmptyError)
+
                 if (bar.data.isDoubleBar) {
                     val tvSteps = barView.findViewById<TextView>(R.id.tvStepValue)
                     val tvHP = barView.findViewById<TextView>(R.id.tvHeartValue)
-                    tvSteps.text = bar.data.valueDisplay
-                    tvHP.text = bar.data.secondaryValueDisplay ?: "-"
+                    val barContainer = barView.findViewById<View>(R.id.llBarContainer)
+                    
+                    if (bar.data.isEmpty) {
+                        tvEmpty?.visibility = View.VISIBLE
+                        barContainer?.visibility = View.INVISIBLE
+                        tvSteps?.visibility = View.INVISIBLE
+                        tvHP?.visibility = View.INVISIBLE
+                    } else {
+                        tvEmpty?.visibility = View.GONE
+                        barContainer?.visibility = View.VISIBLE
+                        tvSteps?.visibility = View.VISIBLE
+                        tvHP?.visibility = View.VISIBLE
+                        tvSteps?.text = bar.data.valueDisplay
+                        tvHP?.text = bar.data.secondaryValueDisplay ?: "-"
+                    }
 
                     val vStep = barView.findViewById<View>(R.id.viewStepBar)
                     val vHeart = barView.findViewById<View>(R.id.viewHeartBar)
 
-                    val sParams = vStep.layoutParams as LinearLayout.LayoutParams
-                    sParams.height = bar.data.heightPx
-                    vStep.layoutParams = sParams
+                    tvSteps.setTextColor(bar.data.color)
+                    bar.data.secondaryColor?.let { tvHP.setTextColor(it) }
 
-                    val hParams = vHeart.layoutParams as LinearLayout.LayoutParams
-                    hParams.height = bar.data.secondaryHeightPx
-                    vHeart.layoutParams = hParams
+                    if (bar.data.backgroundRes != null) {
+                        vStep.setBackgroundResource(bar.data.backgroundRes)
+                        vStep.clipToOutline = true
+                    } else {
+                        vStep.setBackgroundColor(bar.data.color)
+                    }
+
+                    if (bar.data.isSecondaryStacked) {
+                        vHeart.setBackgroundResource(0)
+                        val vBottom = barView.findViewById<View>(R.id.viewBurnedBmr)
+                        val vTop = barView.findViewById<View>(R.id.viewBurnedActive)
+                        bar.data.secondaryBottomColor?.let { vBottom.setBackgroundColor(it) }
+                        bar.data.secondaryTopBackgroundRes?.let { vTop.setBackgroundResource(it) }
+                        vBottom.layoutParams.height = bar.data.secondaryBottomHeightPx
+                        vTop.layoutParams.height = bar.data.secondaryTopHeightPx
+                    } else {
+                        if (bar.data.secondaryBackgroundRes != null) {
+                            vHeart.setBackgroundResource(bar.data.secondaryBackgroundRes)
+                            vHeart.clipToOutline = true
+                        } else if (bar.data.secondaryColor != null) {
+                            vHeart.setBackgroundColor(bar.data.secondaryColor)
+                        }
+                    }
+
+                    vStep.layoutParams.height = bar.data.heightPx
+                    vHeart.layoutParams.height = bar.data.secondaryHeightPx
                 } else {
-                    barView.findViewById<TextView>(R.id.tvBarValue).text = bar.data.valueDisplay
+                    val tvValue = barView.findViewById<TextView>(R.id.tvBarValue)
                     val viewBar = barView.findViewById<View>(R.id.viewBar)
+                    
+                    if (bar.data.isEmpty) {
+                        tvEmpty?.visibility = View.VISIBLE
+                        viewBar?.visibility = View.INVISIBLE
+                        tvValue?.visibility = View.INVISIBLE
+                    } else {
+                        tvEmpty?.visibility = View.GONE
+                        viewBar?.visibility = View.VISIBLE
+                        tvValue?.visibility = View.VISIBLE
+                        tvValue?.text = bar.data.valueDisplay
+                    }
+
                     if (bar.data.backgroundRes != null) {
                         viewBar.setBackgroundResource(bar.data.backgroundRes)
+                        viewBar.clipToOutline = true
                     } else {
                         viewBar.setBackgroundColor(bar.data.color)
                     }
-                    val params = viewBar.layoutParams as LinearLayout.LayoutParams
-                    params.height = bar.data.heightPx
-                    viewBar.layoutParams = params
+                    viewBar.layoutParams.height = bar.data.heightPx
                 }
 
-                // Set weight to distribute evenly
+                // Set weight to distribute evenly, but allow for overflow if more than 5 weeks
                 val containerParams = barView.layoutParams as LinearLayout.LayoutParams
                 containerParams.width = 0
                 containerParams.weight = 1.0f
                 barView.layoutParams = containerParams
+                if (barView is ViewGroup) {
+                    barView.clipChildren = false
+                    barView.clipToPadding = false
+                }
 
                 llWeeks.addView(barView)
             }

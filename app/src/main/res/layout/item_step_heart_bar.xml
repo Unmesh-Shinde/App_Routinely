@@ -10,8 +10,9 @@
 
     <!-- Value labels container -->
     <LinearLayout
+        android:id="@+id/llTopLabels"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:orientation="vertical"
         android:gravity="center"
         android:layout_marginBottom="4dp">
@@ -40,36 +41,67 @@
     </LinearLayout>
 
     <!-- Side-by-side bars -->
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:id="@+id/barAreaContainer"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="bottom"
-        android:layout_gravity="center_horizontal">
+        android:layout_weight="1">
 
-        <View
-            android:id="@+id/viewStepBar"
-            android:layout_width="15dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="2dp"
-            android:background="@drawable/bg_step_bar" />
+        <TextView
+            android:id="@+id/tvEmptyError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="NO DATA"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:textColor="@color/textSecondary"
+            android:rotation="-90"
+            android:visibility="gone"/>
 
-        <View
-            android:id="@+id/viewHeartBar"
-            android:layout_width="15dp"
-            android:layout_height="0dp"
-            android:background="@drawable/bg_calorie_bar" />
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/llBarContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_gravity="center_horizontal">
+
+            <View
+                android:id="@+id/viewStepBar"
+                android:layout_width="15dp"
+                android:layout_height="0dp"
+                android:layout_marginEnd="2dp"
+                android:background="@drawable/bg_step_bar" />
+
+            <LinearLayout
+                android:id="@+id/viewHeartBar"
+                android:layout_width="15dp"
+                android:layout_height="0dp"
+                android:orientation="vertical"
+                android:gravity="bottom"
+                android:background="@drawable/bg_calorie_bar">
+                <View
+                    android:id="@+id/viewBurnedActive"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp" />
+                <View
+                    android:id="@+id/viewBurnedBmr"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvBarLabel"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:textSize="11sp"
         android:textStyle="bold"
         android:textColor="@color/textPrimary"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
         android:maxLines="1"
         android:includeFontPadding="false"
         tools:text="Mon"/>
@@ -77,10 +109,11 @@
     <TextView
         android:id="@+id/tvBarDate"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="16dp"
         android:textSize="11sp"
         android:textColor="@color/textSecondary"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="0dp"
+        android:gravity="center"
         android:maxLines="1"
         android:includeFontPadding="false"
         tools:text="12 Oct"/>

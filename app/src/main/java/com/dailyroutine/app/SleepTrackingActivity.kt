@@ -5,20 +5,29 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.*
+import android.widget.FrameLayout
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
 class SleepTrackingActivity : AppCompatActivity() {
 
     private lateinit var healthDataManager: HealthDataManager
+    private lateinit var weeklyAdapter: WeeklyGraphAdapter
     private var isConnected = false
-    private val sleepBarColor = 0xFF5C6BC0.toInt()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sleep_tracking)
         InsetHelper.applyTopPadding(findViewById(R.id.appBar))
@@ -27,6 +36,7 @@ class SleepTrackingActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, R.color.textPrimary))
         toolbar.setNavigationOnClickListener { finish() }
 
         healthDataManager = HealthDataManager(this)
@@ -88,7 +98,15 @@ class SleepTrackingActivity : AppCompatActivity() {
         findViewById<View>(R.id.tabLayoutSleep).visibility = View.VISIBLE
 
         setupTabs()
+        setupWeeklyGraph()
         refreshWeeklyView()
+    }
+
+    private fun setupWeeklyGraph() {
+        val rv = findViewById<RecyclerView>(R.id.rvWeeklySleepGraph)
+        rv.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        weeklyAdapter = WeeklyGraphAdapter()
+        rv.adapter = weeklyAdapter
     }
 
     private fun setupTabs() {
@@ -112,189 +130,204 @@ class SleepTrackingActivity : AppCompatActivity() {
     }
 
     private fun refreshWeeklyView() {
-        val container = findViewById<LinearLayout>(R.id.llWeeklySleepGraph)
-        container.removeAllViews()
-        val goalOverlay = findViewById<GoalLineOverlayView>(R.id.weeklySleepGoalOverlay)
-        goalOverlay.setGoalLines(
-            listOf(
-                GoalLineSpec(7.0, 12.0, "7h", sleepBarColor),
-                GoalLineSpec(8.0, 12.0, "8h goal", sleepBarColor)
-            )
-        )
+        lifecycleScope.launch {
+            val today = Calendar.getInstance()
+            val startRange = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1)) }
+            val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val metricsMap = healthDataManager.getMetricsMap(dateFormatter.format(startRange.time), dateFormatter.format(today.time))
 
-        val weekGroups = HistoryDateOrder.monthBoundedWeeklyGroups(HealthDataManager.SYNC_HISTORY_DAYS)
+            withContext(Dispatchers.Main) {
+                val sleepBarColor = ContextCompat.getColor(this@SleepTrackingActivity, R.color.graphSleep)
+                val sleepGoalLineColor = ContextCompat.getColor(this@SleepTrackingActivity, R.color.graphSleepGoalLine)
+                val goalOverlay = findViewById<GoalLineOverlayView>(R.id.weeklySleepGoalOverlay)
+                goalOverlay.visibility = View.VISIBLE
+                goalOverlay.setGoalLines(
+                    listOf(
+                        GoalLineSpec(7.0, 12.0, "7h", sleepGoalLineColor),
+                        GoalLineSpec(8.0, 12.0, "Ideal Sleep: 8h", sleepGoalLineColor)
+                    )
+                )
 
-        val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
-        val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
-        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+                val weekGroups = HistoryDateOrder.monthBoundedWeeklyGroups(HealthDataManager.SYNC_HISTORY_DAYS)
 
-        weekGroups.forEachIndexed { weekIndex, weekDates ->
-            weekDates.forEach { calendar ->
-                val dateKey = dateFormatter.format(calendar.time)
-                val sleepHours = healthDataManager.getHistoricalSleep(dateKey)
+                val dayLabelFormatter = SimpleDateFormat("EEE", Locale.US)
+                val dateBarFormatter = SimpleDateFormat("dd MMM", Locale.US)
 
-                val barView = android.view.LayoutInflater.from(this).inflate(R.layout.item_calorie_bar, container, false)
-                barView.findViewById<TextView>(R.id.tvBarLabel).text = dayLabelFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarDate).text = dateBarFormatter.format(calendar.time)
-                barView.findViewById<TextView>(R.id.tvBarValue).text = if (sleepHours > 0) "%.1fh".format(sleepHours) else "-"
+                val graphItems = mutableListOf<WeeklyGraphItem>()
 
-                val bar = barView.findViewById<View>(R.id.viewBar)
-                bar.setBackgroundColor(sleepBarColor)
-                val params = bar.layoutParams as LinearLayout.LayoutParams
-                params.height = (sleepHours * 250 / 12.0).toInt().let { dpToPx(it) }.coerceAtLeast(2)
-                bar.layoutParams = params
+                weekGroups.forEachIndexed { weekIndex, weekDates ->
+                    weekDates.forEach { calendar ->
+                        val dateKey = dateFormatter.format(calendar.time)
+                        val sleepHours = metricsMap[dateKey]?.sleepHours ?: healthDataManager.getHistoricalSleep(dateKey)
+                        val hasSignal = sleepHours > 0
 
-                container.addView(barView)
-            }
+                        val hPx = (sleepHours * 200.0 / 12.0).let { dpToPx(it.toInt()) }.coerceAtLeast(2)
 
-            if (weekIndex != weekGroups.lastIndex) {
-                val divider = View(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(dpToPx(3), dpToPx(180)).apply {
-                        setMargins(dpToPx(16), 0, dpToPx(16), dpToPx(40))
+                        graphItems.add(WeeklyGraphItem(
+                            dayLabel = dayLabelFormatter.format(calendar.time),
+                            dateLabel = dateBarFormatter.format(calendar.time),
+                            primaryValue = "%.1fh".format(sleepHours),
+                            primaryHeightPx = hPx,
+                            primaryColor = sleepBarColor,
+                            primaryBackgroundRes = R.drawable.bg_sleep_bar,
+                            hasSignal = hasSignal
+                        ))
                     }
-                    setBackgroundColor(0xFF303F9F.toInt())
-                }
-                container.addView(divider)
-            }
-        }
 
-        container.post {
-            val targetWidth = maxOf(container.width, container.measuredWidth, dpToPx(2000))
-            val params = goalOverlay.layoutParams
-            if (params.width != targetWidth) {
-                params.width = targetWidth
-                goalOverlay.layoutParams = params
+                    if (weekIndex != weekGroups.lastIndex) {
+                        graphItems.add(WeeklyGraphItem(
+                            dayLabel = "", dateLabel = "", primaryValue = "", primaryHeightPx = 0, primaryColor = 0, isDivider = true
+                        ))
+                    }
+                }
+
+                weeklyAdapter.submitList(graphItems)
             }
         }
     }
 
     private fun refreshMonthlyView() {
-        val rv = findViewById<RecyclerView>(R.id.rvMonthlySleep)
-        val monthDataList = mutableListOf<MonthData>()
-        
-        val today = Calendar.getInstance()
-        val oldestSyncedDay = Calendar.getInstance().apply {
-            add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
-        }
-        val calendar = oldestSyncedDay.clone() as Calendar
-        calendar.firstDayOfWeek = Calendar.MONDAY
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-
-        val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
-        val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
-        val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
-        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val deficitWeeks = mutableListOf<String>()
-
-        while (!calendar.after(today)) {
-            val monthName = monthFormatter.format(calendar.time)
-            val year = yearFormatter.format(calendar.time)
-            val currentMonth = calendar.get(Calendar.MONTH)
-            val isCurrentMonth = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) && currentMonth == today.get(Calendar.MONTH)
+        lifecycleScope.launch {
+            val today = Calendar.getInstance()
+            val startRange = (today.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1)) }
+            val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             
-            val barItems = mutableListOf<BarItem>()
-            var weekIndex = 1
+            // 🚀 BATCH FETCH
+            val metricsMap = healthDataManager.getMetricsMap(dateFormatter.format(startRange.time), dateFormatter.format(today.time))
 
-            if (isCurrentMonth) {
-                HistoryDateOrder.monthWeeksForMonthlyView(calendar, today).forEach { week ->
-                    var weekSum = 0.0
+            // 🚀 BACKGROUND PRE-CALCULATION
+            val monthDataList = mutableListOf<MonthData>()
+            val oldestSyncedDay = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, -(HealthDataManager.SYNC_HISTORY_DAYS - 1))
+            }
+            val calendar = oldestSyncedDay.clone() as Calendar
+            calendar.firstDayOfWeek = Calendar.MONDAY
+            calendar.set(Calendar.DAY_OF_MONTH, 1)
 
-                    if (week.isComplete) {
-                        week.dates.forEach { day ->
-                            val dateKey = dateFormatter.format(day.time)
-                            if (!day.before(oldestSyncedDay) && !day.after(today)) {
-                                weekSum += healthDataManager.getHistoricalSleep(dateKey)
+            val monthFormatter = SimpleDateFormat("MMMM", Locale.US)
+            val yearFormatter = SimpleDateFormat("yyyy", Locale.US)
+            val rangeFormatter = SimpleDateFormat("dd MMM", Locale.US)
+            val deficitWeeks = mutableListOf<String>()
+            val sleepBarColor = ContextCompat.getColor(this@SleepTrackingActivity, R.color.graphSleep)
+
+            while (!calendar.after(today)) {
+                val monthName = monthFormatter.format(calendar.time)
+                val year = yearFormatter.format(calendar.time)
+                val currentMonth = calendar.get(Calendar.MONTH)
+                val isCurrentMonth = calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) && currentMonth == today.get(Calendar.MONTH)
+
+                val barItems = mutableListOf<BarItem>()
+                var weekIndex = 1
+
+                if (isCurrentMonth) {
+                    HistoryDateOrder.monthWeeksForMonthlyView(calendar, today).forEach { week ->
+                        var weekSum = 0.0
+
+                        if (week.isComplete) {
+                            week.dates.forEach { day ->
+                                val dateKey = dateFormatter.format(day.time)
+                                if (!day.before(oldestSyncedDay) && !day.after(today)) {
+                                    weekSum += metricsMap[dateKey]?.sleepHours ?: healthDataManager.getHistoricalSleep(dateKey)
+                                }
                             }
+                        }
+
+                        if (week.isComplete && weekSum < 56.0 && weekSum > 0) {
+                            deficitWeeks.add("${rangeFormatter.format(week.start.time)} - ${rangeFormatter.format(week.end.time)}")
+                        }
+
+                        val height = (weekSum * 250 / 70.0).toInt().coerceIn(if (weekSum > 0) 2 else 0, 250)
+                        barItems.add(BarItem(BarData(
+                            label = "Week $weekIndex",
+                            date = rangeFormatter.format(week.start.time),
+                            valueDisplay = if (weekSum > 0) "%.0fh".format(weekSum) else "0h",
+                            heightPx = dpToPx(height),
+                            color = sleepBarColor,
+                            backgroundRes = R.drawable.bg_sleep_bar,
+                            isEmpty = weekSum <= 0
+                        )))
+                        weekIndex++
+                    }
+
+                    calendar.add(Calendar.MONTH, 1)
+                    calendar.set(Calendar.DAY_OF_MONTH, 1)
+                    if (barItems.isNotEmpty()) {
+                        monthDataList.add(MonthData(monthName, year, barItems, monthlySleepGoalLines()))
+                    }
+                    continue
+                }
+
+                while (calendar.get(Calendar.MONTH) == currentMonth) {
+                    var weekSum = 0.0
+                    val weekStart = calendar.time
+
+                    var isWeekOver = false
+                    while (!isWeekOver) {
+                        val dateKey = dateFormatter.format(calendar.time)
+                        if (!calendar.before(oldestSyncedDay) && !calendar.after(today)) {
+                            weekSum += metricsMap[dateKey]?.sleepHours ?: healthDataManager.getHistoricalSleep(dateKey)
+                        }
+
+                        val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+                        val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
+
+                        calendar.add(Calendar.DAY_OF_YEAR, 1)
+                        val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
+                        val isAfterToday = calendar.after(today)
+
+                        if (isSunday || isNewMonth || isAfterToday) {
+                            isWeekOver = true
                         }
                     }
 
-                    if (week.isComplete && weekSum < 56.0 && weekSum > 0) {
-                        deficitWeeks.add("${rangeFormatter.format(week.start.time)} - ${rangeFormatter.format(week.end.time)}")
+                    if (weekSum < 56.0 && weekSum > 0) {
+                        val endCal = calendar.clone() as Calendar
+                        endCal.add(Calendar.DAY_OF_YEAR, -1)
+                        deficitWeeks.add("${rangeFormatter.format(weekStart)} - ${rangeFormatter.format(endCal.time)}")
                     }
 
                     val height = (weekSum * 250 / 70.0).toInt().coerceIn(if (weekSum > 0) 2 else 0, 250)
+
                     barItems.add(BarItem(BarData(
                         label = "Week $weekIndex",
-                        date = rangeFormatter.format(week.start.time),
-                        valueDisplay = if (weekSum > 0) "%.0fh".format(weekSum) else "-",
+                        date = rangeFormatter.format(weekStart),
+                        valueDisplay = if (weekSum > 0) "%.0fh".format(weekSum) else "0h",
                         heightPx = dpToPx(height),
-                        color = sleepBarColor
+                        color = sleepBarColor,
+                        backgroundRes = R.drawable.bg_sleep_bar,
+                        isEmpty = weekSum <= 0
                     )))
                     weekIndex++
                 }
-
-                calendar.add(Calendar.MONTH, 1)
-                calendar.set(Calendar.DAY_OF_MONTH, 1)
                 if (barItems.isNotEmpty()) {
                     monthDataList.add(MonthData(monthName, year, barItems, monthlySleepGoalLines()))
                 }
-                continue
             }
 
-            while (calendar.get(Calendar.MONTH) == currentMonth) {
-                var weekSum = 0.0
-                val weekStart = calendar.time
-                
-                var isWeekOver = false
-                while (!isWeekOver) {
-                    val dateKey = dateFormatter.format(calendar.time)
-                    if (!calendar.before(oldestSyncedDay) && !calendar.after(today)) {
-                        weekSum += healthDataManager.getHistoricalSleep(dateKey)
-                    }
-                    
-                    val currentDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
-                    val isSunday = (currentDayOfWeek == Calendar.SUNDAY)
-                    
-                    calendar.add(Calendar.DAY_OF_YEAR, 1)
-                    val isNewMonth = (calendar.get(Calendar.MONTH) != currentMonth)
-                    val isAfterToday = calendar.after(today)
-                    
-                    if (isSunday || isNewMonth || isAfterToday) {
-                        isWeekOver = true
-                    }
+            withContext(Dispatchers.Main) {
+                val rv = findViewById<RecyclerView>(R.id.rvMonthlySleep)
+                rv.adapter = MonthGraphAdapter(monthDataList.asReversed())
+                rv.onFlingListener = null
+                androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
+
+                val warning = findViewById<TextView>(R.id.tvMonthlySleepWarning)
+                if (deficitWeeks.isNotEmpty()) {
+                    warning.visibility = View.VISIBLE
+                    warning.text = "⚠️ Target sleep (56h) not met in: ${deficitWeeks.asReversed().take(3).joinToString(", ")}..."
+                } else {
+                    warning.visibility = View.GONE
                 }
-                
-                if (weekSum < 56.0 && weekSum > 0) {
-                    val endCal = calendar.clone() as Calendar
-                    endCal.add(Calendar.DAY_OF_YEAR, -1)
-                    deficitWeeks.add("${rangeFormatter.format(weekStart)} - ${rangeFormatter.format(endCal.time)}")
-                }
-
-                val height = (weekSum * 250 / 70.0).toInt().coerceIn(2, 250)
-
-                barItems.add(BarItem(BarData(
-                    label = "Week $weekIndex",
-                    date = rangeFormatter.format(weekStart),
-                    valueDisplay = if (weekSum > 0) "%.0fh".format(weekSum) else "-",
-                    heightPx = dpToPx(height),
-                    color = sleepBarColor
-                )))
-                weekIndex++
             }
-            if (barItems.isNotEmpty()) {
-                monthDataList.add(MonthData(monthName, year, barItems, monthlySleepGoalLines()))
-            }
-        }
-
-        rv.adapter = MonthGraphAdapter(monthDataList.asReversed())
-        rv.onFlingListener = null
-        androidx.recyclerview.widget.PagerSnapHelper().attachToRecyclerView(rv)
-
-        val warning = findViewById<TextView>(R.id.tvMonthlySleepWarning)
-        if (deficitWeeks.isNotEmpty()) {
-            warning.visibility = View.VISIBLE
-            warning.text = "⚠️ Target sleep (56h) not met in: ${deficitWeeks.asReversed().take(3).joinToString(", ")}..."
-        } else {
-            warning.visibility = View.GONE
         }
     }
 
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 
     private fun monthlySleepGoalLines(): List<GoalLineSpec> {
+        val sleepGoalLineColor = ContextCompat.getColor(this, R.color.graphSleepGoalLine)
         return listOf(
-            GoalLineSpec(49.0, 70.0, "49h", sleepBarColor),
-            GoalLineSpec(56.0, 70.0, "56h goal", sleepBarColor)
+            GoalLineSpec(49.0, 70.0, "49h", sleepGoalLineColor),
+            GoalLineSpec(56.0, 70.0, "Ideal Sleep: 56h", sleepGoalLineColor)
         )
     }
 }

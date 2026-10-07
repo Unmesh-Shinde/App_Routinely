@@ -54,27 +54,31 @@ object WellnessScoreManager {
         }
 
         // If no data is logged at all, return 0
-        if (activeFactors.isEmpty()) return 0
+        if (activeFactors.isEmpty()) {
+            android.util.Log.d("WellnessScore", "No active factors found")
+            return 0
+        }
 
         val totalActual = activeFactors.sumOf { it.first }
         val totalPossibleWeight = activeFactors.sumOf { it.third }
 
-        // Rescale to 100%
-        val finalScore = (totalActual / totalPossibleWeight) * 100.0
+        // Rescale to 10
+        val finalScore = (totalActual / totalPossibleWeight) * 10.0
+        android.util.Log.d("WellnessScore", "Steps: $steps | Weight: $prefStepsWeight | Possible: $totalPossibleWeight | Actual: $totalActual | Final: $finalScore")
 
-        return finalScore.toInt().coerceIn(0, 100)
+        return Math.round(finalScore).toInt().coerceIn(0, 10)
     }
 
     fun saveDailyScore(context: Context, date: String, score: Int) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
-            .putInt(KEY_SCORE_PREFIX + date, score.coerceIn(0, 100))
+            .putInt(KEY_SCORE_PREFIX + date, score.coerceIn(0, 10))
             .apply()
     }
 
     fun getSavedDailyScore(context: Context, date: String): Int? {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val key = KEY_SCORE_PREFIX + date
-        return if (prefs.contains(key)) prefs.getInt(key, 0).coerceIn(0, 100) else null
+        return if (prefs.contains(key)) prefs.getInt(key, 0).coerceIn(0, 10) else null
     }
 }

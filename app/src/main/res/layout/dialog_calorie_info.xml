@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/calorie_calc_title"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/textPrimary"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/calorie_calc_formula"
+        android:textSize="14sp"
+        android:textStyle="italic"
+        android:textColor="@color/healthCalories"
+        android:layout_marginBottom="24dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Intake Calories" android:textColor="@color/textSecondary"/>
+        <TextView android:id="@+id/tvDialogIntake" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kcal" android:textStyle="bold" android:textColor="@color/textPrimary"/>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="12dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Maintenance (BMR)" android:textColor="@color/textSecondary"/>
+        <TextView android:id="@+id/tvDialogBmr" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kcal" android:textStyle="bold" android:textColor="@color/graphCaloriesMaintenance"/>
+    </LinearLayout>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/calorie_calc_bmr_desc" android:textSize="11sp" android:textColor="@color/textSecondary" android:layout_marginBottom="12dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Active Burned" android:textColor="@color/textSecondary"/>
+        <TextView android:id="@+id/tvDialogActive" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kcal" android:textStyle="bold" android:textColor="@color/graphCaloriesBurned"/>
+    </LinearLayout>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/calorie_calc_active_desc" android:textSize="11sp" android:textColor="@color/textSecondary" android:layout_marginBottom="12dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="4dp">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Digestion Cost (TEF)" android:textColor="@color/textSecondary"/>
+        <TextView android:id="@+id/tvDialogTef" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kcal" android:textStyle="bold" android:textColor="@color/healthNutrition"/>
+    </LinearLayout>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Energy your body uses to process the food you eat (approx. 10% of intake)." android:textSize="11sp" android:textColor="@color/textSecondary" android:layout_marginBottom="12dp"/>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginBottom="12dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Total Burned" android:textStyle="bold" android:textColor="@color/textPrimary"/>
+        <TextView android:id="@+id/tvDialogTotalBurn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kcal" android:textStyle="bold" android:textColor="@color/healthWorkout"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/primaryLight"
+        android:padding="12dp">
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Net Balance" android:textStyle="bold" android:textColor="@color/primary"/>
+        <TextView android:id="@+id/tvDialogNet" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kcal" android:textStyle="bold" android:textColor="@color/primary"/>
+    </LinearLayout>
+
+</LinearLayout>

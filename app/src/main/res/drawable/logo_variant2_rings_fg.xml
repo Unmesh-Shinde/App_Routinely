@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer Ring Track (Indigo Habits) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,24 A30,30 0 1,1 53.9,24"
+        android:strokeColor="#1E2244"
+        android:strokeWidth="6" />
+    <!-- Outer Ring Progress Fill (Indigo 75%) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,24 A30,30 0 1,1 24,54"
+        android:strokeColor="#818CF8"
+        android:strokeLineCap="round"
+        android:strokeWidth="6" />
+
+    <!-- Middle Ring Track (Fresh Mint Nutrition) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,33 A21,21 0 1,1 53.9,33"
+        android:strokeColor="#102E23"
+        android:strokeWidth="6" />
+    <!-- Middle Ring Progress Fill (Fresh Mint 85%) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,33 A21,21 0 1,1 33,54"
+        android:strokeColor="#34D399"
+        android:strokeLineCap="round"
+        android:strokeWidth="6" />
+
+    <!-- Inner Ring Track (Sunset Orange Movement) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,42 A12,12 0 1,1 53.9,42"
+        android:strokeColor="#2E1B10"
+        android:strokeWidth="6" />
+    <!-- Inner Ring Progress Fill (Sunset Orange 65%) -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,42 A12,12 0 1,0 66,54"
+        android:strokeColor="#FB923C"
+        android:strokeLineCap="round"
+        android:strokeWidth="6" />
+
+    <!-- Center Streak Core Spark (Amber Gold) -->
+    <path
+        android:fillColor="#F59E0B"
+        android:pathData="M54,50 L55.2,52.8 L58,54 L55.2,55.2 L54,58 L52.8,55.2 L50,54 L52.8,52.8 Z" />
+</vector>

@@ -13,6 +13,7 @@ object AppLockCoordinator : Application.ActivityLifecycleCallbacks {
 	private var lastBackgroundAtMs = 0L
 	private var authenticatedForSession = false
 	private var lockLaunchInProgress = false
+	private var configurationChangeInProgress = false
 
 	fun markUnlocked() {
 		authenticatedForSession = true
@@ -33,8 +34,9 @@ object AppLockCoordinator : Application.ActivityLifecycleCallbacks {
 	override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit
 
 	override fun onActivityStarted(activity: Activity) {
-		val wasBackgrounded = startedActivities == 0
+		val wasBackgrounded = startedActivities == 0 && !configurationChangeInProgress
 		startedActivities += 1
+		configurationChangeInProgress = false
 
 		if (wasBackgrounded && UserPreferencesStore.isSignedUp(activity) && UserSettingsStore.isAppLockEnabled(activity)) {
 			val backgroundDuration = if (lastBackgroundAtMs > 0L) {
@@ -60,7 +62,8 @@ object AppLockCoordinator : Application.ActivityLifecycleCallbacks {
 
 	override fun onActivityStopped(activity: Activity) {
 		startedActivities = (startedActivities - 1).coerceAtLeast(0)
-		if (startedActivities == 0) {
+		configurationChangeInProgress = activity.isChangingConfigurations
+		if (startedActivities == 0 && !configurationChangeInProgress) {
 			lastBackgroundAtMs = SystemClock.elapsedRealtime()
 		}
 	}

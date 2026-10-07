@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Sunburst Radial Rays -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M54,24 V32 M54,76 V84 M24,54 H32 M76,54 H84 M33,33 L39,39 M69,69 L75,75 M33,75 L39,69 M69,39 L75,33"
+        android:strokeColor="#8B5CF6"
+        android:strokeLineCap="round"
+        android:strokeWidth="4" />
+
+    <!-- Lotus Petal - Left (Sky Blue) -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M54,54 C42,54 36,44 42,38 C48,38 54,46 54,54 Z" />
+
+    <!-- Lotus Petal - Right (Rose Pink) -->
+    <path
+        android:fillColor="#F43F5E"
+        android:pathData="M54,54 C66,54 72,44 66,38 C60,38 54,46 54,54 Z" />
+
+    <!-- Lotus Petal - Center (Mint Green) -->
+    <path
+        android:fillColor="#34D399"
+        android:pathData="M54,54 C48,42 54,32 54,32 C54,32 60,42 54,54 Z" />
+
+    <!-- Center Balance Core Spark -->
+    <path
+        android:fillColor="#FBBF24"
+        android:pathData="M54,50 L55.2,52.8 L58,54 L55.2,55.2 L54,58 L52.8,55.2 L50,54 L52.8,52.8 Z" />
+</vector>

@@ -1,36 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand -->
+    <!-- Brand & M3 Roles -->
     <color name="primary">#5B5FEF</color>          <!-- Indigo/Purple -->
     <color name="primaryDark">#3F41C2</color>
     <color name="primaryLight">#EEF0FF</color>
     <color name="accent">#7E57C2</color>
 
-    <!-- Health Palette -->
-    <color name="healthNutrition">#4CAF50</color>  <!-- Soft Green -->
-    <color name="healthWorkout">#FF9800</color>    <!-- Orange -->
-    <color name="healthSleep">#42A5F5</color>      <!-- Blue -->
-    <color name="healthWalking">#26A69A</color>    <!-- Teal -->
-    <color name="healthWeight">#78909C</color>
-    <color name="healthCalories">#EC407A</color>
-    <color name="healthSync">#009688</color>
+    <color name="m3_primary_container">#D9E2FF</color>
+    <color name="m3_on_primary_container">#001945</color>
+    <color name="m3_secondary_container">#E1E2EC</color>
+    <color name="m3_on_secondary_container">#191C23</color>
+    <color name="m3_surface_container">#F3F3F7</color>
+    <color name="m3_surface_container_high">#ECECED</color>
+    <color name="m3_premium_container">#EFF1F3</color>
+    <color name="m3_premium_stroke">#DDE1E6</color>
+    <color name="m3_premium_surface">#F3F3F7</color>
+    <color name="m3_premium_icon_bg">#0D000000</color> <!-- 5% Black for subtle icon backdrops -->
+    <color name="m3_premium_label">#5F6368</color>
+
+    <!-- Category Palette -->
+    <color name="healthNutrition">#4CAF50</color>  <!-- Green -->
+    <color name="healthWorkout">#FB8C00</color>    <!-- Orange -->
+    <color name="healthWalking">#2196F3</color>    <!-- Blue -->
+    <color name="healthCalories">#F44336</color>   <!-- Red -->
+    <color name="calorieStatusOrange">#FB8C00</color>
+    <color name="calorieStatusGreen">#4CAF50</color>
+    <color name="calorieStatusRed">#F44336</color>
+    <color name="healthSleep">#5E35B1</color>      <!-- Deep Purple -->
+    <color name="healthWeight">#009688</color>     <!-- Teal -->
+    <color name="healthSync">#E91E63</color>       <!-- Pink -->
+    <color name="healthReminder">#FFC107</color>   <!-- Amber -->
+    <color name="healthProfile">#546E7A</color>    <!-- Premium Blue Grey -->
+    <color name="healthWellness">#00C853</color>   <!-- Emerald -->
+    <color name="healthHydration">#03A9F4</color>  <!-- Water Blue -->
+    <color name="textOnReminder">#2D2100</color>
+    <color name="textOnProfile">#FFFFFF</color>
+    <color name="textOnWellness">#00351C</color>
+    <color name="headerProfileAvatarBg">#55607D8B</color>
+    <color name="headerProfileAvatarStroke">#99FFFFFF</color>
+
+    <!-- Overhauled Category Color Palette -->
+    <color name="nutritionMacros">#93C572</color>      <!-- Pistachio -->
+    <color name="nutritionVitamins">#ED3293</color>     <!-- Pink -->
+    <color name="nutritionMinerals">#0096FF</color>     <!-- Bright Blue -->
+    <color name="nutritionAminoAcids">#FFBF00</color>   <!-- Amber -->
+    <color name="nutritionAntioxidants">#00F0A8</color> <!-- Spring Green -->
+    <color name="nutritionOthers">#5F9EA0</color>       <!-- Cadet Blue -->
+    <color name="nutritionWarning">#DC2626</color>      <!-- Warning Red -->
 
     <!-- Dashboard calendar strips -->
-    <color name="nutritionHeaderBg">#C62828</color>
-    <color name="nutritionDayStripBg">#FFF7F7</color>
-    <color name="nutritionLegendBg">#FFE7E7</color>
-    <color name="nutritionLegendText">#5D0000</color>
+    <color name="nutritionHeaderBg">#4CAF50</color>
+    <color name="nutritionDayStripBg">#F1FAF2</color>
+    <color name="nutritionLegendBg">#E8F5E9</color>
+    <color name="nutritionLegendText">#1B5E20</color>
+    <color name="nutritionTemplateMarker">#1B5E20</color>
+    <color name="nutritionMealMarker">#4CAF50</color>
+    <color name="nutritionSummaryBg">#EAF7EA</color>
     <color name="workoutHeaderBg">#E65100</color>
     <color name="workoutDayStripBg">#FFF8EF</color>
     <color name="workoutLegendBg">#FFE9CC</color>
     <color name="workoutLegendText">#4A1800</color>
 
     <!-- Backgrounds -->
-    <color name="bgPage">#F5F5F7</color>
-    <color name="cardBg">#FFFFFF</color>
+    <color name="bgPage">#DFE1E5</color>
+    <color name="cardBg">#E8EAED</color>
     <color name="cardStroke">#E0E0E0</color>
     <color name="fieldBg">#F0F0F6</color>
     <color name="fieldStroke">#D0D0E0</color>
+
+    <!-- Professional dashboard surfaces -->
+    <color name="surfaceWellness">#E8FBEF</color>
+    <color name="surfaceReminder">#FFF8DF</color>
+    <color name="surfaceHydration">#EAF7FF</color>
+    <color name="surfaceNutrition">#EAF7EA</color>
+    <color name="surfaceWorkout">#FFF3E0</color>
+    <color name="surfaceWalking">#EAF4FF</color>
+    <color name="surfaceSleep">#F0ECFF</color>
+    <color name="surfaceCalories">#FFEBEE</color>
+    <color name="surfaceWeight">#E6F6F3</color>
+    <color name="surfaceHealthSync">#FCE4EC</color>
+    <color name="surfaceProfile">#F0F5F7</color>
+    <color name="profileMetricPrimary">#00897B</color>
+    <color name="profileMetricSecondary">#EC407A</color>
+    <color name="profileMetricSubtext">#EAF2F5</color>
+
+    <!-- Graph colors -->
+    <color name="graphCaloriesIntake">#4CAF50</color>
+    <color name="graphCaloriesIntakeEnd">#81C784</color>
+    <color name="graphCaloriesBurned">#F44336</color>
+    <color name="graphCaloriesBurnedEnd">#EF5350</color>
+    <color name="graphCaloriesMaintenance">#90A4AE</color>
+    <color name="graphSteps">#2196F3</color>
+    <color name="graphStepsEnd">#90CAF9</color>
+    <color name="graphDistance">#1565C0</color>
+    <color name="graphSleep">#5E35B1</color>
+    <color name="graphSleepGoalLine">#7E57C2</color>
+    <color name="graphSleepGoalText">#4527A0</color>
+    <color name="graphWeight">#009688</color>
+    <color name="graphWeightEnd">#80CBC4</color>
+    <color name="graphWellness">#00C853</color>
+    <color name="graphWellnessEnd">#69F0AE</color>
+    <color name="dialogHeaderText">#FFFFFF</color>
 
     <!-- Text -->
     <color name="textPrimary">#1A1A2E</color>
@@ -49,18 +119,18 @@
     <color name="chipCustom">#BDBDBD</color>
 
     <!-- Vivid icon colors -->
-    <color name="iconNutrition">#00A86B</color>
+    <color name="iconNutrition">#4CAF50</color>
     <color name="iconBreakfast">#F57C00</color>
     <color name="iconLunch">#2E7D32</color>
     <color name="iconDinner">#8E24AA</color>
     <color name="iconSnack">#EC407A</color>
-    <color name="iconWorkout">#FF6D00</color>
+    <color name="iconWorkout">#FB8C00</color>
     <color name="iconHydration">#0091EA</color>
     <color name="iconSleep">#5E35B1</color>
-    <color name="iconWalking">#00A896</color>
-    <color name="iconWeight">#455A64</color>
-    <color name="iconCalories">#D81B60</color>
-    <color name="iconReminder">#5B5FEF</color>
+    <color name="iconWalking">#2196F3</color>
+    <color name="iconWeight">#009688</color>
+    <color name="iconCalories">#F44336</color>
+    <color name="iconReminder">#FFC107</color>
     <color name="iconMeditation">#00897B</color>
     <color name="iconTask">#3949AB</color>
     <color name="iconHome">#EF6C00</color>
@@ -70,15 +140,33 @@
 
     <!-- Icon badge backgrounds -->
     <color name="badgeGeneric">#EAF2FF</color>
-    <color name="badgeNutrition">#D9FBE8</color>
+    <color name="badgeNutrition">#DFF5E1</color>
     <color name="badgeBreakfast">#FFF2CC</color>
     <color name="badgeDinner">#F2E4FF</color>
-    <color name="badgeWorkout">#FFF0D6</color>
+    <color name="badgeWorkout">#FFE7C7</color>
     <color name="badgeHydration">#DDF4FF</color>
-    <color name="badgeSleep">#EEE7FF</color>
-    <color name="badgeWalking">#D8FFF5</color>
-    <color name="badgeWeight">#ECEFF1</color>
-    <color name="badgeCalories">#FFE2EF</color>
+    <color name="badgeSleep">#EDE7F6</color>
+    <color name="badgeWalking">#E3F2FD</color>
+    <color name="badgeWeight">#DFF4F1</color>
+    <color name="badgeCalories">#FFDEDC</color>
     <color name="badgeSnack">#FFE1EF</color>
-    <color name="badgeReminder">#E8EAFF</color>
+    <color name="badgeReminder">#FFF3CD</color>
+    <color name="badgeMeditation">#D7FFF4</color>
+    <color name="badgeTask">#E4EAFF</color>
+    <color name="badgeHome">#FFF1D9</color>
+    <color name="badgeCalendar">#F4E2FF</color>
+    <color name="badgeProfile">#DCE7EC</color>
+    <color name="badgeWellness">#D9FBE8</color>
+
+    <!-- High Contrast Strokes for Cards/Buttons -->
+    <color name="strokeNutrition">#2E7D32</color>
+    <color name="strokeWorkout">#BF360C</color>
+    <color name="strokeWalking">#1565C0</color>
+    <color name="strokeCalories">#B71C1C</color>
+    <color name="strokeSleep">#4527A0</color>
+    <color name="strokeWeight">#00695C</color>
+    <color name="strokeSync">#880E4F</color>
+    <color name="strokeReminder">#FF8F00</color>
+    <color name="strokeWellness">#1B5E20</color>
+    <color name="strokeHydration">#0277BD</color>
 </resources>

@@ -4,26 +4,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="6dp"
-    app:cardCornerRadius="12dp"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="20dp"
     app:cardElevation="2dp"
     app:cardBackgroundColor="@color/cardBg"
-    app:strokeWidth="0dp">
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/cardStroke">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp"
+        android:padding="13dp"
         android:gravity="center_vertical">
 
         <ImageView
             android:id="@+id/tvEmoji"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="@drawable/bg_emoji_badge"
             android:contentDescription="Meal type"
-            android:padding="10dp"
+            android:padding="12dp"
             app:srcCompat="@drawable/ic_meal"/>
 
         <!-- Text block -->
@@ -32,14 +33,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:layout_marginEnd="6dp">
 
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/textPrimary"
                 android:maxLines="1"
@@ -53,7 +54,7 @@
                 android:textColor="@color/textSecondary"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:layout_marginTop="2dp"/>
+                android:layout_marginTop="3dp"/>
         </LinearLayout>
 
         <TextView

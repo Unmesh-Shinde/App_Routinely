@@ -1,7 +1,10 @@
 ﻿package com.dailyroutine.app
 
 import android.app.AlertDialog
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
 import android.text.InputFilter
 import android.text.InputType
 import android.widget.EditText
@@ -10,10 +13,16 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsActivity : AppCompatActivity() {
 	private lateinit var switchAppLock: SwitchMaterial
@@ -21,8 +30,11 @@ class SettingsActivity : AppCompatActivity() {
 	private lateinit var radioMethodPin: RadioButton
 	private lateinit var radioMethodBiometric: RadioButton
 	private lateinit var btnChangePin: MaterialButton
+	private lateinit var btnClearLoggedLists: MaterialButton
+	private lateinit var btnClearDataAndCache: MaterialButton
 
 	override fun onCreate(savedInstanceState: Bundle?) {
+		enableEdgeToEdge()
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_settings)
 		InsetHelper.applyTopPadding(findViewById(R.id.appBar))
@@ -31,6 +43,7 @@ class SettingsActivity : AppCompatActivity() {
 		val toolbar = findViewById<Toolbar>(R.id.toolbar)
 		setSupportActionBar(toolbar)
 		supportActionBar?.setDisplayHomeAsUpEnabled(true)
+		toolbar.navigationIcon?.setTint(ContextCompat.getColor(this, R.color.textPrimary))
 		toolbar.setNavigationOnClickListener { finish() }
 
 		switchAppLock = findViewById(R.id.switchAppLock)
@@ -38,10 +51,128 @@ class SettingsActivity : AppCompatActivity() {
 		radioMethodPin = findViewById(R.id.radioUnlockPin)
 		radioMethodBiometric = findViewById(R.id.radioUnlockBiometric)
 		btnChangePin = findViewById(R.id.btnChangePin)
+		btnClearLoggedLists = findViewById(R.id.btnClearLoggedLists)
+		btnClearDataAndCache = findViewById(R.id.btnClearDataAndCache)
 
 		setupThemeSettings()
 		setupLockSettings()
+		setupClearData()
 		updateLockSummary()
+	}
+
+	private fun setupClearData() {
+		val options = arrayOf(
+			"Nutrition Data (Meals & Templates)",
+			"Workout Data (Exercises & Templates)",
+			"Health Logs & Progress",
+			"Reminders & Alarms"
+		)
+
+		btnClearLoggedLists.setOnClickListener {
+			val checkedItems = booleanArrayOf(false, false, false, false)
+			AlertDialog.Builder(this)
+				.setTitle("Clear Logged Lists")
+				.setMultiChoiceItems(options, checkedItems) { _, which, isChecked ->
+					checkedItems[which] = isChecked
+				}
+				.setPositiveButton("Clear Selected") { _, _ ->
+					if (checkedItems.none { it }) {
+						Toast.makeText(this, "No data selected to clear.", Toast.LENGTH_SHORT).show()
+						return@setPositiveButton
+					}
+					
+					AlertDialog.Builder(this)
+						.setTitle("Clear Logged Lists?")
+						.setMessage("Selected logged entries will be permanently deleted. Your AI calorie and workout estimation cache will be preserved.")
+						.setPositiveButton("Delete") { _, _ ->
+							clearSelectedData(checkedItems, includeCache = false)
+						}
+						.setNegativeButton("Cancel", null)
+						.show()
+				}
+				.setNegativeButton("Cancel", null)
+				.show()
+		}
+
+		btnClearDataAndCache.setOnClickListener {
+			val checkedItems = booleanArrayOf(false, false, false, false)
+			AlertDialog.Builder(this)
+				.setTitle("Clear Lists & AI Cache")
+				.setMultiChoiceItems(options, checkedItems) { _, which, isChecked ->
+					checkedItems[which] = isChecked
+				}
+				.setPositiveButton("Clear Selected") { _, _ ->
+					if (checkedItems.none { it }) {
+						Toast.makeText(this, "No data selected to clear.", Toast.LENGTH_SHORT).show()
+						return@setPositiveButton
+					}
+					
+					val warningMessageHtml = "<font color='#D32F2F'><b>WARNING:</b></font> This action will <font color='#D32F2F'><b>PERMANENTLY ERASE</b></font> all your logged meals, custom nutrition records, and <font color='#D32F2F'><b>AI</b></font> smart cache. This data <font color='#D32F2F'><b>CANNOT BE RECOVERED</b></font> once deleted. Are you absolutely sure you want to proceed?"
+					val formattedMessage = Html.fromHtml(warningMessageHtml, Html.FROM_HTML_MODE_LEGACY)
+
+					AlertDialog.Builder(this)
+						.setTitle("Permanent Data Deletion Warning")
+						.setMessage(formattedMessage)
+						.setPositiveButton("Delete Everything Selected") { _, _ ->
+							clearSelectedData(checkedItems, includeCache = true)
+						}
+						.setNegativeButton("Cancel", null)
+						.show()
+				}
+				.setNegativeButton("Cancel", null)
+				.show()
+		}
+	}
+
+	private fun clearSelectedData(checkedItems: BooleanArray, includeCache: Boolean) {
+		val planManager = PlanManager(this)
+		val clearNutrition = checkedItems[0]
+		val clearWorkouts = checkedItems[1]
+		val clearHealth = checkedItems[2]
+		val clearReminders = checkedItems[3]
+
+		if (clearNutrition) {
+			planManager.clearDietData()
+			if (includeCache) {
+				CalorieSearchEngine.clearCache(this)
+			}
+		}
+
+		if (clearWorkouts) {
+			planManager.clearWorkoutData()
+		}
+
+		if (clearReminders) {
+			val reminderManager = ReminderManager(this)
+			val reminders = reminderManager.getAllReminders()
+			for (reminder in reminders) {
+				reminderManager.deleteReminder(reminder)
+			}
+			getSharedPreferences("reminders_pref", MODE_PRIVATE).edit().clear().apply()
+		}
+
+		if (includeCache) {
+			getSharedPreferences("calorie_cache_pref", MODE_PRIVATE).edit().clear().apply()
+			getSharedPreferences("workout_met_cache_pref", MODE_PRIVATE).edit().clear().apply()
+		}
+
+		if (clearHealth) {
+			getSharedPreferences("health_data_pref", MODE_PRIVATE).edit().clear().apply()
+			getSharedPreferences("routine_progress_pref", MODE_PRIVATE).edit().clear().apply()
+			getSharedPreferences("wellness_score_pref", MODE_PRIVATE).edit().clear().apply()
+			getSharedPreferences("HealthBackfillPrefs", MODE_PRIVATE).edit().clear().apply()
+
+			CoroutineScope(Dispatchers.IO).launch {
+				RoutinelyDatabase.getInstance(this@SettingsActivity).clearAllTables()
+				withContext(Dispatchers.Main) {
+					val message = if (includeCache) "Selected data & AI cache cleared successfully." else "Selected logged lists cleared successfully."
+					Toast.makeText(this@SettingsActivity, message, Toast.LENGTH_SHORT).show()
+				}
+			}
+		} else {
+			val message = if (includeCache) "Selected data & AI cache cleared successfully." else "Selected logged lists cleared successfully."
+			Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+		}
 	}
 
 	private fun setupThemeSettings() {

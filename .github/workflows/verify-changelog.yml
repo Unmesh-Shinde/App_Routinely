@@ -1,0 +1,19 @@
+name: Verify changelog
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  changelog:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require changelog entry for project changes
+        shell: pwsh
+        run: ./tools/verify-changelog.ps1 -BaseRef "${{ github.event.pull_request.base.sha }}"

@@ -31,20 +31,21 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp">
+        android:layout_height="280dp">
 
         <com.dailyroutine.app.GoalLineOverlayView
             android:id="@+id/monthGoalOverlay"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="200dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="40dp" />
 
         <LinearLayout
             android:id="@+id/llWeeksContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:gravity="bottom"
-            android:weightSum="5"/>
+            android:gravity="bottom"/>
     </FrameLayout>
 
 </LinearLayout>

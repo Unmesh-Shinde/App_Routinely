@@ -52,6 +52,13 @@ object ReminderDialogHelper {
         val btnPickTone       = v.findViewById<View>(R.id.btnPickTone)
 
         var selectedToneUri: String? = existing?.soundUri
+        DialogInputHelper.hideKeyboardOnDone(
+            etTitle,
+            etDishType,
+            etIngredients,
+            etIntervalMin,
+            etDayOfMonth
+        )
 
         val cbDays = listOf(
             v.findViewById<SwitchCompat>(R.id.swMon),
@@ -98,6 +105,7 @@ object ReminderDialogHelper {
         activeToneUpdater = ::updateToneLabel
 
         btnPickTone.setOnClickListener {
+            DialogInputHelper.hideKeyboard(v)
             onTonePickerRequested?.invoke(selectedToneUri)
         }
 
@@ -128,13 +136,16 @@ object ReminderDialogHelper {
             override fun onNothingSelected(p: AdapterView<*>?) {}
         }
 
-        btnPickTime.setOnClickListener {
+        fun showReminderTimePicker() {
+            DialogInputHelper.hideKeyboard(v)
             TimePickerDialog(context, { _, h, m ->
                 selHour = h
                 selMin = m
                 refreshTimeLabel()
             }, selHour, selMin, false).show()
         }
+        btnPickTime.setOnClickListener { showReminderTimePicker() }
+        DialogInputHelper.makeTimeLabelClickable(tvTime, "Change reminder time") { showReminderTimePicker() }
 
         fun syncVisibility() {
             val isFixed = rbFixed.isChecked
@@ -157,6 +168,7 @@ object ReminderDialogHelper {
         dialog.show()
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            DialogInputHelper.hideKeyboard(v)
             val title = etTitle.text.toString().trim()
             if (title.isEmpty()) {
                 etTitle.error = "Required"

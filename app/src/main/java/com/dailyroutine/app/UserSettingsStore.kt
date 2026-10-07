@@ -5,6 +5,8 @@ import android.util.Base64
 import androidx.appcompat.app.AppCompatDelegate
 import java.security.MessageDigest
 import java.security.SecureRandom
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 object UserSettingsStore {
 	const val THEME_SYSTEM = "system"
@@ -27,6 +29,10 @@ object UserSettingsStore {
 	private const val KEY_PIN_SALT = "pin_salt"
 	private const val KEY_PIN_HASH = "pin_hash"
 	private const val KEY_PIN_HINT = "pin_hint"
+	private const val KEY_PIN_ALGORITHM = "pin_algorithm"
+	private const val PIN_ALGORITHM_PBKDF2 = "pbkdf2_sha256_v1"
+	private const val PBKDF2_ITERATIONS = 180_000
+	private const val PBKDF2_KEY_LENGTH_BITS = 256
 
 	private fun prefs(context: Context) = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
@@ -68,13 +74,14 @@ object UserSettingsStore {
 	fun setManualPin(context: Context, pin: String, hint: String = ""): Boolean {
 		if (!pin.matches(Regex("\\d{6}"))) return false
 
-		val salt = ByteArray(16).also { SecureRandom().nextBytes(it) }
+		val salt = ByteArray(32).also { SecureRandom().nextBytes(it) }
 		val saltText = Base64.encodeToString(salt, Base64.NO_WRAP)
-		val hash = hashPin(pin, saltText)
+		val hash = hashPinPbkdf2(pin, saltText)
 		prefs(context).edit()
 			.putString(KEY_PIN_SALT, saltText)
 			.putString(KEY_PIN_HASH, hash)
 			.putString(KEY_PIN_HINT, hint.trim())
+			.putString(KEY_PIN_ALGORITHM, PIN_ALGORITHM_PBKDF2)
 			.apply()
 		return true
 	}
@@ -83,14 +90,48 @@ object UserSettingsStore {
 
 	fun verifyManualPin(context: Context, pin: String): Boolean {
 		if (!pin.matches(Regex("\\d{6}"))) return false
-		val savedSalt = prefs(context).getString(KEY_PIN_SALT, null) ?: return false
-		val savedHash = prefs(context).getString(KEY_PIN_HASH, null) ?: return false
-		return hashPin(pin, savedSalt) == savedHash
+		val settings = prefs(context)
+		val savedSalt = settings.getString(KEY_PIN_SALT, null) ?: return false
+		val savedHash = settings.getString(KEY_PIN_HASH, null) ?: return false
+		val algorithm = settings.getString(KEY_PIN_ALGORITHM, null)
+
+		return if (algorithm == PIN_ALGORITHM_PBKDF2) {
+			constantTimeBase64Equals(hashPinPbkdf2(pin, savedSalt), savedHash)
+		} else {
+			val verifiedLegacyPin = constantTimeBase64Equals(hashPinLegacySha256(pin, savedSalt), savedHash)
+			if (verifiedLegacyPin) {
+				// Migrate existing SHA-256 PINs after a successful unlock so users are not locked out.
+				setManualPin(context, pin, getManualPinHint(context))
+			}
+			verifiedLegacyPin
+		}
 	}
 
-	private fun hashPin(pin: String, salt: String): String {
+	private fun hashPinPbkdf2(pin: String, salt: String): String {
+		val saltBytes = Base64.decode(salt, Base64.NO_WRAP)
+		val spec = PBEKeySpec(pin.toCharArray(), saltBytes, PBKDF2_ITERATIONS, PBKDF2_KEY_LENGTH_BITS)
+		return try {
+			val bytes = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).encoded
+			Base64.encodeToString(bytes, Base64.NO_WRAP)
+		} finally {
+			spec.clearPassword()
+		}
+	}
+
+	private fun hashPinLegacySha256(pin: String, salt: String): String {
 		val digest = MessageDigest.getInstance("SHA-256")
 		val bytes = digest.digest("$salt:$pin".toByteArray(Charsets.UTF_8))
 		return Base64.encodeToString(bytes, Base64.NO_WRAP)
+	}
+
+	private fun constantTimeBase64Equals(left: String, right: String): Boolean {
+		return try {
+			MessageDigest.isEqual(
+				Base64.decode(left, Base64.NO_WRAP),
+				Base64.decode(right, Base64.NO_WRAP)
+			)
+		} catch (_: IllegalArgumentException) {
+			false
+		}
 	}
 }

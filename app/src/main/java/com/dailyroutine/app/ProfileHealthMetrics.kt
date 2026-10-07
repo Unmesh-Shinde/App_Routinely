@@ -21,8 +21,8 @@ object ProfileHealthMetricsCalculator {
         )
     }
 
-    fun calculate(age: Int, heightCm: Int, weightKg: Double, gender: String): ProfileHealthMetrics? {
-        if (age <= 0 || heightCm <= 0 || weightKg <= 0.0) return null
+    fun calculate(age: Int, heightCm: Double, weightKg: Double, gender: String): ProfileHealthMetrics? {
+        if (age <= 0 || heightCm <= 0.0 || weightKg <= 0.0) return null
 
         val heightM = heightCm / 100.0
         val bmi = weightKg / (heightM * heightM)
@@ -48,7 +48,7 @@ object ProfileHealthMetricsCalculator {
         )
     }
 
-    private fun calculateIdealWeight(heightCm: Int, gender: String): Double {
+    private fun calculateIdealWeight(heightCm: Double, gender: String): Double {
         val inches = heightCm / 2.54
         val inchesOverFiveFeet = (inches - 60.0).coerceAtLeast(0.0)
         val ideal = when (gender.lowercase()) {

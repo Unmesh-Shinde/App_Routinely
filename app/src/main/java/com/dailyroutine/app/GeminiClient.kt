@@ -2,211 +2,272 @@ package com.dailyroutine.app
 
 import android.content.Context
 import android.util.Log
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.appcheck.FirebaseAppCheck
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
 import org.json.JSONObject
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
+sealed class GeminiResult<out T> {
+    data class Success<out T>(val data: T) : GeminiResult<T>()
+    data class Error(val code: String, val message: String) : GeminiResult<Nothing>()
+}
+
 object GeminiClient {
-    // Gemini API key. If this key is invalid or restricted, the local estimator is used.
-    private const val API_KEY = "AQ.Ab8RN6LJjFAWqVv8-aNwNe5ozESBGbVNxIrPIxKNZ0c-5Ckicg"
+    private const val LOG_TAG = "GeminiClient"
+    private const val MAX_BACKEND_ATTEMPTS = 3
+    private val RETRY_DELAYS_MS = longArrayOf(300L, 900L)
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    suspend fun getCaloriesForMeal(query: String, context: Context? = null): Int = withContext(Dispatchers.IO) {
-        getCaloriesForMeal(title = query, description = "", context = context)
+    suspend fun getCaloriesForMeal(query: String, context: Context? = null): Int =
+        withContext(Dispatchers.IO) {
+            getCaloriesForMeal(title = query, description = "", context = context)
+        }
+
+    suspend fun getCaloriesForMeal(
+        title: String,
+        description: String,
+        context: Context? = null,
+    ): Int = getNutritionForMeal(title, description, context).calories
+
+    suspend fun getNutritionForMeal(
+        title: String,
+        description: String,
+        context: Context? = null,
+    ): MealNutritionInfo = withContext(Dispatchers.IO) {
+        when (val result = getNutritionResultForMeal(title, description, context)) {
+            is GeminiResult.Success -> result.data
+            is GeminiResult.Error -> MealNutritionInfo()
+        }
     }
 
-    suspend fun getCaloriesForMeal(title: String, description: String, context: Context? = null): Int = withContext(Dispatchers.IO) {
-        val configs = listOf(
-            "v1beta" to "gemini-2.0-flash",
-            "v1beta" to "gemini-flash-latest",
-            "v1beta" to "gemini-2.5-flash"
-        )
+    suspend fun getNutritionResultForMeal(
+        title: String,
+        description: String,
+        context: Context? = null,
+    ): GeminiResult<MealNutritionInfo> = withContext(Dispatchers.IO) {
+        val body = JSONObject().apply {
+            put("title", title)
+            put("description", description)
+        }
+        val response = postToBackendWithDetails("/v1/ai/meal-calories", body)
+        if (response.json != null) {
+            val responseJson = response.json
+            val totalCalories = optNumericDouble(responseJson, "total_calories", "calories", "totalCalories").toInt()
+            if (totalCalories > 0) {
+                val carbs = optNumericDouble(responseJson, "carbs_g", "carbs", "carbohydrates", "carbsG")
+                val protein = optNumericDouble(responseJson, "protein_g", "protein", "proteinG")
+                val fat = optNumericDouble(responseJson, "fat_g", "fat", "fatG")
+                val fiber = optNumericDouble(responseJson, "fiber_g", "fiber", "fiberG")
 
-        for ((apiVersion, modelName) in configs) {
-            Log.d("GeminiClient", "Trying $apiVersion/$modelName")
-            val aiCalories = tryCallApi(apiVersion, modelName, title, description)
-            if (aiCalories > 0) return@withContext aiCalories
+                val fatBreakdownMap = parseFlexibleJsonMap(responseJson, "fat_breakdown")
+                val carbBreakdownMap = parseFlexibleJsonMap(responseJson, "carb_breakdown")
+                val vitaminsMap = parseFlexibleJsonMap(responseJson, "vitamins")
+                val mineralsMap = parseFlexibleJsonMap(responseJson, "minerals")
+                val aminoAcidsMap = parseFlexibleJsonMap(responseJson, "amino_acids")
+                val antioxidantsMap = parseFlexibleJsonMap(responseJson, "antioxidants")
+                val otherMap = parseFlexibleJsonMap(responseJson, "other_nutrients")
+
+                val info = MealNutritionInfo(
+                    calories = totalCalories,
+                    carbsG = carbs,
+                    proteinG = protein,
+                    fatG = fat,
+                    fiberG = fiber,
+                    fatBreakdown = fatBreakdownMap,
+                    carbBreakdown = carbBreakdownMap,
+                    vitamins = vitaminsMap,
+                    minerals = mineralsMap,
+                    aminoAcids = aminoAcidsMap,
+                    antioxidants = antioxidantsMap,
+                    otherNutrients = otherMap
+                )
+                if (info.hasDetailedNutrition()) {
+                    val enrichedInfo = CalorieEstimator.enrichMealNutrition(info)
+                    Log.d(LOG_TAG, "Meal nutrition received: $enrichedInfo")
+                    return@withContext GeminiResult.Success(enrichedInfo)
+                } else {
+                    Log.w(LOG_TAG, "AI returned incomplete macros for calories=$totalCalories (carbs=$carbs, protein=$protein, fat=$fat), rejecting with error.")
+                    return@withContext GeminiResult.Error("ai_empty_response", "AI returned incomplete nutritional details. Please try again.")
+                }
+            }
         }
 
-        val localEstimate = if (context != null) {
-            CalorieEstimator.estimateMealCalories(context, title, description)
-        } else {
-            CalorieEstimator.estimateMealCalories(listOf(title, description).joinToString(" "))
+        val code = response.errorCode.ifBlank { "ai_provider_error" }
+        val userMessage = when (code) {
+            "ai_provider_quota" -> "AI service busy due to high traffic. Please wait a minute and try again."
+            "ai_empty_response" -> "AI returned incomplete nutrition details. Please try again."
+            "ai_provider_auth_error", "unauthorized" -> "AI service authorization error. Please check server status."
+            "network_error" -> "Unable to connect to AI server. Please check your internet connection."
+            else -> "AI service temporary error. Please try again shortly."
         }
-        Log.w("GeminiClient", "Gemini unavailable. Using local estimate: $localEstimate kcal")
-        localEstimate
+        Log.w(LOG_TAG, "AI backend error ($code): $userMessage")
+        GeminiResult.Error(code, userMessage)
+    }
+
+    private fun optNumericDouble(json: JSONObject, vararg keys: String): Double {
+        for (key in keys) {
+            if (!json.has(key) || json.isNull(key)) continue
+            val opt = json.opt(key)
+            if (opt is Number) return opt.toDouble()
+            if (opt is String) {
+                val match = Regex("""(\d+(?:\.\d+)?)""").find(opt)
+                if (match != null) {
+                    val parsed = match.groupValues[1].toDoubleOrNull()
+                    if (parsed != null) return parsed
+                }
+            }
+        }
+        return 0.0
+    }
+
+    private fun parseFlexibleJsonMap(json: JSONObject, key: String): Map<String, String> {
+        val result = mutableMapOf<String, String>()
+        if (!json.has(key) || json.isNull(key)) return result
+
+        val obj = json.optJSONObject(key)
+        if (obj != null) {
+            val keys = obj.keys()
+            while (keys.hasNext()) {
+                val k = keys.next()
+                val v = obj.optString(k, "")
+                if (v.isNotBlank()) {
+                    result[k] = v
+                }
+            }
+            return result
+        }
+
+        val array = json.optJSONArray(key)
+        if (array != null) {
+            for (i in 0 until array.length()) {
+                val item = array.optJSONObject(i)
+                if (item != null) {
+                    val name = item.optString("name", item.optString("nutrient", ""))
+                    val value = item.optString("value", item.optString("amount", ""))
+                    if (name.isNotBlank() && value.isNotBlank()) {
+                        result[name] = value
+                    }
+                }
+            }
+        }
+        return result
     }
 
     suspend fun getMetForWorkout(exercise: Exercise): Double = withContext(Dispatchers.IO) {
-        val configs = listOf(
-            "v1beta" to "gemini-2.0-flash",
-            "v1beta" to "gemini-flash-latest",
-            "v1beta" to "gemini-2.5-flash"
-        )
-
-        for ((apiVersion, modelName) in configs) {
-            val met = tryCallWorkoutMetApi(apiVersion, modelName, exercise)
-            if (met in 1.0..15.0) return@withContext met
+        val body = JSONObject().apply {
+            put("exercise_name", exercise.name)
+            put("target_area", exercise.targetArea)
+            put("exercise_type", exercise.exerciseType.orEmpty())
+            put("effort_label", exercise.effortLabel.orEmpty())
+            put("sets", exercise.sets)
+            put("reps", exercise.reps)
+            put("duration_seconds", exercise.durationSeconds)
+            put("rest_seconds", exercise.restSeconds)
+            put("rounds", exercise.rounds)
+            put("work_seconds", exercise.workSeconds)
+            put("added_weight_kg", exercise.addedWeightKg)
+            put("distance_km", exercise.distanceKm)
+            put("intensity", exercise.intensity)
+        }
+        val result = postToBackendWithDetails("/v1/ai/workout-met", body).json?.optDouble("base_met", 0.0) ?: 0.0
+        if (result in 1.0..15.0) {
+            Log.d(LOG_TAG, "Workout MET received: $result")
+            return@withContext result
         }
 
+        Log.w(LOG_TAG, "AI backend unavailable for workout MET")
         0.0
     }
 
-    private fun tryCallApi(apiVersion: String, modelName: String, title: String, description: String): Int {
-        val url = "https://generativelanguage.googleapis.com/$apiVersion/models/$modelName:generateContent"
-        val prompt = "Estimate total calories for exactly one meal from these fields:\n" +
-            "meal_title: \"$title\"\n" +
-            "portion_details: \"$description\"\n\n" +
-            "Rules:\n" +
-            "- Treat meal_title and portion_details as describing the same meal, not two separate meals.\n" +
-            "- If portion_details lists quantities, use those quantities and do not count repeated title words again.\n" +
-            "- Use meal_title only to identify ambiguous foods in portion_details, or to add foods that are not mentioned in portion_details.\n" +
-            "- If portion_details is empty or vague, use meal_title with normal serving sizes.\n" +
-            "- For Indian food, estimate realistic homemade portions unless restaurant/fried/large is stated.\n" +
-            "Return only JSON in this exact shape: {\"total_calories\": integer}."
+    private data class BackendResponse(
+        val json: JSONObject?,
+        val statusCode: Int = 0,
+        val errorCode: String = ""
+    )
 
-        val jsonRequest = JSONObject().apply {
-            put("contents", JSONArray().apply {
-                put(JSONObject().apply {
-                    put("parts", JSONArray().apply {
-                        put(JSONObject().apply { put("text", prompt) })
-                    })
-                })
-            })
-            put("generationConfig", JSONObject().apply {
-                put("temperature", 0.1)
-                put("responseMimeType", "application/json")
-            })
+    private suspend fun postToBackendWithDetails(path: String, body: JSONObject): BackendResponse {
+        val backendUrl = BuildConfig.AI_BACKEND_URL.trim().trimEnd('/')
+        if (backendUrl.isBlank()) {
+            Log.w(LOG_TAG, "AI_BACKEND_URL is blank. Configure it in local.properties.")
+            return BackendResponse(null, 0, "ai_provider_not_configured")
         }
 
-        return try {
-            val body = jsonRequest.toString().toRequestBody("application/json".toMediaType())
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("x-goog-api-key", API_KEY)
-                .post(body)
-                .build()
+        var forceRefreshTokens = false
+        var lastErrorCode = "network_error"
+        var lastStatusCode = 0
 
-            client.newCall(request).execute().use { response ->
-                val rawBody = response.body?.string() ?: ""
-                if (!response.isSuccessful) {
-                    Log.w("GeminiClient", "HTTP ${response.code} from $modelName: $rawBody")
-                    return 0
+        repeat(MAX_BACKEND_ATTEMPTS) { attemptNumber ->
+            try {
+                val auth = FirebaseAuth.getInstance()
+                val user = auth.currentUser ?: Tasks.await(auth.signInAnonymously()).user
+                val idToken = user?.let { Tasks.await(it.getIdToken(forceRefreshTokens)).token }
+                val appCheckToken = Tasks.await(
+                    FirebaseAppCheck.getInstance().getAppCheckToken(forceRefreshTokens),
+                ).token
+
+                if (idToken.isNullOrBlank() || appCheckToken.isNullOrBlank()) {
+                    Log.w(LOG_TAG, "Firebase security tokens are unavailable")
+                    return BackendResponse(null, 401, "unauthorized")
                 }
 
-                val root = JSONObject(rawBody)
-                val candidates = root.optJSONArray("candidates")
-                if (candidates == null || candidates.length() == 0) {
-                    Log.w("GeminiClient", "No candidates returned: $rawBody")
-                    return 0
+                val request = Request.Builder()
+                    .url(backendUrl + path)
+                    .addHeader("Authorization", "Bearer $idToken")
+                    .addHeader("X-Firebase-AppCheck", appCheckToken)
+                    .addHeader("Content-Type", "application/json")
+                    .post(body.toString().toRequestBody("application/json".toMediaType()))
+                    .build()
+
+                client.newCall(request).execute().use { response ->
+                    val rawBody = response.body?.string().orEmpty()
+                    lastStatusCode = response.code
+                    if (response.isSuccessful) {
+                        return BackendResponse(JSONObject(rawBody), response.code, "")
+                    }
+
+                    Log.w(LOG_TAG, "Backend HTTP ${response.code}: ${rawBody.take(300)}")
+                    if (response.code == 401) {
+                        forceRefreshTokens = true
+                        lastErrorCode = "unauthorized"
+                    } else if (response.code == 429 || rawBody.contains("ai_provider_quota")) {
+                        lastErrorCode = "ai_provider_quota"
+                        return BackendResponse(null, 429, "ai_provider_quota")
+                    } else {
+                        lastErrorCode = "ai_provider_busy"
+                    }
+
+                    if (!isRetryableBackendStatus(response.code) || attemptNumber == MAX_BACKEND_ATTEMPTS - 1) {
+                        return BackendResponse(null, response.code, lastErrorCode)
+                    }
                 }
-
-                val text = candidates
-                    .getJSONObject(0)
-                    .getJSONObject("content")
-                    .getJSONArray("parts")
-                    .getJSONObject(0)
-                    .getString("text")
-                    .trim()
-
-                val cleanJson = text.replace("```json", "").replace("```", "").trim()
-                val calories = parseCalories(cleanJson)
-                if (calories > 0) Log.d("GeminiClient", "Success: $calories kcal")
-                calories
+            } catch (error: Exception) {
+                Log.e(LOG_TAG, "AI backend request failed: ${error.message}")
+                lastErrorCode = "network_error"
+                if (attemptNumber == MAX_BACKEND_ATTEMPTS - 1 || error !is IOException) {
+                    return BackendResponse(null, lastStatusCode, "network_error")
+                }
             }
-        } catch (e: Exception) {
-            Log.e("GeminiClient", "Exception: ${e.message}")
-            0
+
+            delay(RETRY_DELAYS_MS[attemptNumber] ?: RETRY_DELAYS_MS.last())
         }
+
+        return BackendResponse(null, lastStatusCode, lastErrorCode)
     }
 
-    private fun parseCalories(text: String): Int {
-        return try {
-            JSONObject(text).optInt("total_calories", 0)
-        } catch (_: Exception) {
-            Regex("""\d{2,5}""").find(text)?.value?.toIntOrNull() ?: 0
-        }
-    }
-
-    private fun tryCallWorkoutMetApi(apiVersion: String, modelName: String, exercise: Exercise): Double {
-        val url = "https://generativelanguage.googleapis.com/$apiVersion/models/$modelName:generateContent"
-        val prompt = "Classify this workout and estimate a base MET value for calorie-burn calculation:\n" +
-            "exercise_name: \"${exercise.name}\"\n" +
-            "target_area: \"${exercise.targetArea}\"\n" +
-            "sets: ${exercise.sets}\n" +
-            "reps_or_duration: \"${exercise.reps}\"\n" +
-            "user_intensity_percent: ${exercise.intensity}\n\n" +
-            "Rules:\n" +
-            "- Return the base MET for the exercise type at normal/moderate effort.\n" +
-            "- Do not multiply by sets, reps, duration, body weight, or intensity.\n" +
-            "- Use accepted Compendium-style MET ranges when possible.\n" +
-            "- Keep MET between 1.0 and 15.0.\n" +
-            "Return only JSON in this exact shape: {\"exercise_family\": string, \"base_met\": number}."
-
-        val jsonRequest = JSONObject().apply {
-            put("contents", JSONArray().apply {
-                put(JSONObject().apply {
-                    put("parts", JSONArray().apply {
-                        put(JSONObject().apply { put("text", prompt) })
-                    })
-                })
-            })
-            put("generationConfig", JSONObject().apply {
-                put("temperature", 0.1)
-                put("responseMimeType", "application/json")
-            })
-        }
-
-        return try {
-            val body = jsonRequest.toString().toRequestBody("application/json".toMediaType())
-            val request = Request.Builder()
-                .url(url)
-                .addHeader("x-goog-api-key", API_KEY)
-                .post(body)
-                .build()
-
-            client.newCall(request).execute().use { response ->
-                val rawBody = response.body?.string() ?: ""
-                if (!response.isSuccessful) {
-                    Log.w("GeminiClient", "Workout MET HTTP ${response.code} from $modelName: $rawBody")
-                    return 0.0
-                }
-
-                val root = JSONObject(rawBody)
-                val candidates = root.optJSONArray("candidates")
-                if (candidates == null || candidates.length() == 0) return 0.0
-
-                val text = candidates
-                    .getJSONObject(0)
-                    .getJSONObject("content")
-                    .getJSONArray("parts")
-                    .getJSONObject(0)
-                    .getString("text")
-                    .trim()
-
-                parseWorkoutMet(text.replace("```json", "").replace("```", "").trim())
-            }
-        } catch (e: Exception) {
-            Log.e("GeminiClient", "Workout MET exception: ${e.message}")
-            0.0
-        }
-    }
-
-    private fun parseWorkoutMet(text: String): Double {
-        return try {
-            JSONObject(text).optDouble("base_met", 0.0)
-        } catch (_: Exception) {
-            Regex("""\d+(?:\.\d+)?""").find(text)?.value?.toDoubleOrNull() ?: 0.0
-        }
+    private fun isRetryableBackendStatus(status: Int): Boolean {
+        return status == 401 || status == 408 || status == 429 || status >= 500
     }
 }

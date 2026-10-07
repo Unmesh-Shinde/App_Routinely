@@ -1,6 +1,7 @@
 package com.dailyroutine.app
 
 import android.content.Context
+import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.*
@@ -10,7 +11,7 @@ import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import java.time.Instant
 
-class HealthConnectManager(private val context: Context) {
+open class HealthConnectManager(private val context: Context) : IHealthConnectManager {
 
     private val healthConnectClient by lazy { HealthConnectClient.getOrCreate(context) }
 
@@ -27,7 +28,7 @@ class HealthConnectManager(private val context: Context) {
         "android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"
     )
 
-    suspend fun getGrantedPermissions(): Set<String> {
+    override suspend fun getGrantedPermissions(): Set<String> {
         return try {
             healthConnectClient.permissionController.getGrantedPermissions()
         } catch (_: Exception) {
@@ -35,15 +36,16 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    suspend fun hasAnyPermission(): Boolean {
+    override suspend fun getMissingPermissions(): Set<String> {
         val granted = getGrantedPermissions()
-        for (p in permissions) {
-            if (granted.contains(p)) return true
-        }
-        return false
+        return permissions.filterNot { granted.contains(it) }.toSet()
     }
 
-    suspend fun readSteps(startTime: Instant, endTime: Instant, filterPackage: String? = null): Long {
+    override suspend fun readSteps(startTime: Instant, endTime: Instant, filterPackage: String?): Long {
+        return readStepsOrNull(startTime, endTime, filterPackage) ?: 0L
+    }
+
+    override suspend fun readStepsOrNull(startTime: Instant, endTime: Instant, filterPackage: String?): Long? {
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.aggregate(
@@ -55,11 +57,42 @@ class HealthConnectManager(private val context: Context) {
             )
             response[StepsRecord.COUNT_TOTAL] ?: 0L
         } catch (_: Exception) {
-            0L
+            null
         }
     }
 
-    suspend fun readDistanceMeters(startTime: Instant, endTime: Instant, filterPackage: String? = null): Double {
+    override suspend fun readStepsWithFallback(startTime: Instant, endTime: Instant, filterPackage: String?): Long? {
+        val filteredSteps = readStepsOrNull(startTime, endTime, filterPackage)
+        if (filterPackage == null || filteredSteps == null) {
+            return filteredSteps
+        }
+
+        // Some Health Connect providers write a small portion of imported/merged step records
+        // under a different origin than the app selected by the user. For now, keep the
+        // existing conservative selected-origin behavior, but log when the resolver would
+        // safely prefer a slightly higher all-origin count. That lets us confirm the user's
+        // under-count pattern before changing user-visible totals.
+        val allOriginSteps = readStepsOrNull(startTime, endTime, null)
+        val diagnosticResolvedSteps = StepCountResolver.resolve(
+            selectedOriginSteps = filteredSteps,
+            allOriginSteps = allOriginSteps,
+            hasOriginFilter = true
+        )
+        if (diagnosticResolvedSteps != filteredSteps) {
+            Log.d(
+                "HealthConnectSteps",
+                "Step diagnostic: package=$filterPackage selected=$filteredSteps all=$allOriginSteps candidate=$diagnosticResolvedSteps"
+            )
+        }
+
+        if (filteredSteps > 0L) return filteredSteps
+
+        // Existing fallback behavior: if the selected origin has no records, use all origins so
+        // historical charts do not lose valid step history.
+        return if (allOriginSteps != null && allOriginSteps > 0L) allOriginSteps else filteredSteps
+    }
+
+    override suspend fun readDistanceMeters(startTime: Instant, endTime: Instant, filterPackage: String?): Double {
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.aggregate(
@@ -75,7 +108,7 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    suspend fun readTotalCalories(startTime: Instant, endTime: Instant, filterPackage: String? = null): Double {
+    override suspend fun readTotalCalories(startTime: Instant, endTime: Instant, filterPackage: String?): Double {
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.aggregate(
@@ -91,7 +124,23 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    suspend fun readMoveMinutes(startTime: Instant, endTime: Instant, filterPackage: String? = null): Int {
+    override suspend fun readActiveCalories(startTime: Instant, endTime: Instant, filterPackage: String?): Double {
+        val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
+        return try {
+            val response = healthConnectClient.aggregate(
+                AggregateRequest(
+                    metrics = setOf(ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL),
+                    timeRangeFilter = TimeRangeFilter.between(startTime, endTime),
+                    dataOriginFilter = originFilter
+                )
+            )
+            response[ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL]?.inKilocalories ?: 0.0
+        } catch (_: Exception) {
+            0.0
+        }
+    }
+
+    override suspend fun readMoveMinutes(startTime: Instant, endTime: Instant, filterPackage: String?): Int {
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.readRecords(
@@ -110,7 +159,7 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    suspend fun readSleepSessions(startTime: Instant, endTime: Instant, filterPackage: String? = null): List<SleepSessionRecord> {
+    override suspend fun readSleepSessions(startTime: Instant, endTime: Instant, filterPackage: String?): List<SleepSessionRecord> {
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.readRecords(
@@ -126,7 +175,7 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    suspend fun readWeightKg(startTime: Instant, endTime: Instant, filterPackage: String? = null): Double {
+    override suspend fun readWeightKg(startTime: Instant, endTime: Instant, filterPackage: String?): Double {
         val originFilter = filterPackage?.let { setOf(DataOrigin(it)) } ?: emptySet()
         return try {
             val response = healthConnectClient.readRecords(

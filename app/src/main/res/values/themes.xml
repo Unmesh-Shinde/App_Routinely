@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.DailyRoutine" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.DailyRoutine" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primaryDark</item>
         <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/primaryLight</item>
+        <item name="colorOnPrimaryContainer">@color/primaryDark</item>
         <item name="colorSecondary">@color/accent</item>
         <item name="colorOnSecondary">@android:color/white</item>
         <item name="android:windowBackground">@color/bgPage</item>
-        <item name="android:statusBarColor">@color/statusBar</item>
-        <item name="android:navigationBarColor">@color/primaryDark</item>
-        <!-- Dialog corner radius -->
-        <item name="dialogCornerRadius">16dp</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <!-- Material 3 Surface and Background -->
+        <item name="colorSurface">@color/bgPage</item>
+        <item name="colorOnSurface">@color/textPrimary</item>
+        <item name="colorSurfaceVariant">@color/cardBg</item>
+        <item name="colorOnSurfaceVariant">@color/textSecondary</item>
+        <item name="colorOutline">@color/cardStroke</item>
     </style>
 
     <!-- Label text used in dialog -->
@@ -23,6 +33,10 @@
         <item name="android:textColor">@color/textSecondary</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:letterSpacing">0.08</item>
+    </style>
+
+    <style name="ShapeAppearance.DailyRoutine.Circle" parent="">
+        <item name="cornerSize">50%</item>
     </style>
 
 </resources>

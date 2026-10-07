@@ -1,214 +1,153 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widgetRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_widget_shell"
-    android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="4dp">
 
-    <TextView
-        android:id="@+id/tvWidgetDate"
+    <!-- Water Section (Pinned to bottom with absolute horizontal symmetry) -->
+    <RelativeLayout
+        android:id="@+id/llWaterSection"
         android:layout_width="match_parent"
-        android:layout_height="22dp"
-        android:ellipsize="end"
-        android:gravity="center_vertical"
-        android:maxLines="1"
-        android:text="@string/widget_date_placeholder"
-        android:textColor="@android:color/white"
-        android:textSize="13sp"
-        android:textStyle="bold" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_widget_metric"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="6dp"
-        android:layout_weight="1"
-        android:baselineAligned="false"
-        android:orientation="vertical">
-
+        <!-- Controls container: Forces the [-] Value [+] to be exactly centered -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginBottom="5dp"
-            android:layout_weight="1"
-            android:baselineAligned="false"
+            android:id="@+id/llWaterControls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_widget_primary_metric"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="9dp"
-                android:paddingEnd="8dp">
-
-                <ImageView
-                    android:layout_width="21dp"
-                    android:layout_height="21dp"
-                    android:contentDescription="@string/widget_steps_label"
-                    android:src="@drawable/ic_steps" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                android:id="@+id/btnWidgetRemoveWater"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_widget_action"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="7dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvWidgetSteps"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="@string/widget_steps_placeholder"
-                        android:textColor="@android:color/white"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/widget_steps_label"
-                        android:textColor="#D9FFFFFF"
-                        android:textSize="11sp" />
-                </LinearLayout>
+                    android:text="@string/widget_remove_water"
+                    android:textColor="@color/strokeHydration"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvWidgetWater"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:text="0.0 L"
+                android:textColor="@color/textPrimary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_widget_metric"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="9dp"
-                android:paddingEnd="8dp">
-
-                <ImageView
-                    android:layout_width="21dp"
-                    android:layout_height="21dp"
-                    android:contentDescription="@string/widget_distance_label"
-                    android:src="@drawable/ic_health_sync" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="7dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
+                android:id="@+id/btnWidgetAddWater"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_widget_action"
+                android:gravity="center">
                 <TextView
-                    android:id="@+id/tvWidgetDistance"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="@string/widget_distance_placeholder"
-                    android:textColor="@android:color/white"
-                    android:textSize="17sp"
+                    android:text="@string/widget_add_water"
+                    android:textColor="@color/strokeHydration"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/widget_distance_label"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="11sp" />
-                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
+        <!-- Icon: Positioned relative to the centered controls so it doesn't push them right -->
+        <ImageView
+            android:id="@+id/ivWidgetWaterIcon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/llWaterControls"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_water"
+            android:contentDescription="@string/widget_water_label" />
+    </RelativeLayout>
+
+    <!-- Hero Circular Progress Section (Centered in remaining space) -->
+    <FrameLayout
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:layout_above="@id/llWaterSection">
+
+        <ProgressBar
+            android:id="@+id/pbWidgetSteps"
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="5dp"
-            android:layout_weight="1.12"
-            android:baselineAligned="false"
-            android:background="@drawable/bg_widget_metric"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="10dp"
-            android:paddingEnd="8dp">
+            android:layout_height="match_parent"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            android:progressDrawable="@drawable/bg_widget_progress_circle" />
 
-                <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:contentDescription="@string/widget_water_label"
-                    android:src="@drawable/ic_water" />
+        <LinearLayout
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="0dp">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="9dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+            <ImageView
+                android:id="@+id/ivWidgetStepsIcon"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_steps"
+                android:contentDescription="@string/widget_steps_label" />
 
-                    <TextView
-                        android:id="@+id/tvWidgetWater"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:text="@string/widget_water_placeholder"
-                        android:textColor="@android:color/white"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tvWidgetSteps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/widget_water_label"
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="11sp" />
-                </LinearLayout>
+            <TextView
+                android:id="@+id/tvWidgetStepProgress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/ 10,000"
+                android:textColor="@color/textSecondary"
+                android:textSize="10sp" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="40dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:background="#D1D5DB"
+                android:orientation="horizontal" />
 
-                    <LinearLayout
-                        android:id="@+id/btnWidgetRemoveWater"
-                        android:layout_width="38dp"
-                        android:layout_height="34dp"
-                        android:background="@drawable/bg_widget_action"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/widget_remove_water"
-                            android:textColor="@android:color/white"
-                            android:textSize="21sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/btnWidgetAddWater"
-                        android:layout_width="38dp"
-                        android:layout_height="34dp"
-                        android:layout_marginStart="7dp"
-                        android:background="@drawable/bg_widget_action"
-                        android:gravity="center"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/widget_add_water"
-                            android:textColor="@android:color/white"
-                            android:textSize="21sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
+            <TextView
+                android:id="@+id/tvWidgetDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.0 km"
+                android:textColor="@color/strokeWalking"
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
+    </FrameLayout>
+
+</RelativeLayout>

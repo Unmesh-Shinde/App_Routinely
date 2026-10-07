@@ -9,23 +9,26 @@
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/healthWalking">
+        android:background="@color/m3_premium_surface"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="Step Tracker"
-            app:titleTextColor="@android:color/white"/>
+            app:titleTextColor="@color/textPrimary"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="@color/textPrimary"/>
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/healthWalking"
-            app:tabTextColor="#B2DFDB"
-            app:tabSelectedTextColor="@android:color/white"
-            app:tabIndicatorColor="@android:color/white"
+            android:background="@color/m3_premium_surface"
+            app:tabTextColor="@color/textSecondary"
+            app:tabSelectedTextColor="@color/primary"
+            app:tabIndicatorColor="@color/primary"
             app:tabMode="fixed">
             <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Today"/>
             <com.google.android.material.tabs.TabItem android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Weekly"/>
@@ -103,10 +106,14 @@
                     android:weightSum="3">
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardDistance"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginEnd="4dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="1dp"
@@ -133,10 +140,14 @@
                     </com.google.android.material.card.MaterialCardView>
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardHeartPoints"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:layout_marginStart="4dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="1dp"
@@ -158,18 +169,40 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <HorizontalScrollView
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:scrollbars="none">
-                    <LinearLayout
-                        android:id="@+id/llWeeklyStepsGraph"
-                        android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingTop="12dp">
+                    <View android:layout_width="10dp" android:layout_height="10dp" android:background="@color/graphSteps"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="@string/legend_steps" android:textColor="@color/textSecondary" android:textSize="12sp" android:textStyle="bold"/>
+                    <View android:layout_width="10dp" android:layout_height="10dp" android:layout_marginStart="18dp" android:background="@color/healthCalories"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="@string/legend_heart_points" android:textColor="@color/textSecondary" android:textSize="12sp" android:textStyle="bold"/>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp">
+
+                    <com.dailyroutine.app.GoalLineOverlayView
+                        android:id="@+id/weeklyStepsGoalOverlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="40dp"
+                        android:visibility="gone" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvWeeklyStepsGraph"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:paddingHorizontal="16dp"
+                        android:scrollbars="none"
                         android:orientation="horizontal"
-                        android:padding="16dp"
-                        android:gravity="bottom"/>
-                </HorizontalScrollView>
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                </FrameLayout>
 
             </LinearLayout>
 
@@ -180,6 +213,19 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="4dp">
+                    <View android:layout_width="10dp" android:layout_height="10dp" android:background="@color/graphSteps"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="@string/legend_steps" android:textColor="@color/textSecondary" android:textSize="12sp" android:textStyle="bold"/>
+                    <View android:layout_width="10dp" android:layout_height="10dp" android:layout_marginStart="18dp" android:background="@color/healthCalories"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="6dp" android:text="@string/legend_heart_points" android:textColor="@color/textSecondary" android:textSize="12sp" android:textStyle="bold"/>
+                </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvMonthlySteps"
