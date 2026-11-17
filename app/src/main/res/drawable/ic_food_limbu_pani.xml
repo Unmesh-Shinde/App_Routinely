@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Coaster Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Coaster Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Glass Cup Ambient Shadow -->
+    <path android:pathData="M 16.5,13.8 L 31.5,13.8 L 29.5,38.8 L 18.5,38.8 Z" android:fillColor="#22000000" />
+
+    <!-- Glass Cup Body Filled with Translucent Yellow Lemonade -->
+    <path android:pathData="M 16,13 L 32,13 L 29,38 L 19,38 Z" android:fillColor="#FFF59D" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 17,15 L 31,15 L 28.5,36.5 L 19.5,36.5 Z" android:fillColor="#FFEE58" />
+
+    <!-- Drinking Straw -->
+    <path android:pathData="M 28,7 L 22,38" android:fillColor="#00000000" android:strokeColor="#29B6F6" android:strokeWidth="1.6" android:strokeLineCap="round" />
+
+    <!-- Lemon Slice Wheel Resting on Rim -->
+    <path android:pathData="M 10,13 A 5,5 0 1,0 20,13 A 5,5 0 1,0 10,13 Z" android:fillColor="#F8D84F" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <path android:pathData="M 11.5,13 A 3.5,3.5 0 1,0 18.5,13 A 3.5,3.5 0 1,0 11.5,13 Z" android:fillColor="#FFF9C4" />
+    <path android:pathData="M 15,10 L 15,16 M 12,13 L 18,13" android:fillColor="#00000000" android:strokeColor="#F8D84F" android:strokeWidth="0.5" />
+
+    <!-- Floating Ice Cubes in Lemonade -->
+    <path android:pathData="M 22,18 L 27,17 L 28,21 L 23,22 Z" android:fillColor="#50FFFFFF" android:strokeColor="#FFFFFF" android:strokeWidth="0.4" />
+
+    <!-- Fresh Green Mint Sprig -->
+    <path android:pathData="M 25,12 Q 28,10 30,13 Z" android:fillColor="#4CAF50" android:strokeColor="#1B5E20" android:strokeWidth="0.3" />
+
+    <!-- Glass Specular Gloss Highlight -->
+    <path android:pathData="M 18,16 L 19,36" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>

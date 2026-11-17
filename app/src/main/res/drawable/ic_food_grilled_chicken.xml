@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Seared Grilled Chicken Fillet Ambient Drop Shadow -->
+    <path android:pathData="M 12.5,22.8 C 12.5,14 34.5,14 34.5,22.8 C 34.5,33 12.5,33 12.5,22.8 Z" android:fillColor="#22000000" />
+
+    <!-- Grilled Chicken Breast Fillet Body -->
+    <path android:pathData="M 12,22 C 12,13 34,13 34,22 C 34,32 12,32 12,22 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 14,20 C 14,15 32,15 32,20 C 32,29 14,29 14,20 Z" android:fillColor="#FFC107" />
+
+    <!-- Parallel Charcoal Grill Sear Marks -->
+    <path android:pathData="M 16,17 L 19,25 M 21,16 L 24,26 M 26,16 L 29,26 M 31,17 L 33,23" android:fillColor="#00000000" android:strokeColor="#212121" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Steamed Broccoli Florets & Rosemary Herbs on Side -->
+    <path android:pathData="M 28,27 C 28,24 35,24 35,27 C 35,31 28,31 28,27 Z" android:fillColor="#388E3C" android:strokeColor="#1B5E20" android:strokeWidth="0.4" />
+    <path android:pathData="M 29,26 A 1,1 0 1,0 31,26 A 1,1 0 1,0 29,26 Z M 32,27 A 1,1 0 1,0 34,27 A 1,1 0 1,0 32,27 Z" android:fillColor="#4CAF50" />
+
+    <path android:pathData="M 12,28 Q 16,25 18,29 L 14,32 Z" android:fillColor="#F8D84F" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+</vector>

@@ -1,5 +1,6 @@
 package com.dailyroutine.app
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Typeface
@@ -167,7 +168,7 @@ class CaloriesActivity : AppCompatActivity() {
 
     private fun refreshTodayView() {
         val todayStr = dateFormatter.format(Date())
-        val meals = planManager.getMealsForDate(todayStr)
+        val meals = WaterIntakeSummary.mealsWithSummaryLast(planManager.getMealsForDate(todayStr))
         updateIdealCaloriesMessage()
         
         val tvAnalyzing = findViewById<TextView>(R.id.tvAnalyzing)
@@ -280,10 +281,10 @@ class CaloriesActivity : AppCompatActivity() {
         val tv = findViewById<TextView>(R.id.tvIdealCaloriesMessage)
         val metrics = ProfileHealthMetricsCalculator.calculate(this)
         if (metrics == null) {
-            tv.text = "Complete age, height, weight, and gender in Profile to calculate your ideal calorie intake."
+            tv.text = "Ideal calorie intake: --- kcal/day. According to the vital details added to your profile"
             return
         }
-        tv.text = "Ideal Calorie Intake: ${metrics.idealCalories} kcal/day according to your profile."
+        tv.text = "Ideal calorie intake: %d kcal/day. According to the vital details added to your profile".format(metrics.idealCalories)
     }
 
     private fun refreshWeeklyView() {
@@ -319,7 +320,7 @@ class CaloriesActivity : AppCompatActivity() {
                 weekDates.forEach { calendar ->
                     val dateKey = dateFormatter.format(calendar.time)
                     val metrics = metricsMap[dateKey]
-                    val intake = allMealsMap[dateKey]?.sumOf { it.calories.coerceAtLeast(0) } ?: 0
+                    val intake = allMealsMap[dateKey]?.sumOf { (it.displayCalories ?: 0).coerceAtLeast(0) } ?: 0
                     val activeBurn = getBurnedCaloriesForDateRoom(dateKey, metrics)
                     val bmr = WellnessEngine.calculateBMRForDateRoom(this@CaloriesActivity, dateKey, metrics).toInt()
                     val tef = WellnessEngine.calculateTEF(intake).toInt()
@@ -414,7 +415,7 @@ class CaloriesActivity : AppCompatActivity() {
                                 val dateKey = dateFormatter.format(day.time)
                                 if (!day.before(oldestSyncedDay) && !day.after(today)) {
                                     val metrics = metricsMap[dateKey]
-                                    val dailyIntake = allMealsMap[dateKey]?.sumOf { it.calories.coerceAtLeast(0) } ?: 0
+                                    val dailyIntake = allMealsMap[dateKey]?.sumOf { (it.displayCalories ?: 0).coerceAtLeast(0) } ?: 0
                                     weekIntake += dailyIntake
                                     weekBmr += WellnessEngine.calculateBMRForDateRoom(this@CaloriesActivity, dateKey, metrics).toInt()
                                     weekActive += getBurnedCaloriesForDateRoom(dateKey, metrics)
@@ -482,7 +483,7 @@ class CaloriesActivity : AppCompatActivity() {
                     var weekTef = 0
                     weekDates.forEach {
                         val metrics = metricsMap[it]
-                        val dailyIntake = allMealsMap[it]?.sumOf { it.calories.coerceAtLeast(0) } ?: 0
+                        val dailyIntake = allMealsMap[it]?.sumOf { (it.displayCalories ?: 0).coerceAtLeast(0) } ?: 0
                         weekIntake += dailyIntake
                         weekBmr += WellnessEngine.calculateBMRForDateRoom(this@CaloriesActivity, it, metrics).toInt()
                         weekActive += getBurnedCaloriesForDateRoom(it, metrics)
@@ -531,16 +532,55 @@ class CaloriesActivity : AppCompatActivity() {
     private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 
     private fun showMealNutritionPopup(meal: Meal) {
+        if (meal.nutritionErrorCode == "ai_payload_too_large" || meal.nutritionErrorCode == "ai_content_blocked") {
+            val isPayloadTooLarge = meal.nutritionErrorCode == "ai_payload_too_large"
+            MaterialAlertDialogBuilder(this)
+                .setTitle(if (isPayloadTooLarge) "Meal Details Too Long" else "Meal Details Need Editing")
+                .setMessage(
+                    if (isPayloadTooLarge) {
+                        "The meal description exceeds the nutrition service's input limit. Open Nutrition and shorten it before saving the meal again."
+                    } else {
+                        "The current meal title or description could not be used for an estimate. Open Nutrition and edit the text before saving again."
+                    }
+                )
+                .setPositiveButton("Open Nutrition") { _, _ ->
+                    startActivity(Intent(this, DietPlanActivity::class.java))
+                }
+                .show()
+            return
+        }
+        if (!meal.isWaterIntakeSummary && (meal.isPendingOvernightRetry || (meal.nutritionInfo?.hasAnyNutrition() != true && meal.displayCalories == null))) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(when {
+                    meal.nutritionAutoRetriesExhausted -> "Estimate Not Available"
+                    meal.isPendingOvernightRetry -> "Estimate Retry Scheduled"
+                    else -> "No Estimate Yet"
+                })
+                .setMessage(
+                    when {
+                    meal.nutritionAutoRetriesExhausted -> {
+                        "Automatic retries are finished or paused for this error. Open Nutrition and edit the meal to start a new estimate."
+                    }
+                    meal.isPendingOvernightRetry -> {
+                        "The first retry is after 30 minutes, the next is 45 minutes after that, and the third is 1 hour later. If still needed, the final retry windows are 12 AM, 2 AM, 6 AM, and 8 AM. Please wait."
+                    }
+                    else -> "Open Nutrition and edit this meal to start a new estimate."
+                })
+                .setPositiveButton("Open Nutrition") { _, _ -> startActivity(Intent(this, DietPlanActivity::class.java)) }
+                .setNegativeButton("Close", null)
+                .show()
+            return
+        }
         val todayStr = dateFormatter.format(Date())
         fun displayDialog(info: MealNutritionInfo) {
             val v = LayoutInflater.from(this).inflate(R.layout.dialog_meal_nutrition_info, null)
-            v.findViewById<ImageView>(R.id.ivMealIcon).apply {
-                setImageResource(RoutineIconMapper.iconForMealType(meal.mealType))
-                setBackgroundResource(RoutineIconMapper.badgeForMealType(meal.mealType))
+            v.findViewById<MealIconView>(R.id.ivMealIcon).apply {
+                val icons = FoodIconResolver.getIconsForMeal(meal.name, meal.description, meal.mealType)
+                setIconResList(icons, RoutineIconMapper.badgeForMealType(meal.mealType))
             }
             v.findViewById<TextView>(R.id.tvMealTitle).text = meal.name
             v.findViewById<TextView>(R.id.tvMealCategory).text = "${meal.mealType} • ${meal.formatTime()}"
-            v.findViewById<TextView>(R.id.tvMealCalories).text = "${info.calories} kcal"
+            v.findViewById<TextView>(R.id.tvMealCalories).text = info.calories?.let { "$it kcal" } ?: "Calories not provided"
 
             val tvNotes = v.findViewById<TextView>(R.id.tvMealNotes)
             if (meal.description.isNotBlank()) {
@@ -552,15 +592,23 @@ class CaloriesActivity : AppCompatActivity() {
 
             val personalRda = PersonalizedRdaCalculator.calculate(this)
 
-            // Macro Ratio Split
-            val totalMacroG = (info.carbsG + info.proteinG + info.fatG).coerceAtLeast(1.0)
-            val carbsPct = round((info.carbsG / totalMacroG) * 100).toInt()
-            val proteinPct = round((info.proteinG / totalMacroG) * 100).toInt()
-            val fatPct = (100 - carbsPct - proteinPct).coerceAtLeast(0)
+            // Only show macro percentages when all three macro estimates are present.
+            val macroValues = listOf(info.carbsG, info.proteinG, info.fatG)
+            val allMacrosKnown = macroValues.all { it != null }
+            val totalMacroG = macroValues.filterNotNull().sum()
+            fun formatMacroRatio(value: Double?): String {
+                if (value == null) return "Not provided"
+                val amount = "%.1fg".format(value)
+                return if (allMacrosKnown && totalMacroG > 0.0) {
+                    "$amount (${round((value / totalMacroG) * 100).toInt()}%)"
+                } else {
+                    amount
+                }
+            }
 
-            v.findViewById<TextView>(R.id.tvCarbsRatio).text = "%.1fg (%d%%)".format(info.carbsG, carbsPct)
-            v.findViewById<TextView>(R.id.tvProteinRatio).text = "%.1fg (%d%%)".format(info.proteinG, proteinPct)
-            v.findViewById<TextView>(R.id.tvFatRatio).text = "%.1fg (%d%%)".format(info.fatG, fatPct)
+            v.findViewById<TextView>(R.id.tvCarbsRatio).text = formatMacroRatio(info.carbsG)
+            v.findViewById<TextView>(R.id.tvProteinRatio).text = formatMacroRatio(info.proteinG)
+            v.findViewById<TextView>(R.id.tvFatRatio).text = formatMacroRatio(info.fatG)
 
             val llTabs = v.findViewById<LinearLayout>(R.id.llCategoryTabs)
             val llList = v.findViewById<LinearLayout>(R.id.llNutrientsList)
@@ -610,24 +658,24 @@ class CaloriesActivity : AppCompatActivity() {
                 // MACROS (Category 0 = All or Category 1 = Macros)
                 if (catIndex == 0 || catIndex == 1) {
                     // Carbs & sub-types
-                    addNutrientRow("Carbohydrates", "%.1f g".format(info.carbsG), cMacros, R.drawable.bg_nutrient_progress_macros)
+                    addNutrientRow("Carbohydrates", info.carbsG?.let { "%.1f g".format(it) } ?: "Not provided", cMacros, R.drawable.bg_nutrient_progress_macros)
                     info.carbBreakdown.forEach { (key, valStr) ->
                         val isAddedSugarWarning = key.lowercase().contains("added sugar") && parseNum(valStr) > 25.0
                         addNutrientRow(key, valStr, cMacros, R.drawable.bg_nutrient_progress_macros, isChild = true, isWarning = isAddedSugarWarning)
                     }
 
                     // Protein
-                    addNutrientRow("Protein", "%.1f g".format(info.proteinG), cMacros, R.drawable.bg_nutrient_progress_macros)
+                    addNutrientRow("Protein", info.proteinG?.let { "%.1f g".format(it) } ?: "Not provided", cMacros, R.drawable.bg_nutrient_progress_macros)
 
                     // Fat & sub-types (Saturated Fat, Unsaturated, MUFA, PUFA, Omega-3, Omega-6, Trans Fat)
-                    addNutrientRow("Fat", "%.1f g".format(info.fatG), cMacros, R.drawable.bg_nutrient_progress_macros)
+                    addNutrientRow("Fat", info.fatG?.let { "%.1f g".format(it) } ?: "Not provided", cMacros, R.drawable.bg_nutrient_progress_macros)
                     info.fatBreakdown.forEach { (key, valStr) ->
                         val isTransFatWarning = key.lowercase().contains("trans fat") && parseNum(valStr) > 0.0
                         addNutrientRow(key, valStr, cMacros, R.drawable.bg_nutrient_progress_macros, isChild = true, isWarning = isTransFatWarning)
                     }
 
                     // Fiber
-                    if (info.fiberG > 0) {
+                    if (info.fiberG != null) {
                         addNutrientRow("Dietary Fiber", "%.1f g".format(info.fiberG), cMacros, R.drawable.bg_nutrient_progress_macros)
                     }
                 }
@@ -665,6 +713,15 @@ class CaloriesActivity : AppCompatActivity() {
                     info.otherNutrients.forEach { (key, valStr) ->
                         addNutrientRow(key, valStr, cOther, R.drawable.bg_nutrient_progress_others)
                     }
+                }
+
+                if (llList.childCount == 0) {
+                    val padding = (16 * resources.displayMetrics.density).toInt()
+                    llList.addView(TextView(this@CaloriesActivity).apply {
+                        text = "No nutrient details provided"
+                        textSize = 14f
+                        setPadding(padding, padding, padding, padding)
+                    })
                 }
             }
 
@@ -716,30 +773,24 @@ class CaloriesActivity : AppCompatActivity() {
                 .show()
         }
 
+        if (meal.isPendingOvernightRetry) {
+            return
+        }
+
         val existingInfo = meal.nutritionInfo
-        if (existingInfo != null && existingInfo.hasDetailedNutrition()) {
+        if (meal.isWaterIntakeSummary) {
+            displayDialog(MealNutritionInfo(otherNutrients = mapOf("Water intake" to meal.description)))
+        } else if (existingInfo != null && existingInfo.hasAnyNutrition()) {
             displayDialog(existingInfo)
+        } else if (meal.calories != null) {
+            displayDialog(MealNutritionInfo(calories = meal.calories))
         } else {
-            val progress = Toast.makeText(this, "Fetching calories and nutritional values...", Toast.LENGTH_SHORT)
-            progress.show()
-            CalorieSearchEngine.getMealNutritionResult(this, meal.name, meal.description) { result ->
-                progress.cancel()
-                when (result) {
-                    is NutritionResult.Success -> {
-                        val info = result.info
-                        val updatedMeal = meal.copy(calories = info.calories, nutritionInfo = info)
-                        planManager.saveMealForDate(todayStr, updatedMeal)
-                        displayDialog(info)
-                    }
-                    is NutritionResult.Error -> {
-                        MaterialAlertDialogBuilder(this)
-                            .setTitle("Nutrition Error")
-                            .setMessage(result.message)
-                            .setPositiveButton("Close", null)
-                            .show()
-                    }
-                }
-            }
+            MaterialAlertDialogBuilder(this)
+                .setTitle("No Estimate Yet")
+                .setMessage("Open Nutrition and edit this meal to start a new estimate.")
+                .setPositiveButton("Open Nutrition") { _, _ -> startActivity(Intent(this, DietPlanActivity::class.java)) }
+                .setNegativeButton("Close", null)
+                .show()
         }
     }
 
@@ -758,48 +809,87 @@ class CaloriesActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val m = items[position]
-            holder.ivIcon.setImageResource(RoutineIconMapper.iconForMealType(m.mealType))
-            holder.ivIcon.setBackgroundResource(RoutineIconMapper.badgeForMealType(m.mealType))
-            holder.tvTitle.text = m.name
+            val icons = FoodIconResolver.getIconsForMeal(m.name, m.description, m.mealType)
+            holder.ivIcon.setIconResList(icons, RoutineIconMapper.badgeForMealType(m.mealType))
+            holder.tvTitle.text = if (m.isWaterIntakeSummary) {
+                "${m.name} · ${WaterIntakeSummary.amountLabel(m)}"
+            } else {
+                m.name
+            }
+            holder.tvTitle.textSize = if (m.isWaterIntakeSummary) 14f else 16f
             holder.tvSubtitle.text = m.mealType
             holder.tvSubtitle.setBackgroundResource(R.drawable.bg_chip)
             holder.tvSubtitle.visibility = View.VISIBLE
             
-            holder.tvTime.text = if (m.calories > 0) "${m.calories} kcal" else "AI Syncing..."
+            val mealCalories = m.nutritionInfo?.calories ?: m.calories?.takeIf { it > 0 }
+            val warningPresentation = NutritionWarningPresentation.forMeal(
+                m.nutritionErrorCode,
+                m.nutritionAutoRetriesExhausted
+            )
+            val cardWarning = warningPresentation.cardText
+            if (m.isWaterIntakeSummary) {
+                holder.tvTime.visibility = View.GONE
+            } else {
+                holder.tvTime.visibility = View.VISIBLE
+                holder.tvTime.text = when {
+                    mealCalories != null -> "$mealCalories kcal"
+                    cardWarning != null -> cardWarning
+                    m.isPendingOvernightRetry -> "Automatic retry scheduled"
+                    m.nutritionInfo?.hasAnyNutrition() == true -> "Partial estimate • Tap for details"
+                    else -> "No estimate • Tap for details"
+                }
+                holder.tvTime.setTextColor(when (warningPresentation.tone) {
+                    NutritionWarningTone.AMBER -> Color.rgb(183, 103, 0)
+                    NutritionWarningTone.RED -> Color.rgb(183, 28, 28)
+                    NutritionWarningTone.NONE -> ContextCompat.getColor(this@CaloriesActivity, R.color.textSecondary)
+                })
+            }
 
+            val hasFullNutrition = m.nutritionInfo?.hasAnyNutrition() == true || (m.calories != null && m.calories > 0)
             val tvHint = holder.itemView.findViewById<TextView>(R.id.tvHint)
-            tvHint.visibility = View.VISIBLE
+            tvHint.visibility = if (m.isWaterIntakeSummary || m.isPendingOvernightRetry || cardWarning != null || !hasFullNutrition) View.GONE else View.VISIBLE
 
-            val hasDetails = m.nutritionInfo?.hasDetailedNutrition() == true
-            if (m.calories == 0 || !hasDetails) {
-                CalorieSearchEngine.getMealNutrition(holder.itemView.context, m.name, m.description) { info ->
-                    holder.itemView.post {
-                        if (info.hasDetailedNutrition()) {
-                            holder.tvTime.text = "${info.calories} kcal"
-                            val todayStr = dateFormatter.format(Date())
-                            planManager.saveMealForDate(todayStr, m.copy(calories = info.calories, nutritionInfo = info))
-                            refreshTodayView()
-                        }
+            holder.itemView.setOnClickListener {
+                if (!m.isWaterIntakeSummary) {
+                    if (m.isPendingOvernightRetry) {
+                        showMealNutritionPopup(m)
+                    } else {
+                        showMealNutritionPopup(m)
                     }
                 }
             }
-
-            holder.itemView.setOnClickListener {
-                showMealNutritionPopup(m)
-            }
             
             holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
-            holder.itemView.findViewById<View>(R.id.btnEdit).visibility = View.GONE
             holder.itemView.findViewById<View>(R.id.btnDelete).visibility = View.GONE
+            val btnEdit = holder.itemView.findViewById<View>(R.id.btnEdit)
+            btnEdit.visibility = if (m.isWaterIntakeSummary) View.VISIBLE else View.GONE
+            btnEdit.setOnClickListener {
+                val date = dateFormatter.format(Date())
+                showWaterSummaryAdjustMenu(date)
+            }
         }
 
         override fun getItemCount() = items.size
 
         inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-            val ivIcon: ImageView = v.findViewById(R.id.tvEmoji)
+            val ivIcon: MealIconView = v.findViewById(R.id.tvEmoji)
             val tvTitle: TextView = v.findViewById(R.id.tvTitle)
             val tvSubtitle: TextView = v.findViewById(R.id.tvSubtitle)
             val tvTime: TextView = v.findViewById(R.id.tvTime)
         }
+    }
+
+    private fun showWaterSummaryAdjustMenu(date: String) {
+        val labels = WaterIntakeSummary.adjustmentAmountsMl.map { amount ->
+            val action = if (amount > 0) "Add" else "Remove"
+            "$action ${kotlin.math.abs(amount)} ml"
+        }.toTypedArray()
+        MaterialAlertDialogBuilder(this)
+            .setItems(labels) { _, which ->
+                val updated = WaterIntakeSummary.adjustDate(this, date, WaterIntakeSummary.adjustmentAmountsMl[which])
+                refreshTodayView()
+                Toast.makeText(this, "Total water intake: ${WaterIntakeSummary.formatLiters(updated)} L", Toast.LENGTH_SHORT).show()
+            }
+            .show()
     }
 }

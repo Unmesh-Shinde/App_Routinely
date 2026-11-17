@@ -51,7 +51,7 @@ class StepCountResolverTest {
     }
 
     @Test
-    fun resolve_withOriginFilter_acceptsSmallAllOriginIncrease() {
+    fun resolve_withOriginFilter_prefersDeduplicatedAllOriginTotalWhenSlightlyHigher() {
         val resolved = StepCountResolver.resolve(
             selectedOriginSteps = 8_942L,
             allOriginSteps = 8_968L,
@@ -62,24 +62,24 @@ class StepCountResolverTest {
     }
 
     @Test
-    fun resolve_withOriginFilter_keepsSelectedOriginWhenAllOriginIsSuspiciouslyHigher() {
+    fun resolve_withOriginFilter_prefersDeduplicatedAllOriginTotalWhenMuchHigher() {
         val resolved = StepCountResolver.resolve(
             selectedOriginSteps = 8_942L,
             allOriginSteps = 17_600L,
             hasOriginFilter = true
         )
 
-        assertEquals(8_942L, resolved)
+        assertEquals(17_600L, resolved)
     }
 
     @Test
-    fun resolve_withOriginFilter_keepsSelectedOriginWhenAllOriginIsLower() {
+    fun resolve_withOriginFilter_prefersDeduplicatedAllOriginTotalWhenLower() {
         val resolved = StepCountResolver.resolve(
             selectedOriginSteps = 8_942L,
             allOriginSteps = 8_900L,
             hasOriginFilter = true
         )
 
-        assertEquals(8_942L, resolved)
+        assertEquals(8_900L, resolved)
     }
 }

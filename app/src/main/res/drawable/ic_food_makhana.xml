@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Bowl of Makhana Vessel & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,24 A 14.5,14.5 0 1,0 38.5,24 A 14.5,14.5 0 1,0 9.5,24 Z" android:fillColor="#FFF8E1" />
+
+    <!-- Puffy Irregular Makhana Lotus Seed Pops -->
+    <path android:pathData="M 12,18 C 12,15 17,15 17,18 C 17,21 12,21 12,18 Z M 21,15 C 21,12 26,12 26,15 C 26,18 21,18 21,15 Z M 29,18 C 29,15 34,15 34,18 C 34,21 29,21 29,18 Z M 16,26 C 16,23 21,23 21,26 C 21,29 16,29 16,26 Z M 26,27 C 26,24 31,24 31,27 C 31,30 26,30 26,27 Z" android:fillColor="#FFFFFF" android:strokeColor="#D7CCC8" android:strokeWidth="0.5" />
+    <path android:pathData="M 14,18 A 0.8,0.8 0 1,0 15.6,18 A 0.8,0.8 0 1,0 14,18 Z M 23,15 A 0.8,0.8 0 1,0 24.6,15 A 0.8,0.8 0 1,0 23,15 Z M 31,18 A 0.8,0.8 0 1,0 32.6,18 A 0.8,0.8 0 1,0 31,18 Z M 18,26 A 0.8,0.8 0 1,0 19.6,26 A 0.8,0.8 0 1,0 18,26 Z M 28,27 A 0.8,0.8 0 1,0 29.6,27 A 0.8,0.8 0 1,0 28,27 Z" android:fillColor="#8D6E63" />
+</vector>

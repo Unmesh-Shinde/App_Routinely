@@ -61,32 +61,47 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:text="Wednesday, 2 July"
-                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
                     android:textColor="#B3FFFFFF"/>
             </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:id="@+id/cardProfileAvatar"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                app:cardCornerRadius="23dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="@color/headerProfileAvatarBg"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/headerProfileAvatarStroke"
-                app:cardPreventCornerOverlap="false"
-                app:cardUseCompatPadding="false"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
                 android:clickable="true"
                 android:focusable="true"
-                app:rippleColor="#4DFFFFFF">
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/ivHeaderAvatar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:contentDescription="Profile Avatar"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearance.DailyRoutine.Circle"/>
-            </com.google.android.material.card.MaterialCardView>
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="2dp">
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    app:cardCornerRadius="32dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/headerProfileAvatarBg"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/headerProfileAvatarStroke"
+                    app:cardPreventCornerOverlap="false"
+                    app:cardUseCompatPadding="false">
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivHeaderAvatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="Profile Avatar"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.DailyRoutine.Circle"/>
+                </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Profile &amp; Settings"
+                    android:textColor="#E6FFFFFF"
+                    android:textSize="10sp"
+                    android:maxLines="1" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -103,39 +118,37 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:baselineAligned="false">
 
-            <!-- Wellness Score Card -->
+            <!-- Daily Wellness Score Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardWellnessScore"
                 style="?attr/materialCardViewElevatedStyle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
+                android:layout_height="82dp"
                 app:cardCornerRadius="24dp"
-                app:cardBackgroundColor="@color/surfaceWellness"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/strokeWellness">
+                app:cardBackgroundColor="@color/surfaceWellness">
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal"
-                    android:padding="18dp"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="8dp"
                     android:gravity="center_vertical">
 
                     <RelativeLayout
-                        android:layout_width="100dp"
-                        android:layout_height="80dp">
+                        android:layout_width="60dp"
+                        android:layout_height="60dp">
                         <com.google.android.material.progressindicator.CircularProgressIndicator
                             android:id="@+id/progressWellness"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:progress="0"
-                            app:indicatorSize="74dp"
-                            app:trackThickness="14dp"
+                            app:indicatorSize="50dp"
+                            app:trackThickness="8dp"
                             app:indicatorColor="@color/healthWellness"
                             app:trackColor="#6600C853"
                             app:trackCornerRadius="7dp"/>
@@ -145,7 +158,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
                             android:text="0"
-                            android:textSize="22sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             android:textColor="@color/textPrimary"
                             android:gravity="center"/>
@@ -155,13 +168,13 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="22dp"
+                        android:layout_marginStart="12dp"
                         android:orientation="vertical">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Wellness Compass"
-                            android:textSize="16sp"
+                            android:text="Daily Wellness Score"
+                            android:textSize="14sp"
                             android:textStyle="bold"
                             android:textColor="@color/textPrimary"/>
                         <TextView
@@ -170,95 +183,21 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="A quick read of your movement, rest and routine."
-                            android:textSize="12sp"
+                            android:textSize="11sp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
                             android:textColor="@color/textSecondary"/>
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-            <!-- Upcoming Reminder Strip -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardUpcoming"
-                style="?attr/materialCardViewElevatedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:cardCornerRadius="18dp"
-                app:cardBackgroundColor="@color/m3_premium_container"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/m3_premium_stroke">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="12dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-                    <ImageView android:layout_width="38dp" android:layout_height="38dp" android:contentDescription="Upcoming reminder" android:padding="9dp" app:srcCompat="@drawable/ic_reminder" app:tint="@color/healthReminder"/>
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="14dp" android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Next gentle nudge" android:textSize="11sp" android:textStyle="bold" android:textColor="@color/healthReminder"/>
-                        <TextView android:id="@+id/tvUpcomingText" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="..." android:textSize="13sp" android:textStyle="bold" android:textColor="@color/textPrimary"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardWater"
-                style="?attr/materialCardViewElevatedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
-                app:cardCornerRadius="18dp"
-                app:cardBackgroundColor="@color/m3_premium_container"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/m3_premium_stroke"
-                android:clickable="true"
-                android:focusable="true">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="12dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-                    <ImageView android:layout_width="38dp" android:layout_height="38dp" android:contentDescription="@string/hydration_label" android:padding="9dp" app:srcCompat="@drawable/ic_water" app:tint="@color/healthHydration"/>
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="14dp" android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/hydration_label" android:textSize="11sp" android:textStyle="bold" android:textColor="@color/healthHydration"/>
-                        <TextView android:id="@+id/tvValWater" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/water_liters_placeholder" android:textSize="14sp" android:textStyle="bold" android:textColor="@color/textPrimary"/>
-                    </LinearLayout>
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnWaterMinus"
-                        android:layout_width="42dp"
-                        android:layout_height="36dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:padding="0dp"
-                        android:text="@string/water_minus"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/healthHydration"
-                        app:backgroundTint="@color/badgeHydration"
-                        app:cornerRadius="14dp"/>
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnWaterPlus"
-                        android:layout_width="42dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="8dp"
-                        android:minWidth="0dp"
-                        android:minHeight="0dp"
-                        android:padding="0dp"
-                        android:text="@string/water_plus"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/white"
-                        app:backgroundTint="@color/healthHydration"
-                        app:cornerRadius="14dp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
 
             <!-- Main Modules (Nutrition / Workout Row) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="82dp"
-                android:orientation="horizontal"
-                android:layout_marginBottom="14dp">
+                android:orientation="horizontal">
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardDiet"
                     style="?attr/materialCardViewElevatedStyle"
@@ -301,56 +240,7 @@
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Buttons Row -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                    android:layout_marginBottom="14dp">
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnHealthSync"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Health Sync"
-                    app:icon="@drawable/ic_health_sync"
-                    android:textSize="12sp"
-                    android:textAllCaps="false"
-                    app:cornerRadius="16dp"
-                    android:backgroundTint="#14E91E63"
-                    android:textColor="@color/healthSync"
-                    app:iconTint="@color/healthSync"/>
-                <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnReminders"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Reminders"
-                    app:icon="@drawable/ic_alarm"
-                    android:textSize="12sp"
-                    android:textAllCaps="false"
-                    app:cornerRadius="16dp"
-                    android:backgroundTint="@color/primary"/>
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvLastSync"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Last Auto-Sync: Never"
-                android:textSize="10sp"
-                android:textColor="@color/textSecondary"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="8dp"
-                android:alpha="0.8"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp"/>
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
 
             <!-- Wellness Tracking Grid (Restored 2x2 Orientation) -->
             <TextView
@@ -360,7 +250,6 @@
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@color/textPrimary"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="6dp"/>
 
             <LinearLayout
@@ -477,6 +366,156 @@
                     </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
             </LinearLayout>
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+
+            <!-- Quick hydration and reminder actions -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:orientation="horizontal">
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardWater"
+                    style="?attr/materialCardViewElevatedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardCornerRadius="22dp"
+                    app:cardBackgroundColor="@color/m3_premium_container"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/m3_premium_stroke">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="8dp">
+                        <ImageView
+                            android:id="@+id/ivWaterDrop"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:contentDescription="@string/hydration_label"
+                            app:srcCompat="@drawable/ic_water"
+                            app:tint="@color/healthHydration"/>
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginHorizontal="4dp"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvValWater"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="0 L"
+                                android:textColor="@color/textPrimary"
+                                android:textSize="13sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:id="@+id/tvWaterDeltaBadge"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/healthHydration"
+                                android:visibility="gone"/>
+                        </LinearLayout>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnWaterMinus"
+                            android:layout_width="38dp"
+                            android:layout_height="40dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:padding="0dp"
+                            android:text="@string/water_minus"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/healthHydration"
+                            app:backgroundTint="@color/badgeHydration"
+                            app:cornerRadius="14dp"/>
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnWaterPlus"
+                            android:layout_width="38dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="4dp"
+                            android:minWidth="0dp"
+                            android:minHeight="0dp"
+                            android:padding="0dp"
+                            android:text="@string/water_plus"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/healthHydration"
+                            app:backgroundTint="@color/badgeHydration"
+                            app:cornerRadius="14dp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReminders"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text="Reminders"
+                    app:icon="@drawable/ic_alarm"
+                    android:textSize="14sp"
+                    android:textAllCaps="false"
+                    app:cornerRadius="16dp"
+                    android:backgroundTint="@color/primary"/>
+            </LinearLayout>
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnHealthSync"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sync Now"
+                    app:icon="@drawable/ic_health_sync"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    app:cornerRadius="16dp"
+                    app:iconSize="20dp"
+                    app:iconGravity="textStart"
+                    android:backgroundTint="#14E91E63"
+                    android:textColor="@color/healthSync"
+                    app:iconTint="@color/healthSync"/>
+                <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSyncLogs"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sync Logs"
+                    app:icon="@drawable/ic_sync_logs"
+                    app:iconSize="20dp"
+                    app:iconGravity="textStart"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    app:cornerRadius="16dp"
+                    app:backgroundTint="@color/cardBg"
+                    android:textColor="@color/textSecondary"
+                    app:iconTint="@color/textSecondary"/>
+            </LinearLayout>
+
+            <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

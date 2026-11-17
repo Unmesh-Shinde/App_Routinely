@@ -12,13 +12,24 @@
 	},
 	"upload_source_maps": true,
 	"vars": {
-		"FIREBASE_PROJECT_ID": "app-routinely",
-		"FIREBASE_PROJECT_NUMBER": "420538867344",
-		"FIREBASE_APP_ID": "1:420538867344:android:496ce1c11559d95475c215"
+		"FIREBASE_PROJECT_ID": "routinely-firebase-don-tdelete",
+		"FIREBASE_PROJECT_NUMBER": "104566110788",
+		"FIREBASE_APP_ID": "1:104566110788:android:2937834e00d772257bda11",
+		"GEMINI_MAX_UPSTREAM_ATTEMPTS_PER_DAY": "300"
 	},
 	"secrets": {
-		"required": ["GEMINI_API_KEY"]
-	}
+		"required": [
+			"GEMINI_API_KEYS_SET1"
+		]
+	},
+	"durable_objects": {
+		"bindings": [
+			{ "name": "NUTRITION_BUDGET", "class_name": "NutritionBudgetDurableObject" }
+		]
+	},
+	"migrations": [
+		{ "tag": "v1", "new_sqlite_classes": ["NutritionBudgetDurableObject"] }
+	]
 	/**
 	 * Smart Placement
 	 * https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

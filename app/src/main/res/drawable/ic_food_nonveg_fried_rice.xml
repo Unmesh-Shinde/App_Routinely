@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 7.5,24 A 16.5,16.5 0 1,0 40.5,24 A 16.5,16.5 0 1,0 7.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Wok-Tossed Soy Fried Rice Bed & Ambient Shadow -->
+    <path android:pathData="M 8.5,24.8 A 16,16 0 1,0 40.5,24.8 A 16,16 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFF0C8" android:strokeColor="#51382B" android:strokeWidth="0.65" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 10,22 C 16,12 28,12 36,18 C 30,22 22,23 10,22 Z" android:fillColor="#35FFCA28" />
+
+    <!-- Fried Rice Grain Texture -->
+    <path android:pathData="M 12.95,12 Q 13.65,11.28 14.9,11.8 Q 15.15,12 14.62,12.35 Q 13.65,12.72 12.95,12 Z M 19,9.95 Q 19.72,10.65 19.2,11.9 Q 19,12.15 18.65,11.62 Q 18.28,10.65 19,9.95 Z M 23.05,11.45 Q 23.95,11.05 24.95,12.35 Q 25.05,12.62 24.42,12.55 Q 23.5,12.3 23.05,11.45 Z" android:fillColor="#FFFCF2" android:strokeColor="#D8B76F" android:strokeWidth="0.26" />
+
+    <!-- Prominent Roasted Chicken Drumstick Piece (Clear Non-Veg Indicator) -->
+    <path android:pathData="M 10.5,18.8 Q 10.5,14.8 14.5,14.3 Q 18.5,13.8 20,17.3 Q 21,20.3 18,22.8 Q 14.5,24.8 11.5,22.3 Z" android:fillColor="#28000000" />
+    <path android:pathData="M 10,18 Q 10,14 14,13.5 Q 18,13 19.5,16.5 Q 20.5,19.5 17.5,22 Q 14,24 11,21.5 Q 9.8,20 10,18 Z" android:fillColor="#A94B2E" android:strokeColor="#51382B" android:strokeWidth="0.55" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 12,15.5 L 15,17 M 13.5,17.5 L 16.5,19" android:fillColor="#00000000" android:strokeColor="#5C1F0E" android:strokeWidth="0.5" android:strokeLineCap="round" />
+    <path android:pathData="M 12,15 C 14,14 17,15 18,17 C 16,17 13,17 12,15 Z" android:fillColor="#50FFFFFF" />
+    <!-- Bone Joint -->
+    <path android:pathData="M 16.8,20.8 L 20.8,24.8" android:fillColor="#FFF7E6" android:strokeColor="#51382B" android:strokeWidth="1.25" android:strokeLineCap="round" />
+    <path android:pathData="M 20.1,25.2 A 1.1,1.1 0 1,0 22.3,25.2 A 1.1,1.1 0 1,0 20.1,25.2 Z" android:fillColor="#FFF7E6" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+
+    <!-- 3D Fluffy Egg Scramble Curds -->
+    <path android:pathData="M 27.5,16.1 L 30.6,15.5 L 31.5,16.5 L 28.4,17.1 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 27,15.6 L 30.1,15 L 31,16 L 27.9,16.65 Z" android:fillColor="#FFF4B8" android:strokeColor="#51382B" android:strokeWidth="0.38" />
+    <path android:pathData="M 27,15.6 L 27.9,16.65 L 27.9,19 L 27,18 Z" android:fillColor="#E7BD69" android:strokeColor="#51382B" android:strokeWidth="0.38" />
+    <path android:pathData="M 27.9,16.65 L 31,16 L 31,18.3 L 27.9,19 Z" android:fillColor="#F0CF82" android:strokeColor="#51382B" android:strokeWidth="0.38" />
+
+    <!-- Diced Roasted Chicken Chunks -->
+    <path android:pathData="M 16,30.5 Q 16.3,27.9 18.5,28 Q 20.7,28.1 21,30.5 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 15.5,30 Q 15.8,27.4 18,27.5 Q 20.2,27.6 20.5,30 Q 19.5,31.5 18,31.5 Q 16.4,31.5 15.5,30 Z" android:fillColor="#A94B2E" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+    <path android:pathData="M 17.3,30.4 L 18.7,30.4 L 19,32.2 L 17,32.2 Z" android:fillColor="#FFF0D1" android:strokeColor="#51382B" android:strokeWidth="0.35" />
+
+    <!-- Green Spring Onion Rings & Peas -->
+    <path android:pathData="M 22.15,14 A 0.85,0.85 0 1,0 23.85,14 A 0.85,0.85 0 1,0 22.15,14 Z" android:fillColor="#66A84F" android:strokeColor="#2E6323" android:strokeWidth="0.3" />
+    <path android:pathData="M 33.15,21 A 0.85,0.85 0 1,0 34.85,21 A 0.85,0.85 0 1,0 33.15,21 Z" android:fillColor="#66A84F" android:strokeColor="#2E6323" android:strokeWidth="0.3" />
+    <path android:pathData="M 25,25.3 Q 23.2,24.1 22.6,22.8 Q 23.9,22.3 23.8,20.9 Q 24.8,20.9 25,22.1 Q 25.4,20.7 26.4,21 Q 26.1,22.3 27.3,22.8 Q 26.7,24.2 25,25.3 Z" android:fillColor="#43864A" android:strokeColor="#2E6323" android:strokeWidth="0.35" />
+    <path android:pathData="M 25,24.7 L 25,21.5" android:fillColor="#00000000" android:strokeColor="#A5C870" android:strokeWidth="0.32" />
+</vector>

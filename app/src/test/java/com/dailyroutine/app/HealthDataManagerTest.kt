@@ -35,7 +35,7 @@ class HealthDataManagerTest {
         manager.saveHistoricalSteps(keptDate, 1234L)
         manager.saveHistoricalSleep(keptDate, 7.5)
         manager.saveHistoricalCalories(keptDate, 1800.0)
-        manager.saveHistoricalHeartPoints(keptDate, 22.0)
+        prefs.edit().putFloat("hist_heart_pts_$keptDate", 22.0f).putBoolean("hist_heart_pts_synced_$keptDate", true).commit()
         manager.adjustWaterIntake(keptDate, 1.5)
         manager.saveWeight(keptDate, 72.5)
         prefs.edit().putString("hist_dist_$keptDate", "2.00 km").commit()
@@ -43,7 +43,7 @@ class HealthDataManagerTest {
         manager.saveHistoricalSteps(oldDate, 4321L)
         manager.saveHistoricalSleep(oldDate, 6.0)
         manager.saveHistoricalCalories(oldDate, 1600.0)
-        manager.saveHistoricalHeartPoints(oldDate, 11.0)
+        prefs.edit().putFloat("hist_heart_pts_$oldDate", 11.0f).putBoolean("hist_heart_pts_synced_$oldDate", true).commit()
         manager.adjustWaterIntake(oldDate, 2.0)
         manager.saveWeight(oldDate, 80.0)
         prefs.edit().putString("hist_dist_$oldDate", "4.00 km").commit()
@@ -96,17 +96,6 @@ class HealthDataManagerTest {
     }
 
     @Test
-    fun historicalHeartPointsCompletion_countsSyncedMarkersIncludingZeroPointDays() {
-        val today = LocalDate.now()
-        repeat(HealthDataManager.SYNC_HISTORY_DAYS) { offset ->
-            manager.saveHistoricalHeartPoints(today.minusDays(offset.toLong()).toString(), 0.0)
-        }
-
-        assertEquals(HealthDataManager.SYNC_HISTORY_DAYS, manager.countHistoricalHeartPointsSyncedDays())
-        assertTrue(manager.isHeartPointsHistoryComplete())
-    }
-
-    @Test
     fun distanceGoal_canBeSavedAndRetrieved() {
         manager.setDailyDistanceGoal(7.5f)
         assertEquals(7.5f, manager.getDailyDistanceGoal(), 0.001f)
@@ -132,6 +121,31 @@ class HealthDataManagerTest {
         assertEquals(2.0, HealthDataManager.normalizeDistanceKm(2.0), 0.001)
         assertEquals(0.0, HealthDataManager.normalizeDistanceKm(Double.NaN), 0.001)
         assertEquals(0.0, HealthDataManager.normalizeDistanceKm(-1.0), 0.001)
+    }
+
+    @Test
+    fun healthConnectSourceIdentity_requiresFreshSyncAfterProviderFilteredHistory() {
+        val prefs = context.getSharedPreferences("health_data_pref", Context.MODE_PRIVATE)
+        prefs.edit().putString("synced_health_connect_source_pkg", "com.google.android.apps.fitness").commit()
+
+        assertFalse(manager.hasSyncedHealthConnectSource(HealthDataManager.HEALTH_CONNECT_ALL_ORIGINS_SOURCE))
+
+        manager.markHealthConnectSourceSynced(HealthDataManager.HEALTH_CONNECT_ALL_ORIGINS_SOURCE)
+
+        assertTrue(manager.hasSyncedHealthConnectSource(HealthDataManager.HEALTH_CONNECT_ALL_ORIGINS_SOURCE))
+    }
+
+    @Test
+    fun connectedHealthSource_isAlwaysHealthConnect_andDisconnectClearsLegacyProviderState() {
+        val prefs = context.getSharedPreferences("health_data_pref", Context.MODE_PRIVATE)
+        prefs.edit().putString("connected_health_app_package", "com.fitbit.FitbitMobile").commit()
+
+        manager.setConnected(true)
+        assertEquals("Health Connect", manager.getConnectedAppName())
+        assertFalse(prefs.contains("connected_health_app_package"))
+
+        manager.setConnected(false)
+        assertEquals("None", manager.getConnectedAppName())
     }
 }
 

@@ -17,10 +17,12 @@ class HealthMetricsBackfillManager(
     private val appPrefs: SharedPreferences = appContext.getSharedPreferences(PREF_APP, Context.MODE_PRIVATE)
 
     suspend fun backfillIfNeeded(force: Boolean = false): BackfillResult {
-        // Increment SCHEMA_VERSION here if we want to force a re-backfill on schema changes
+        // Increment SCHEMA_VERSION to migrate new legacy preference fields into Room.
         // Version 3: Separated active/total calories
         // Version 4: Distance normalization (meters -> km)
-        val currentSchemaVersion = 4
+        // Version 5: Persist per-metric sync status and source provenance in Room.
+        // Version 6: Stop copying legacy Heart Points cache values into Room.
+        val currentSchemaVersion = 6
         val lastDoneVersion = appPrefs.getInt(KEY_BACKFILL_SCHEMA_VERSION, 0)
 
         if (!force && appPrefs.getBoolean(KEY_BACKFILL_DONE, false) && lastDoneVersion >= currentSchemaVersion) {
@@ -54,7 +56,6 @@ class HealthMetricsBackfillManager(
         var stepDays = 0
         var sleepDays = 0
         var calorieDays = 0
-        var heartPointDays = 0
         var distanceDays = 0
         var weightDays = 0
 
@@ -72,36 +73,37 @@ class HealthMetricsBackfillManager(
                 val stepsSynced = healthPrefs.getBoolean(KEY_HIST_STEPS_SYNCED_PREFIX + date, false)
                 current = current.copy(
                     steps = healthPrefs.getLong(KEY_HIST_STEPS_PREFIX + date, 0L),
-                    stepsSynced = stepsSynced || (current.stepsSynced == true)
+                    stepsSynced = stepsSynced || current.stepsSynced,
+                    stepsSyncStatus = if (stepsSynced) "SYNCED" else current.stepsSyncStatus,
+                    stepsSource = if (stepsSynced) "legacy_preferences" else current.stepsSource
                 )
                 stepDays++
             }
 
             if (healthPrefs.contains(KEY_HIST_SLEEP_PREFIX + date)) {
                 current = current.copy(
-                    sleepHours = healthPrefs.getFloat(KEY_HIST_SLEEP_PREFIX + date, 0f).toDouble()
+                    sleepHours = healthPrefs.getFloat(KEY_HIST_SLEEP_PREFIX + date, 0f).toDouble(),
+                    sleepHoursSyncStatus = "SYNCED",
+                    sleepHoursSource = "legacy_preferences"
                 )
                 sleepDays++
             }
 
             if (healthPrefs.contains(KEY_HIST_CALS_PREFIX + date)) {
                 current = current.copy(
-                    totalCalories = healthPrefs.getFloat(KEY_HIST_CALS_PREFIX + date, 0f).toDouble()
+                    totalCalories = healthPrefs.getFloat(KEY_HIST_CALS_PREFIX + date, 0f).toDouble(),
+                    totalCaloriesSyncStatus = "SYNCED",
+                    totalCaloriesSource = "legacy_preferences"
                 )
                 calorieDays++
             }
 
             if (healthPrefs.contains(KEY_HIST_ACTIVE_CALS_PREFIX + date)) {
                 current = current.copy(
-                    activeCalories = healthPrefs.getFloat(KEY_HIST_ACTIVE_CALS_PREFIX + date, 0f).toDouble()
+                    activeCalories = healthPrefs.getFloat(KEY_HIST_ACTIVE_CALS_PREFIX + date, 0f).toDouble(),
+                    activeCaloriesSyncStatus = "SYNCED",
+                    activeCaloriesSource = "legacy_preferences"
                 )
-            }
-
-            if (healthPrefs.contains(KEY_HIST_HEART_POINTS_PREFIX + date)) {
-                current = current.copy(
-                    heartPoints = healthPrefs.getFloat(KEY_HIST_HEART_POINTS_PREFIX + date, 0f).toDouble()
-                )
-                heartPointDays++
             }
 
             if (healthPrefs.contains(KEY_HIST_DISTANCE_PREFIX + date)) {
@@ -117,13 +119,21 @@ class HealthMetricsBackfillManager(
                 }
                 
                 if (distanceKm != null && distanceKm > 0.0) {
-                    current = current.copy(distanceKm = distanceKm)
+                    current = current.copy(
+                        distanceKm = distanceKm,
+                        distanceKmSyncStatus = "SYNCED",
+                        distanceKmSource = "legacy_preferences"
+                    )
                     distanceDays++
                 }
             }
 
             weightHistory[date]?.let { weightKg ->
-                current = current.copy(weightKg = weightKg)
+                current = current.copy(
+                    weightKg = weightKg,
+                    weightKgSyncStatus = "SYNCED",
+                    weightKgSource = "legacy_preferences"
+                )
                 weightDays++
             }
             
@@ -147,7 +157,7 @@ class HealthMetricsBackfillManager(
             "Room health metrics batch backfill finished. success=$success, " +
                 "total_entities=${entitiesToUpsert.size}, " +
                 "steps=$stepDays, sleep=$sleepDays, calories=$calorieDays, " +
-                "heartPoints=$heartPointDays, distance=$distanceDays, weight=$weightDays"
+                "distance=$distanceDays, weight=$weightDays"
         )
 
         return BackfillResult(
@@ -155,7 +165,6 @@ class HealthMetricsBackfillManager(
             stepDays = stepDays,
             sleepDays = sleepDays,
             calorieDays = calorieDays,
-            heartPointDays = heartPointDays,
             distanceDays = distanceDays,
             weightDays = weightDays
         )
@@ -180,7 +189,6 @@ class HealthMetricsBackfillManager(
         val stepDays: Int = 0,
         val sleepDays: Int = 0,
         val calorieDays: Int = 0,
-        val heartPointDays: Int = 0,
         val distanceDays: Int = 0,
         val weightDays: Int = 0
     )
@@ -195,7 +203,6 @@ class HealthMetricsBackfillManager(
         private const val KEY_HIST_STEPS_SYNCED_PREFIX = "hist_steps_synced_"
         private const val KEY_HIST_SLEEP_PREFIX = "hist_sleep_"
         private const val KEY_HIST_CALS_PREFIX = "hist_cals_"
-        private const val KEY_HIST_HEART_POINTS_PREFIX = "hist_heart_pts_"
         private const val KEY_HIST_DISTANCE_PREFIX = "hist_dist_"
         private const val KEY_HIST_ACTIVE_CALS_PREFIX = "hist_active_cals_"
         private const val KEY_WEIGHT_HISTORY = "weight_history_data"

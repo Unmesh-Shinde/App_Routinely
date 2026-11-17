@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Ceramic Bowl of Fiery Red Misal Rassa Vessel & Shadow -->
+    <path android:pathData="M 5.5,20.8 C 5.5,13.8 22.5,13.8 22.5,20.8 C 22.5,29 5.5,29 5.5,20.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 5,20 C 5,13 22,13 22,20 C 22,28 5,28 5,20 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 6,20 C 6,14 21,14 21,20 C 21,27 6,27 6,20 Z" android:fillColor="#D32F2F" />
+    <path android:pathData="M 8,17 C 12,14 18,14 20,17 C 18,19 10,19 8,17 Z" android:fillColor="#FF5722" />
+
+    <!-- Misal Farsan / Sev Topping & Diced Onions -->
+    <path android:pathData="M 9,18 Q 13,16 17,19 M 8,21 Q 12,19 16,22" android:fillColor="#00000000" android:strokeColor="#FFC107" android:strokeWidth="0.7" android:strokeLineCap="round" />
+    <path android:pathData="M 10,20 L 11,19 L 11.5,20.5 Z M 15,21 L 16,20 L 16.5,21.5 Z" android:fillColor="#E1BEE7" />
+
+    <!-- Soft Butter-Toasted Pav Buns Pair -->
+    <path android:pathData="M 23.5,18.8 C 23.5,11.8 38.5,11.8 38.5,18.8 L 38.5,31.8 C 38.5,35 23.5,35 23.5,31.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 23,18 C 23,11 38,11 38,18 L 38,31 C 38,34 23,34 23,31 Z" android:fillColor="#DDA04E" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 23,24 L 38,24" android:fillColor="#00000000" android:strokeColor="#51382B" android:strokeWidth="0.6" />
+    <path android:pathData="M 25,16 C 28,13 33,13 36,16" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1" android:strokeLineCap="round" />
+
+    <!-- Lemon Wedge -->
+    <path android:pathData="M 10,30 Q 14,27 16,31 L 12,34 Z" android:fillColor="#F8D84F" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+</vector>

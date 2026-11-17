@@ -203,7 +203,7 @@ object WellnessEngine {
             return
         }
 
-        val totalIntake = meals.sumOf { it.calories }
+        val totalIntake = meals.sumOf { it.displayCalories ?: 0 }
         Log.d("WellnessEngine", "Intake for $date: $totalIntake kcal")
         onResult(totalIntake)
     }

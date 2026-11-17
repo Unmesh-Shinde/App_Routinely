@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Ceramic Bowl of Yellow Dal (Lentil Soup) with Tadka -->
+    <path android:pathData="M 5.5,24.8 C 5.5,19.3 7.8,15.2 13.2,15.2 C 18.2,15.2 20.5,19.6 20.5,24.8 C 20.5,30.0 18.2,34.5 13.2,34.5 C 8,34.5 5.5,30.1 5.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 5.0,24 A 10.5,10.5 0 1,0 26.0,24 A 10.5,10.5 0 1,0 5.0,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 6.2,24 A 9.3,9.3 0 1,0 24.8,24 A 9.3,9.3 0 1,0 6.2,24 Z" android:fillColor="#E8B552" android:strokeColor="#D49743" android:strokeWidth="0.4" />
+
+    <!-- Glossy Ghee Surface Reflection on Dal -->
+    <path android:pathData="M 8,20 C 11,16.5 15,16.5 19,19" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Whole Red Chili, Curry Leaf & Cumin Tadka Tempering -->
+    <path android:pathData="M 12,17 Q 14,15.5 16,17 Q 15,18 12,17 Z" android:fillColor="#BA4930" android:strokeColor="#51382B" android:strokeWidth="0.3" />
+    <path android:pathData="M 17,21 Q 19,20 18,22 Z" android:fillColor="#43864A" android:strokeColor="#2E6323" android:strokeWidth="0.3" />
+    <path android:pathData="M 9.7,20 A 0.8,0.8 0 1,0 11.3,20 A 0.8,0.8 0 1,0 9.7,20 Z M 14.35,17 A 0.65,0.65 0 1,0 15.65,17 A 0.65,0.65 0 1,0 14.35,17 Z M 18.25,21 A 0.75,0.75 0 1,0 19.75,21 A 0.75,0.75 0 1,0 18.25,21 Z" android:fillColor="#7A3E1D" />
+
+    <!-- Stack of Puffed Golden Chapatis (Roti) with Charred Phulka Spots -->
+    <path android:pathData="M 24.8,24.8 A 7.7,7.7 0 1,0 40.2,24.8 A 7.7,7.7 0 1,0 24.8,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 24.3,24 A 7.7,7.7 0 1,0 39.7,24 A 7.7,7.7 0 1,0 24.3,24 Z" android:fillColor="#E99F31" android:strokeColor="#51382B" android:strokeWidth="0.75" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 25.2,24 A 6.8,6.8 0 1,0 38.8,24 A 6.8,6.8 0 1,0 25.2,24 Z" android:fillColor="#EAA33A" />
+
+    <!-- Chapati Surface Folds, Charred Spots & Ghee Sheen -->
+    <path android:pathData="M 28.7,22 Q 29,20.9 30.1,21.1 Q 31.5,21.5 31.2,22.25 Q 30.5,23 28.7,22 Z" android:fillColor="#F2C765" android:strokeColor="#A5662D" android:strokeWidth="0.3" />
+    <path android:pathData="M 29.35,21.42 Q 30.1,21.9 30.7,22.4" android:fillColor="#00000000" android:strokeColor="#A5662D" android:strokeWidth="0.28" />
+    <path android:pathData="M 33.6,20.9 Q 34.7,21.2 34.5,22.3 Q 34.1,23.7 33.35,23.4 Q 32.6,22.7 33.6,20.9 Z" android:fillColor="#F2C765" android:strokeColor="#A5662D" android:strokeWidth="0.3" />
+    <path android:pathData="M 28,26 A 0.8,0.8 0 1,0 29.6,26 A 0.8,0.8 0 1,0 28,26 Z M 34,27 A 0.65,0.65 0 1,0 35.3,27 A 0.65,0.65 0 1,0 34,27 Z M 31,31 A 0.7,0.7 0 1,0 32.4,31 A 0.7,0.7 0 1,0 31,31 Z" android:fillColor="#6D3C1B" />
+    <!-- Ghee Sheen Glaze -->
+    <path android:pathData="M 27,20 C 30,18.5 34,19 36,21 C 32,20.5 28.5,21 27,20 Z" android:fillColor="#50FFF9C4" />
+</vector>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Coaster Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Coaster Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Popcorn Tub Ambient Shadow -->
+    <path android:pathData="M 13.5,21.8 L 34.5,21.8 L 31.5,39.8 L 16.5,39.8 Z" android:fillColor="#22000000" />
+
+    <!-- Striped Red-and-White Bucket / Tub -->
+    <path android:pathData="M 13,21 L 34,21 L 31,39 L 16,39 Z" android:fillColor="#E53935" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- White Vertical Stripes -->
+    <path android:pathData="M 17,21 L 20,21 L 19,39 L 17.5,39 Z M 24,21 L 27,21 L 25.5,39 L 24,39 Z M 31,21 L 33,21 L 30.5,39 L 29,39 Z" android:fillColor="#FFFFFF" />
+
+    <!-- Fluffy Overflowing Buttered Popcorn Kernels -->
+    <path android:pathData="M 12,19 C 10,15 14,12 17,15 C 19,11 23,11 25,14 C 27,10 31,11 33,15 C 36,13 38,17 35,21 C 32,23 15,23 12,19 Z" android:fillColor="#FFF59D" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 14,18 C 16,14 19,16 21,18 M 22,15 C 24,12 28,14 29,17 M 29,16 C 31,14 34,16 34,19" android:fillColor="#00000000" android:strokeColor="#FFA000" android:strokeWidth="0.6" />
+
+    <!-- Butter Melt Drizzle Glint -->
+    <path android:pathData="M 18,16 C 22,14 26,14 30,17" android:fillColor="#00000000" android:strokeColor="#50FFFFFF" android:strokeWidth="1" android:strokeLineCap="round" />
+</vector>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Puffed Golden Puris with Ambient Shadows -->
+    <path android:pathData="M 8.5,19.8 A 7.5,7.5 0 1,0 23.5,19.8 A 7.5,7.5 0 1,0 8.5,19.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,19 A 7.5,7.5 0 1,0 23,19 A 7.5,7.5 0 1,0 8,19 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 9.5,19 A 6,6 0 1,0 21.5,19 A 6,6 0 1,0 9.5,19 Z" android:fillColor="#FFC107" />
+    <path android:pathData="M 11,16 C 14,14 18,14 20,17" android:fillColor="#00000000" android:strokeColor="#FFE082" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Second Puri (Bottom Center) -->
+    <path android:pathData="M 15.5,28.8 A 7.5,7.5 0 1,0 30.5,28.8 A 7.5,7.5 0 1,0 15.5,28.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 15,28 A 7.5,7.5 0 1,0 30,28 A 7.5,7.5 0 1,0 15,28 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 16.5,28 A 6,6 0 1,0 28.5,28 A 6,6 0 1,0 16.5,28 Z" android:fillColor="#FFC107" />
+
+    <!-- Bowl of Yellow Spiced Potato Bhaji -->
+    <path android:pathData="M 25.5,18.8 A 7.5,7.5 0 1,0 40.5,18.8 A 7.5,7.5 0 1,0 25.5,18.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 25,18 A 7.5,7.5 0 1,0 40,18 A 7.5,7.5 0 1,0 25,18 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 26,18 A 6.5,6.5 0 1,0 39,18 A 6.5,6.5 0 1,0 26,18 Z" android:fillColor="#FCE082" />
+    <path android:pathData="M 28,15 C 31,13 35,13 37,16" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Mustard Seeds & Coriander on Bhaji -->
+    <path android:pathData="M 29,18 A 0.5,0.5 0 1,0 30,18 A 0.5,0.5 0 1,0 29,18 Z M 34,19 A 0.5,0.5 0 1,0 35,19 A 0.5,0.5 0 1,0 34,19 Z" android:fillColor="#633929" />
+    <path android:pathData="M 31,19 Q 33,18 34,20 Z" android:fillColor="#4CAF50" />
+</vector>

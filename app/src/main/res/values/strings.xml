@@ -18,7 +18,6 @@
     <string name="water_minus">-</string>
     <string name="water_plus">+</string>
     <string name="legend_steps">Steps</string>
-    <string name="legend_heart_points">Heart Points</string>
     <string name="step_goal_value">%1$,d steps</string>
     <string name="distance_km_value">%1$.2f km</string>
     <string name="duration_min_value">%1$d min</string>

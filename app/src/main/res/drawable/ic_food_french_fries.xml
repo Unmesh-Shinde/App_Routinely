@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Red Fast Food Pouch Ambient Drop Shadow -->
+    <path android:pathData="M 12.5,22.8 L 29.5,22.8 L 27.5,38.8 L 14.5,38.8 Z" android:fillColor="#22000000" />
+
+    <!-- Golden Crispy French Fries Sticks Protruding Out -->
+    <path android:pathData="M 14,10 L 16,10 L 16,24 L 14,24 Z M 17,8 L 19,8 L 19,24 L 17,24 Z M 20,11 L 22,11 L 22,24 L 20,24 Z M 23,9 L 25,9 L 25,24 L 23,24 Z M 26,12 L 28,12 L 28,24 L 26,24 Z" android:fillColor="#FFD54F" android:strokeColor="#FFA000" android:strokeWidth="0.3" />
+    <path android:pathData="M 15,10 L 16,10 L 16,24 L 15,24 Z M 18,8 L 19,8 L 19,24 L 18,24 Z M 21,11 L 22,11 L 22,24 L 21,24 Z M 24,9 L 25,9 L 25,24 L 24,24 Z M 27,12 L 28,12 L 28,24 L 27,24 Z" android:fillColor="#FFC107" />
+
+    <!-- Red Paper Pouch Base -->
+    <path android:pathData="M 12,22 L 29,22 L 27,38 L 14,38 Z" android:fillColor="#E53935" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 14,22 C 18,24 23,24 27,22 L 26,36 L 15,36 Z" android:fillColor="#C62828" />
+    <path android:pathData="M 13,24 L 14.5,36" android:fillColor="#00000000" android:strokeColor="#40FFFFFF" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Tomato Ketchup Dip Bowl on Side -->
+    <path android:pathData="M 29.5,30.8 A 5.5,5.5 0 1,0 40.5,30.8 A 5.5,5.5 0 1,0 29.5,30.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 29,30 A 5.5,5.5 0 1,0 40,30 A 5.5,5.5 0 1,0 29,30 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 30,30 A 4.5,4.5 0 1,0 39,30 A 4.5,4.5 0 1,0 30,30 Z" android:fillColor="#D32F2F" />
+    <path android:pathData="M 32,28 C 34,27 36,27 38,29" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="0.7" android:strokeLineCap="round" />
+</vector>

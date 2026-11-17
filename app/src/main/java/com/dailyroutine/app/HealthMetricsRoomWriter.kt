@@ -16,7 +16,8 @@ class HealthMetricsRoomWriter(internal val repository: HealthMetricsRepository) 
         totalCalories: Double? = null,
         heartPoints: Double? = null,
         distanceKm: Double? = null,
-        weightKg: Double? = null
+        weightKg: Double? = null,
+        source: String? = null
     ): Boolean {
         return safeWrite("metric", date) {
             repository.upsertMetric(
@@ -28,7 +29,8 @@ class HealthMetricsRoomWriter(internal val repository: HealthMetricsRepository) 
                 totalCalories = totalCalories,
                 heartPoints = heartPoints,
                 distanceKm = distanceKm,
-                weightKg = weightKg
+                weightKg = weightKg,
+                source = source
             )
         }
     }
@@ -56,7 +58,7 @@ class HealthMetricsRoomWriter(internal val repository: HealthMetricsRepository) 
             block()
             true
         } catch (e: Exception) {
-            Log.w(TAG, "Room dual-write failed for $label on $date; existing prefs write remains authoritative", e)
+            Log.w(TAG, "Room write failed for $label on $date", e)
             false
         }
     }

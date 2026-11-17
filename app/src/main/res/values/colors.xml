@@ -31,6 +31,7 @@
     <color name="healthSync">#E91E63</color>       <!-- Pink -->
     <color name="healthReminder">#FFC107</color>   <!-- Amber -->
     <color name="healthProfile">#546E7A</color>    <!-- Premium Blue Grey -->
+    <color name="reportExportHintText">#6A4B00</color>
     <color name="healthWellness">#00C853</color>   <!-- Emerald -->
     <color name="healthHydration">#03A9F4</color>  <!-- Water Blue -->
     <color name="textOnReminder">#2D2100</color>
@@ -144,7 +145,7 @@
     <color name="badgeBreakfast">#FFF2CC</color>
     <color name="badgeDinner">#F2E4FF</color>
     <color name="badgeWorkout">#FFE7C7</color>
-    <color name="badgeHydration">#DDF4FF</color>
+    <color name="badgeHydration">#D8F0FC</color>
     <color name="badgeSleep">#EDE7F6</color>
     <color name="badgeWalking">#E3F2FD</color>
     <color name="badgeWeight">#DFF4F1</color>

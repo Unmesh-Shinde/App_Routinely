@@ -67,10 +67,6 @@ dependencies {
     // Health Connect
     implementation 'androidx.health.connect:connect-client:1.1.0'
 
-    // Google Fit (direct Heart Points)
-    implementation 'com.google.android.gms:play-services-fitness:21.2.0'
-    implementation 'com.google.android.gms:play-services-auth:21.2.0'
-
     // WorkManager
     implementation 'androidx.work:work-runtime-ktx:2.9.0'
     
@@ -79,6 +75,8 @@ dependencies {
     
     // Coil image loading
     implementation 'io.coil-kt:coil:2.5.0'
+    implementation 'io.coil-kt:coil-gif:2.5.0'
+    implementation 'io.coil-kt:coil-svg:2.5.0'
     
     // Lifecycle
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Marinara Coated Pasta Bed Mound & Ambient Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#E53935" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 10,22 C 16,12 28,12 36,18 C 30,22 22,23 10,22 Z" android:fillColor="#D32F2F" />
+
+    <!-- Detailed Penne Pasta Tubes with Ridges & Cheese Coat -->
+    <path android:pathData="M 12,18 L 18,15 L 20,18 L 14,21 Z" android:fillColor="#FFCA28" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+    <path android:pathData="M 14,17 L 18,15 M 15,18 L 19,16" android:fillColor="#00000000" android:strokeColor="#E65100" android:strokeWidth="0.3" />
+
+    <path android:pathData="M 22,14 L 28,12 L 30,15 L 24,17 Z" android:fillColor="#FFCA28" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+    <path android:pathData="M 24,13.5 L 28,12 M 25,15 L 29,13.5" android:fillColor="#00000000" android:strokeColor="#E65100" android:strokeWidth="0.3" />
+
+    <path android:pathData="M 16,25 L 22,22 L 24,25 L 18,28 Z" android:fillColor="#FFCA28" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+    <path android:pathData="M 18,24 L 22,22 M 19,25.5 L 23,23.5" android:fillColor="#00000000" android:strokeColor="#E65100" android:strokeWidth="0.3" />
+
+    <path android:pathData="M 26,23 L 32,20 L 34,23 L 28,26 Z" android:fillColor="#FFCA28" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+    <path android:pathData="M 28,22 L 32,20 M 29,23.5 L 33,21.5" android:fillColor="#00000000" android:strokeColor="#E65100" android:strokeWidth="0.3" />
+
+    <path android:pathData="M 20,31 L 26,28 L 28,31 L 22,34 Z" android:fillColor="#FFCA28" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+
+    <!-- Grated Parmesan Cheese Flecks -->
+    <path android:pathData="M 15,20 L 16,19.5 L 16.5,20.5 Z M 25,18 L 26,17.5 L 26.5,18.5 Z M 21,27 L 22,26.5 L 22.5,27.5 Z M 30,25 L 31,24.5 L 31.5,25.5 Z" android:fillColor="#FFFDF0" />
+
+    <!-- Fresh Basil Leaves -->
+    <path android:pathData="M 20,20 Q 22,17 25,20 Q 23,23 20,20 Z" android:fillColor="#388E3C" android:strokeColor="#1B5E20" android:strokeWidth="0.3" />
+    <path android:pathData="M 20,20 L 25,20" android:fillColor="#00000000" android:strokeColor="#A5C870" android:strokeWidth="0.3" />
+
+    <!-- Olive Oil Glaze Glossy Reflection -->
+    <path android:pathData="M 12,18 C 18,12 28,12 34,16" android:fillColor="#00000000" android:strokeColor="#60FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>

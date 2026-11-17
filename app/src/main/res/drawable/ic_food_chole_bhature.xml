@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Large Puffed Golden Bhatura Bread Base & Shadow -->
+    <path android:pathData="M 9.5,23.8 C 9.5,13 31.5,13 31.5,23.8 C 31.5,33 9.5,33 9.5,23.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 9,23 C 9,12 31,12 31,23 C 31,32 9,32 9,23 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" />
+    <path android:pathData="M 11,22 C 11,14 29,14 29,22 C 29,30 11,30 11,22 Z" android:fillColor="#FFC107" />
+    <path android:pathData="M 13,18 C 17,14 23,14 27,18" android:fillColor="#00000000" android:strokeColor="#FFFDF0" android:strokeWidth="1.2" android:strokeLineCap="round" />
+
+    <!-- Bowl of Dark Spicy Chickpea Chole Curry -->
+    <path android:pathData="M 24.5,27.8 A 7.5,7.5 0 1,0 39.5,27.8 A 7.5,7.5 0 1,0 24.5,27.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 24,27 A 7.5,7.5 0 1,0 39,27 A 7.5,7.5 0 1,0 24,27 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 25,27 A 6.5,6.5 0 1,0 38,27 A 6.5,6.5 0 1,0 25,27 Z" android:fillColor="#4E342E" />
+
+    <!-- Whole Chickpeas (Kabuli Chana) in Chole Bowl -->
+    <path android:pathData="M 28,26 A 1,1 0 1,0 30,26 A 1,1 0 1,0 28,26 Z M 32,28 A 1,1 0 1,0 34,28 A 1,1 0 1,0 32,28 Z M 29,30 A 1,1 0 1,0 31,30 A 1,1 0 1,0 29,30 Z" android:fillColor="#8D6E63" />
+
+    <!-- Onion Ring & Lemon Wedge -->
+    <path android:pathData="M 30,16 A 2,2 0 1,0 34,16 A 2,2 0 1,0 30,16 Z" android:fillColor="#E1BEE7" android:strokeColor="#8E24AA" android:strokeWidth="0.3" />
+    <path android:pathData="M 12,30 Q 16,27 18,31 L 14,34 Z" android:fillColor="#F8D84F" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+</vector>

@@ -1,6 +1,7 @@
 package com.dailyroutine.app
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -29,7 +30,7 @@ class CalorieEstimatorTest {
     }
 
     @Test
-    fun enrichMealNutrition_derivesNetCarbsWhenCarbsAndFiberExist() {
+    fun enrichMealNutrition_preservesGeminiValuesWithoutSynthesizingBreakdowns() {
         val baseInfo = MealNutritionInfo(
             calories = 500,
             carbsG = 55.0,
@@ -39,10 +40,14 @@ class CalorieEstimatorTest {
         )
         val info = CalorieEstimator.enrichMealNutrition(baseInfo)
 
-        assertEquals(500, info.calories)
-        assertEquals(55.0, info.carbsG, 0.01)
-        assertEquals(30.0, info.proteinG, 0.01)
-        assertEquals(49.0, info.carbBreakdown["Net Carbs"]?.replace(" g", "")?.toDouble() ?: 0.0, 0.1)
+        assertEquals(500, info.calories ?: -1)
+        assertEquals(55.0, info.carbsG ?: 0.0, 0.01)
+        assertEquals(30.0, info.proteinG ?: 0.0, 0.01)
+        assertTrue(info.carbBreakdown.isEmpty())
+        assertTrue(info.fatBreakdown.isEmpty())
+        assertTrue(info.aminoAcids.isEmpty())
+        assertTrue(info.antioxidants.isEmpty())
+        assertTrue(info.otherNutrients.isEmpty())
     }
 
     @Test
@@ -58,13 +63,16 @@ class CalorieEstimatorTest {
     }
 
     @Test
-    fun hasDetailedNutrition_rejectsCaloriesWithMicrosButMissingMacros() {
+    fun hasAnyNutrition_acceptsPartialNutritionAndExplicitZeros() {
         val incomplete = MealNutritionInfo(
             calories = 128,
             vitamins = mapOf("Vitamin D" to "1.5 mcg"),
             minerals = mapOf("Magnesium" to "45 mg")
         )
 
-        assertTrue(!incomplete.hasDetailedNutrition())
+        assertTrue(incomplete.hasAnyNutrition())
+        assertTrue(MealNutritionInfo(calories = 3, carbsG = 0.9, proteinG = 0.0, fatG = 0.0).hasAnyNutrition())
+        assertTrue(MealNutritionInfo(calories = 0, carbsG = 0.0, proteinG = 0.0, fatG = 0.0).hasAnyNutrition())
+        assertFalse(MealNutritionInfo().hasAnyNutrition())
     }
 }

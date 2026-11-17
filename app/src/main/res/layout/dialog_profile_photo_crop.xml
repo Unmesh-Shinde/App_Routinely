@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="12dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Crop profile photo"
+        android:textColor="@color/textPrimary"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
+        android:text="Drag to reposition and pinch to zoom. Cropping is optional."
+        android:textColor="@color/textSecondary"
+        android:textSize="13sp" />
+
+    <FrameLayout
+        android:id="@+id/profilePhotoCropFrame"
+        android:layout_width="match_parent"
+        android:layout_height="240dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSaveCroppedPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:text="Save cropped photo"
+        android:textAllCaps="false"
+        android:textColor="@color/textOnProfile"
+        app:backgroundTint="@color/healthProfile"
+        app:cornerRadius="12dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnUseOriginalPhoto"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="4dp"
+        android:text="Use original photo"
+        android:textAllCaps="false"
+        android:textColor="@color/healthProfile"
+        app:cornerRadius="12dp"
+        app:strokeColor="@color/healthProfile" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancelPhotoCrop"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="2dp"
+        android:text="Cancel"
+        android:textAllCaps="false"
+        android:textColor="@color/textSecondary" />
+
+</LinearLayout>

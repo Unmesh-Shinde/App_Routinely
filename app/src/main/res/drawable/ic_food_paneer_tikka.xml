@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Wooden Skewer Line & Ambient Shadow -->
+    <path android:pathData="M 9,33 L 37,11" android:fillColor="#00000000" android:strokeColor="#22000000" android:strokeWidth="1.5" android:strokeLineCap="round" />
+    <path android:pathData="M 8,32 L 36,10" android:fillColor="#00000000" android:strokeColor="#8D6E63" android:strokeWidth="1.2" android:strokeLineCap="round" />
+
+    <!-- Paneer Tikka Cube 1 (Lower Left) -->
+    <path android:pathData="M 12,25.5 L 18,21 L 22,25 L 16,29.5 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 11,25 L 17,20.5 L 21,24.5 L 15,29 Z" android:fillColor="#FF8F00" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <path android:pathData="M 12,24.5 L 16,21.5 L 19,24.5 L 15,27.5 Z" android:fillColor="#FFF9C4" />
+    <path android:pathData="M 13,24 L 15,22.5 M 16,26 L 18,24.5" android:fillColor="#00000000" android:strokeColor="#3E2723" android:strokeWidth="0.6" />
+
+    <!-- Green Capsicum & Red Onion Interspersed -->
+    <path android:pathData="M 18,21 L 22,18 L 24,20 L 20,23 Z" android:fillColor="#388E3C" android:strokeColor="#1B5E20" android:strokeWidth="0.4" />
+    <path android:pathData="M 21,18 L 24,15.5 L 26,17.5 L 23,20 Z" android:fillColor="#AB47BC" android:strokeColor="#6A1B9A" android:strokeWidth="0.4" />
+
+    <!-- Paneer Tikka Cube 2 (Upper Right) -->
+    <path android:pathData="M 24,16 L 30,11.5 L 34,15.5 L 28,20 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 23,15.5 L 29,11 L 33,15 L 27,19.5 Z" android:fillColor="#FF8F00" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <path android:pathData="M 24,15 L 28,12 L 31,15 L 27,18 Z" android:fillColor="#FFF9C4" />
+    <path android:pathData="M 25,14.5 L 27,13 M 28,16.5 L 30,15" android:fillColor="#00000000" android:strokeColor="#3E2723" android:strokeWidth="0.6" />
+
+    <!-- Mint Chutney Bowl & Lemon Slice -->
+    <path android:pathData="M 27.5,31.8 A 5.5,5.5 0 1,0 38.5,31.8 A 5.5,5.5 0 1,0 27.5,31.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 27,31 A 5.5,5.5 0 1,0 38,31 A 5.5,5.5 0 1,0 27,31 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 28,31 A 4.5,4.5 0 1,0 37,31 A 4.5,4.5 0 1,0 28,31 Z" android:fillColor="#388E3C" />
+    <path android:pathData="M 30,29 C 32,28 34,28 36,30" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="0.7" android:strokeLineCap="round" />
+
+    <!-- Juicy Lemon Wedge -->
+    <path android:pathData="M 9,33 Q 12,29 16,31 L 14,36 Q 11,37 9,33 Z" android:fillColor="#F8D84F" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+</vector>

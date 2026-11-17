@@ -72,9 +72,9 @@ class AnimatedHeaderBackgroundDrawable private constructor(
         val waveBaseAlpha = (255 * 0.12f).toInt()
         val dynamicAlpha = (waveBaseAlpha * entranceProgress).toInt()
 
-        drawWave(canvas, bounds, baseRatio = 0.50f, amplitudeRatio = 0.06f * entranceProgress, alpha = dynamicAlpha, speed = 0.4f, progress = motionProgress)
-        drawWave(canvas, bounds, baseRatio = 0.64f, amplitudeRatio = 0.08f * entranceProgress, alpha = (dynamicAlpha * 1.5).toInt().coerceAtMost(255), speed = 0.6f, progress = motionProgress)
-        drawWave(canvas, bounds, baseRatio = 0.80f, amplitudeRatio = 0.05f * entranceProgress, alpha = dynamicAlpha, speed = 0.8f, progress = motionProgress)
+        drawWave(canvas, bounds, baseRatio = 0.50f, amplitudeRatio = 0.06f * entranceProgress, alpha = dynamicAlpha, speed = 1f, progress = motionProgress)
+        drawWave(canvas, bounds, baseRatio = 0.64f, amplitudeRatio = 0.08f * entranceProgress, alpha = (dynamicAlpha * 1.5).toInt().coerceAtMost(255), speed = 2f, progress = motionProgress)
+        drawWave(canvas, bounds, baseRatio = 0.80f, amplitudeRatio = 0.05f * entranceProgress, alpha = dynamicAlpha, speed = 3f, progress = motionProgress)
     }
 
     private fun drawMovingGlow(canvas: Canvas, bounds: Rect, entranceProgress: Float, motionProgress: Float) {
@@ -84,7 +84,7 @@ class AnimatedHeaderBackgroundDrawable private constructor(
         
         // Smooth transition for glow position
         val centerX = bounds.left + width * (0.85f + 0.10f * kotlin.math.sin(motionProgress * 2 * Math.PI).toFloat())
-        val centerY = bounds.top + height * (0.22f + 0.15f * kotlin.math.sin(motionProgress * Math.PI).toFloat())
+        val centerY = bounds.top + height * (0.22f + 0.12f * kotlin.math.sin(motionProgress * 2 * Math.PI).toFloat())
         
         val glowAlpha = (110 * entranceProgress).toInt()
         glowPaint.shader = RadialGradient(
@@ -179,8 +179,8 @@ class AnimatedHeaderBackgroundDrawable private constructor(
     override fun isRunning(): Boolean = infiniteAnimator.isRunning
 
     companion object {
-        internal const val ENTRANCE_DURATION_MILLIS = 2500L
-        internal const val IDLE_DURATION_MILLIS = 10000L
+        internal const val ENTRANCE_DURATION_MILLIS = 1700L
+        internal const val IDLE_DURATION_MILLIS = 20000L
         @Deprecated("Use ENTRANCE or IDLE variants", ReplaceWith("ENTRANCE_DURATION_MILLIS"))
         internal const val ANIMATION_DURATION_MILLIS = ENTRANCE_DURATION_MILLIS
 

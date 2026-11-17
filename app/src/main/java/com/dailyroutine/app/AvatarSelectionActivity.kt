@@ -44,7 +44,7 @@ class AvatarSelectionActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: VH, position: Int) {
             val avatarId = position + 1
-            AvatarHelper.applyAvatar(holder.ivAvatar, avatarId)
+            AvatarHelper.applyAvatar(holder.ivAvatar, avatarId, useCustomAvatar = false)
 
             val density = resources.displayMetrics.density
             val isSelected = avatarId == selectedAvatarId
@@ -59,6 +59,7 @@ class AvatarSelectionActivity : AppCompatActivity() {
             }
 
             holder.itemView.setOnClickListener {
+                AvatarHelper.clearCustomAvatar(this@AvatarSelectionActivity)
                 UserPreferencesStore.setUserAvatarId(this@AvatarSelectionActivity, avatarId)
                 selectedAvatarId = avatarId
                 notifyDataSetChanged()

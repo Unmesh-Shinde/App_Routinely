@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Dhokla Cubes 3D Shapes & Shadows -->
+    <!-- Cube 1 (Left) -->
+    <path android:pathData="M 12.5,22.8 L 22.5,18.8 L 22.5,31.8 L 12.5,35.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 12,22 L 22,18 L 22,31 L 12,35 Z" android:fillColor="#FFF176" android:strokeColor="#51382B" android:strokeWidth="0.65" />
+    <path android:pathData="M 12,22 L 22,18 L 22,23 L 12,27 Z" android:fillColor="#FFEE58" />
+    <path android:pathData="M 17,20 L 22,18 L 22,31 L 17,33 Z" android:fillColor="#FBC02D" />
+
+    <!-- Cube 2 (Right) -->
+    <path android:pathData="M 23.5,18.8 L 34.5,14.8 L 34.5,27.8 L 23.5,31.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 23,18 L 34,14 L 34,27 L 23,31 Z" android:fillColor="#FFF176" android:strokeColor="#51382B" android:strokeWidth="0.65" />
+    <path android:pathData="M 23,18 L 34,14 L 34,19 L 23,23 Z" android:fillColor="#FFEE58" />
+    <path android:pathData="M 28.5,16 L 34,14 L 34,27 L 28.5,29 Z" android:fillColor="#FBC02D" />
+
+    <!-- Spongy Pitted Texture Dots -->
+    <path android:pathData="M 14,25 A 0.4,0.4 0 1,0 14.8,25 A 0.4,0.4 0 1,0 14,25 Z M 18,28 A 0.4,0.4 0 1,0 18.8,28 A 0.4,0.4 0 1,0 18,28 Z M 26,21 A 0.4,0.4 0 1,0 26.8,21 A 0.4,0.4 0 1,0 26,21 Z M 30,24 A 0.4,0.4 0 1,0 30.8,24 A 0.4,0.4 0 1,0 30,24 Z" android:fillColor="#F57F17" />
+
+    <!-- Slit Green Chilis, Mustard Seeds & Shredded Coconut -->
+    <path android:pathData="M 16,19 Q 20,17 22,21" android:fillColor="#00000000" android:strokeColor="#4CAF50" android:strokeWidth="0.8" android:strokeLineCap="round" />
+    <path android:pathData="M 15,21 A 0.4,0.4 0 1,0 15.8,21 A 0.4,0.4 0 1,0 15,21 Z M 27,17 A 0.4,0.4 0 1,0 27.8,17 A 0.4,0.4 0 1,0 27,17 Z" android:fillColor="#633929" />
+    <path android:pathData="M 18,20 L 20,19.5 M 28,16 L 30,15.5" android:fillColor="#00000000" android:strokeColor="#FFFDF0" android:strokeWidth="0.6" android:strokeLineCap="round" />
+</vector>

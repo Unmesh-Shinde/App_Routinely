@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Black Grapes Bunch Ambient Shadow -->
+    <path android:pathData="M 14.5,20.8 C 14.5,14 33.5,14 33.5,20.8 C 33.5,33 14.5,33 14.5,20.8 Z" android:fillColor="#22000000" />
+
+    <!-- Vine Stem & Grape Leaf -->
+    <path android:pathData="M 24,10 Q 23,6 20,8 M 24,10 Q 28,6 30,9" android:fillColor="#00000000" android:strokeColor="#388E3C" android:strokeWidth="1" android:strokeLineCap="round" />
+    <path android:pathData="M 28,7 Q 32,5 31,10 Z" android:fillColor="#4CAF50" android:strokeColor="#1B5E20" android:strokeWidth="0.3" />
+
+    <!-- Cluster of Deep Purple/Black Grape Spheres -->
+    <!-- Top Row -->
+    <path android:pathData="M 16,18 A 3,3 0 1,0 22,18 A 3,3 0 1,0 16,18 Z M 21,18 A 3,3 0 1,0 27,18 A 3,3 0 1,0 21,18 Z M 26,18 A 3,3 0 1,0 32,18 A 3,3 0 1,0 26,18 Z" android:fillColor="#311B92" android:strokeColor="#1A237E" android:strokeWidth="0.35" />
+    <!-- Middle Row -->
+    <path android:pathData="M 18,23 A 3,3 0 1,0 24,23 A 3,3 0 1,0 18,23 Z M 24,23 A 3,3 0 1,0 30,23 A 3,3 0 1,0 24,23 Z" android:fillColor="#4A148C" android:strokeColor="#1A237E" android:strokeWidth="0.35" />
+    <!-- Bottom Row -->
+    <path android:pathData="M 21,28 A 3,3 0 1,0 27,28 A 3,3 0 1,0 21,28 Z M 21,33 A 2.5,2.5 0 1,0 26,33 A 2.5,2.5 0 1,0 21,33 Z" android:fillColor="#311B92" android:strokeColor="#1A237E" android:strokeWidth="0.35" />
+
+    <!-- Specular Gloss Glints -->
+    <path android:pathData="M 17,17 A 0.8,0.8 0 1,0 18.6,17 A 0.8,0.8 0 1,0 17,17 Z M 22,17 A 0.8,0.8 0 1,0 23.6,17 A 0.8,0.8 0 1,0 22,17 Z M 25,22 A 0.8,0.8 0 1,0 26.6,22 A 0.8,0.8 0 1,0 25,22 Z" android:fillColor="#80FFFFFF" />
+</vector>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Bhel Puri Mix Base Mound & Ambient Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFE082" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+
+    <!-- Mixed Murmura (Puffed Rice) Oval Grains Layer -->
+    <path android:pathData="M 12,16 C 11,14 14,14 15,16 C 14,18 11,18 12,16 Z M 18,14 C 17,12 20,12 21,14 C 20,16 17,16 18,14 Z M 26,15 C 25,13 28,13 29,15 C 28,17 25,17 26,15 Z M 32,18 C 31,16 34,16 35,18 C 34,20 31,20 32,18 Z M 14,24 C 13,22 16,22 17,24 C 16,26 13,26 14,24 Z M 22,22 C 21,20 24,20 25,22 C 24,24 21,24 22,22 Z M 29,23 C 28,21 31,21 32,23 C 31,25 28,25 29,23 Z M 16,30 C 15,28 18,28 19,30 C 18,32 15,32 16,30 Z M 24,30 C 23,28 26,28 27,30 C 26,32 23,32 24,30 Z M 31,29 C 30,27 33,27 34,29 C 33,31 30,31 31,29 Z" android:fillColor="#FFFDF0" android:strokeColor="#D7CCC8" android:strokeWidth="0.3" />
+
+    <!-- Red Sweet & Tangy Sauce Coated Streaks Over Murmura -->
+    <path android:pathData="M 13,18 Q 18,16 23,19 M 25,16 Q 30,14 34,17 M 15,25 Q 21,22 27,26 M 28,22 Q 33,20 37,24 M 18,31 Q 23,28 28,32" android:fillColor="#00000000" android:strokeColor="#D32F2F" android:strokeWidth="1.2" android:strokeLineCap="round" />
+
+    <!-- Mixed Sev Crisps Interspersed -->
+    <path android:pathData="M 11,20 Q 16,18 20,21 M 23,20 Q 28,18 33,21 M 12,27 Q 17,25 21,28 M 27,27 Q 31,25 36,28" android:fillColor="#00000000" android:strokeColor="#FFC107" android:strokeWidth="0.7" android:strokeLineCap="round" />
+
+    <!-- Diced Red Onions Mixed In -->
+    <path android:pathData="M 13,20 L 14.5,19 L 15,21 Z M 21,17 L 22.5,16 L 23,18 Z M 27,19 L 28.5,18 L 29,20 Z M 17,26 L 18.5,25 L 19,27 Z M 25,28 L 26.5,27 L 27,29 Z M 32,25 L 33.5,24 L 34,26 Z" android:fillColor="#E1BEE7" android:strokeColor="#8E24AA" android:strokeWidth="0.25" />
+
+    <!-- Fresh Finely Chopped Cilantro (Coriander) Flecks -->
+    <path android:pathData="M 16,17 Q 17,15 18,17 Z M 24,15 Q 25,13 26,15 Z M 30,16 Q 31,14 32,16 Z M 14,23 Q 15,21 16,23 Z M 20,22 Q 21,20 22,22 Z M 28,24 Q 29,22 30,24 Z M 18,29 Q 19,27 20,29 Z M 29,29 Q 30,27 31,29 Z" android:fillColor="#4CAF50" />
+
+    <!-- Crispy Papdi Shards on Top -->
+    <path android:pathData="M 11,23 L 14,21 L 13,25 Z M 31,21 L 34,19 L 33,23 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.3" />
+</vector>

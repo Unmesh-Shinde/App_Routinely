@@ -5,22 +5,24 @@ import com.google.gson.Gson
 import java.util.Locale
 import kotlin.math.max
 
-fun MealNutritionInfo.hasDetailedNutrition(): Boolean {
-    return calories > 0 && carbsG > 0 && proteinG > 0 && fatG > 0
+fun MealNutritionInfo.hasAnyNutrition(): Boolean {
+    return calories != null || carbsG != null || proteinG != null || fatG != null || fiberG != null ||
+        fatBreakdown.isNotEmpty() || carbBreakdown.isNotEmpty() || vitamins.isNotEmpty() ||
+        minerals.isNotEmpty() || aminoAcids.isNotEmpty() || antioxidants.isNotEmpty() || otherNutrients.isNotEmpty()
 }
 
 object CalorieEstimator {
 
     private const val PREFS_LEARNED_MEALS = "learned_meal_nutrition_store"
     private const val SIMILARITY_THRESHOLD = 0.95
-    private const val LEARNED_KEY_PREFIX = "learned|v2|t="
+    private const val LEARNED_KEY_PREFIX = "learned|v3|t="
 
     fun clearSmartCache(context: Context) {
         context.getSharedPreferences(PREFS_LEARNED_MEALS, Context.MODE_PRIVATE).edit().clear().apply()
     }
 
     fun saveLearnedMeal(context: Context, title: String, description: String, nutrition: MealNutritionInfo) {
-        if (nutrition.calories <= 0) return
+        if (!nutrition.hasAnyNutrition()) return
         val prefs = context.getSharedPreferences(PREFS_LEARNED_MEALS, Context.MODE_PRIVATE)
         val jsonStr = Gson().toJson(nutrition)
         val fullKey = buildNormalizedKey(title, description)
@@ -55,7 +57,7 @@ object CalorieEstimator {
             if (score >= SIMILARITY_THRESHOLD && score > highestScore) {
                 try {
                     val parsed = Gson().fromJson(rawValue, MealNutritionInfo::class.java)
-                    if (parsed != null && parsed.hasDetailedNutrition()) {
+                    if (parsed != null && parsed.hasAnyNutrition()) {
                         highestScore = score
                         bestMatch = enrichMealNutrition(parsed)
                     } else if (parsed != null) {
@@ -73,96 +75,9 @@ object CalorieEstimator {
     }
 
     fun enrichMealNutrition(info: MealNutritionInfo): MealNutritionInfo {
-        if (info.calories <= 0) return info
-        val calories = info.calories
-        val hasMacros = info.carbsG > 0 || info.proteinG > 0 || info.fatG > 0
-
-        val carbs = if (hasMacros) info.carbsG else Math.round((calories * 0.50 / 4.0) * 10.0) / 10.0
-        val protein = if (hasMacros) info.proteinG else Math.round((calories * 0.22 / 4.0) * 10.0) / 10.0
-        val fat = if (hasMacros) info.fatG else Math.round((calories * 0.28 / 9.0) * 10.0) / 10.0
-        val fiber = if (hasMacros) info.fiberG else Math.round((carbs * 0.12) * 10.0) / 10.0
-
-        val netCarbsG = Math.round((carbs - fiber).coerceAtLeast(0.0) * 10.0) / 10.0
-        val sugarsG = Math.round((carbs * 0.2) * 10.0) / 10.0
-        val satFatG = Math.round((fat * 0.3) * 10.0) / 10.0
-        val mufaG = Math.round((fat * 0.4) * 10.0) / 10.0
-        val pufaG = Math.round((fat * 0.3) * 10.0) / 10.0
-
-        val fatBreakdown = if (info.fatBreakdown.isEmpty()) {
-            mapOf(
-                "Saturated Fat" to "$satFatG g",
-                "Monounsaturated Fat" to "$mufaG g",
-                "Polyunsaturated Fat" to "$pufaG g",
-                "Trans Fat" to "0 g",
-                "Omega-6" to "${Math.round(pufaG * 0.8 * 10) / 10.0} g"
-            )
-        } else info.fatBreakdown
-
-        val carbBreakdown = if (info.carbBreakdown.isEmpty()) {
-            mapOf(
-                "Net Carbs" to "$netCarbsG g",
-                "Total Sugars" to "$sugarsG g",
-                "Added Sugars" to "0 g",
-                "Soluble Fiber" to "${Math.round(fiber * 0.4 * 10) / 10.0} g",
-                "Insoluble Fiber" to "${Math.round(fiber * 0.6 * 10) / 10.0} g"
-            )
-        } else info.carbBreakdown
-
-        // Micronutrients depend on the actual ingredients; never synthesize values from calories.
-        val vitamins = info.vitamins
-        val minerals = info.minerals
-
-        val aminoAcids = if (info.aminoAcids.isEmpty()) {
-            mapOf(
-                "Leucine" to "${Math.round(protein * 0.08 * 10) / 10.0} g",
-                "Isoleucine" to "${Math.round(protein * 0.04 * 10) / 10.0} g",
-                "Valine" to "${Math.round(protein * 0.05 * 10) / 10.0} g",
-                "Lysine" to "${Math.round(protein * 0.06 * 10) / 10.0} g",
-                "Methionine" to "${Math.round(protein * 0.025 * 10) / 10.0} g",
-                "Phenylalanine" to "${Math.round(protein * 0.045 * 10) / 10.0} g",
-                "Threonine" to "${Math.round(protein * 0.035 * 10) / 10.0} g",
-                "Tryptophan" to "${Math.round(protein * 0.012 * 10) / 10.0} g",
-                "Histidine" to "${Math.round(protein * 0.025 * 10) / 10.0} g"
-            )
-        } else {
-            val base = mapOf(
-                "Leucine" to "${Math.round(protein * 0.08 * 10) / 10.0} g",
-                "Isoleucine" to "${Math.round(protein * 0.04 * 10) / 10.0} g",
-                "Valine" to "${Math.round(protein * 0.05 * 10) / 10.0} g",
-                "Lysine" to "${Math.round(protein * 0.06 * 10) / 10.0} g",
-                "Methionine" to "${Math.round(protein * 0.025 * 10) / 10.0} g",
-                "Phenylalanine" to "${Math.round(protein * 0.045 * 10) / 10.0} g",
-                "Threonine" to "${Math.round(protein * 0.035 * 10) / 10.0} g",
-                "Tryptophan" to "${Math.round(protein * 0.012 * 10) / 10.0} g",
-                "Histidine" to "${Math.round(protein * 0.025 * 10) / 10.0} g"
-            )
-            base + info.aminoAcids
-        }
-
-        val antioxidants = if (info.antioxidants.isEmpty()) {
-            mapOf("Polyphenols" to "${Math.round(calories * 0.25).coerceIn(20, 500)} mg")
-        } else info.antioxidants
-
-        val otherNutrients = if (info.otherNutrients.isEmpty()) {
-            mapOf(
-                "Saturated Fat" to "$satFatG g",
-                "Cholesterol" to "${Math.round(protein * 1.5)} mg"
-            )
-        } else info.otherNutrients
-
-        return info.copy(
-            carbsG = carbs,
-            proteinG = protein,
-            fatG = fat,
-            fiberG = fiber,
-            fatBreakdown = fatBreakdown,
-            carbBreakdown = carbBreakdown,
-            vitamins = vitamins,
-            minerals = minerals,
-            aminoAcids = aminoAcids,
-            antioxidants = antioxidants,
-            otherNutrients = otherNutrients
-        )
+        // Keep the model output intact. Missing fields stay unavailable instead of being
+        // synthesized from calories or generic macro ratios.
+        return info
     }
 
     fun calculateSimilarity(s1: String, s2: String): Double {

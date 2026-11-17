@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/m3_surface_container">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Nutrition Fair Use Policy"
+            app:titleTextColor="@color/textPrimary" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/primaryLight"
+                app:strokeColor="@color/primary"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="14dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:contentDescription="Policy Info"
+                        app:srcCompat="@android:drawable/ic_dialog_info"
+                        app:tint="@color/primary" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Official Guidelines &amp; Summary"
+                            android:textColor="@color/primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Meal plan caps limit saved entries; separate AI allowances limit Gemini requests. Review the rules below."
+                            android:textColor="@color/textSecondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1. Purpose &amp; AI Principles"
+                android:textColor="@color/healthNutrition"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="Routinely uses Gemini AI to estimate calories and nutrients from meal descriptions. Separate AI request allowances help manage provider usage and keep the service available. Meal category caps control how many entries can be saved in your plan."
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2. Daily Category Addition Limits"
+                android:textColor="@color/healthNutrition"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="Each calendar date allows up to two active meals per category (Breakfast, Lunch, Dinner, Snack). This is a limit on saved plan entries; it does not count or cap Gemini requests. Deleting a meal frees a slot for a replacement."
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3. AI Calculation Tokens &amp; Replacement Credits"
+                android:textColor="@color/healthNutrition"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="These limits are separate from the meal-entry cap above.\n• Base AI Quota: 2 network calls per category per day.\n• Replacement Credit: Deleting a meal grants 1 replacement AI token for that category today.\n• Zero Token Cost: Adding meals previously saved in local memory uses offline cache at 0 token cost."
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4. Per-Meal Lifetime Edit Limits"
+                android:textColor="@color/healthNutrition"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="• AI Fields (Name, Details, Category): Capped at 2 lifetime edits per meal.\n• Unlimited Updates: Adjusting meal time or toggling reminders does NOT consume edit attempts."
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5. Overnight Off-Peak Batch Queue"
+                android:textColor="@color/healthNutrition"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="When temporary network or server delays occur after 3 immediate retries, meals are queued for overnight estimation (12 AM–6 AM) and processed 1 by 1 sequentially."
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="6. Refined 3-Day Discipline Streak Rewards"
+                android:textColor="@color/healthNutrition"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="• Primary Category Rule: Days count toward a streak ONLY IF at least 1 Breakfast, Lunch, or Dinner is logged. Empty days are ignored.\n• Edit Streak Reward: 3 qualifying days with 0 edits unlocks +1 bonus edit per meal for 3 days.\n• Delete Streak Reward: 3 qualifying days with 0 deletes unlocks +1 extra delete-replacement credit per category for 3 days.\n• Automatic Lapse: Bonus rewards automatically lapse on Day 4."
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="7. User Declaration &amp; Compliance"
+                android:textColor="@color/healthNutrition"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="By acknowledging this policy, you confirm that you have read and understood the fair use rules for Routinely's AI Nutrition features."
+                android:textColor="@color/textPrimary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="3dp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardAcknowledge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="?attr/colorSurface">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+            <CheckBox
+                android:id="@+id/cbAcknowledgePolicy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="I have read, understood, and agree to the Nutrition Fair Use Policy."
+                android:textColor="@color/textPrimary"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btnAcknowledgePolicy"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:text="Acknowledge"
+                android:backgroundTint="@color/healthNutrition"
+                android:textColor="@android:color/white"
+                android:enabled="false" />
+
+            <TextView
+                android:id="@+id/tvAckDateStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="✓ Acknowledged on 2026-10-26"
+                android:textColor="@color/healthNutrition"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Flat Papdi Disc 1 (Top Left) -->
+    <path android:pathData="M 10.5,19.8 A 6.5,6.5 0 1,0 23.5,19.8 A 6.5,6.5 0 1,0 10.5,19.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 10,19 A 6.5,6.5 0 1,0 23,19 A 6.5,6.5 0 1,0 10,19 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 12,19 A 4.5,4.5 0 1,0 21,19 A 4.5,4.5 0 1,0 12,19 Z" android:fillColor="#FCE082" />
+
+    <!-- Flat Papdi Disc 2 (Right Overlapping) -->
+    <path android:pathData="M 23.5,23.8 A 6.5,6.5 0 1,0 36.5,23.8 A 6.5,6.5 0 1,0 23.5,23.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 23,23 A 6.5,6.5 0 1,0 36,23 A 6.5,6.5 0 1,0 23,23 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 25,23 A 4.5,4.5 0 1,0 34,23 A 4.5,4.5 0 1,0 25,23 Z" android:fillColor="#FCE082" />
+
+    <!-- Flat Papdi Disc 3 (Bottom Left) -->
+    <path android:pathData="M 14.5,29.8 A 6.5,6.5 0 1,0 27.5,29.8 A 6.5,6.5 0 1,0 14.5,29.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 14,29 A 6.5,6.5 0 1,0 27,29 A 6.5,6.5 0 1,0 14,29 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 16,29 A 4.5,4.5 0 1,0 25,29 A 4.5,4.5 0 1,0 16,29 Z" android:fillColor="#FCE082" />
+
+    <!-- Tamarind & Mint Chutney Drizzles Over Papdi -->
+    <path android:pathData="M 13,18 Q 16,17 20,20 M 26,22 Q 29,21 33,24 M 17,28 Q 20,27 24,30" android:fillColor="#00000000" android:strokeColor="#8D6E63" android:strokeWidth="0.8" android:strokeLineCap="round" />
+    <path android:pathData="M 14,20 Q 17,19 21,21 M 27,24 Q 30,23 34,25 M 18,30 Q 21,29 25,31" android:fillColor="#00000000" android:strokeColor="#388E3C" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Shower of Golden Nylon Sev Strands -->
+    <path android:pathData="M 11,19 Q 16,17 22,20 M 24,23 Q 29,21 35,24 M 15,29 Q 20,27 26,30" android:fillColor="#00000000" android:strokeColor="#FFC107" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Pomegranate Seeds (Anar) Topping -->
+    <path android:pathData="M 16,18 A 0.8,0.8 0 1,0 17.6,18 A 0.8,0.8 0 1,0 16,18 Z M 29,22 A 0.8,0.8 0 1,0 30.6,22 A 0.8,0.8 0 1,0 29,22 Z M 20,28 A 0.8,0.8 0 1,0 21.6,28 A 0.8,0.8 0 1,0 20,28 Z" android:fillColor="#E53935" />
+</vector>

@@ -149,11 +149,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
         ExercisePreset("Dynamic Warmup", "Warmup / Cooldown", "Warmup", effort = "Light", durationMinutes = 8.0)
     )
 
-    private data class TemplateDialogAction(
-        val title: String,
-        val description: String,
-        val onClick: () -> Unit
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -195,54 +190,23 @@ class WorkoutPlanActivity : AppCompatActivity() {
     private fun setupDateStrip() {
         val scrollView = findViewById<HorizontalScrollView>(R.id.hsvWorkoutDaysStrip)
         val container = findViewById<LinearLayout>(R.id.llWorkoutDaysStrip)
-        container.removeAllViews()
-        
-        val tempCal = selectedCalendar.clone() as Calendar
-        tempCal.add(Calendar.DAY_OF_YEAR, -dateStripPastDays)
-
-        val stripDateFormatter = SimpleDateFormat("EEE\ndd", Locale.US)
-        val todayStr = dateFormatter.format(Date())
-        var selectedButton: Button? = null
-
-        repeat(dateStripPastDays + dateStripFutureDays + 1) {
-            val dateStr = dateFormatter.format(tempCal.time)
-            val isSelected = dateStr == dateFormatter.format(selectedCalendar.time)
-            val isToday = dateStr == todayStr
-            val hasExercises = planManager.hasExercisesForDate(dateStr)
-            val inTemplateRange = planManager.isDateInAppliedWorkoutTemplateRange(dateStr)
-
-            val btn = Button(this, null, android.R.attr.buttonStyleSmall).apply {
-                text = if (isToday) "Today\n${SimpleDateFormat("dd", Locale.US).format(tempCal.time)}" else stripDateFormatter.format(tempCal.time)
-                setAllCaps(false)
-                minWidth = (64 * resources.displayMetrics.density).toInt()
-                setPadding(10, 6, 10, 6)
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    val margin = (4 * resources.displayMetrics.density).toInt()
-                    setMargins(margin, 0, margin, 0)
-                }
-                setOnClickListener {
-                    val clickedCal = Calendar.getInstance()
-                    clickedCal.time = dateFormatter.parse(dateStr) ?: Date()
-                    selectedCalendar = clickedCal
-                    updateDateUI()
-                    setupDateStrip()
-                }
-                alpha = 1f
+        PlannerDateStrip.render(
+            activity = this,
+            scrollView = scrollView,
+            container = container,
+            selectedDate = selectedCalendar.time,
+            dateFormatter = dateFormatter,
+            pastDays = dateStripPastDays,
+            futureDays = dateStripFutureDays,
+            hasItems = planManager::hasExercisesForDate,
+            isInTemplateRange = planManager::isDateInAppliedWorkoutTemplateRange,
+            styleButton = ::styleWorkoutStripButton,
+            onDateSelected = { dateStr ->
+                selectedCalendar.time = dateFormatter.parse(dateStr) ?: Date()
+                updateDateUI()
+                setupDateStrip()
             }
-            styleWorkoutStripButton(btn, isSelected, isToday, inTemplateRange, hasExercises)
-            if (isSelected) selectedButton = btn
-            container.addView(btn)
-            tempCal.add(Calendar.DAY_OF_YEAR, 1)
-        }
-        selectedButton?.let { button ->
-            scrollView.post {
-                val targetX = button.left - ((scrollView.width - button.width) / 2)
-                scrollView.smoothScrollTo(targetX.coerceAtLeast(0), 0)
-            }
-        }
+        )
     }
 
     private fun styleWorkoutStripButton(button: Button, isSelected: Boolean, isToday: Boolean, inTemplateRange: Boolean, hasExercises: Boolean) {
@@ -326,63 +290,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
         )
     }
 
-    private fun showTemplateActionDialog(title: String, message: String, actions: List<TemplateDialogAction>) {
-        val isNightMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        val container = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(12), dp(20), dp(8))
-        }
-
-        container.addView(TextView(this).apply {
-            text = message
-            textSize = 13f
-            setTextColor(if (isNightMode) Color.argb(220, 255, 255, 255) else Color.argb(210, 0, 0, 0))
-            setPadding(0, 0, 0, dp(10))
-        })
-
-        var dialog: AlertDialog? = null
-        actions.forEach { action ->
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                isClickable = true
-                isFocusable = true
-                setPadding(dp(14), dp(12), dp(14), dp(12))
-                background = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = dp(12).toFloat()
-                    setColor(if (isNightMode) 0xFF2A2116.toInt() else 0xFFFFF7ED.toInt())
-                    setStroke(dp(1), if (isNightMode) 0xFFFFB74D.toInt() else 0xFFE65100.toInt())
-                }
-                setOnClickListener {
-                    dialog?.dismiss()
-                    action.onClick()
-                }
-            }
-            row.addView(TextView(this).apply {
-                text = action.title
-                textSize = 16f
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-                setTextColor(if (isNightMode) Color.WHITE else 0xFF4A1800.toInt())
-            })
-            row.addView(TextView(this).apply {
-                text = action.description
-                textSize = 12f
-                setPadding(0, dp(3), 0, 0)
-                setTextColor(if (isNightMode) Color.argb(220, 255, 255, 255) else 0xFF6D2D00.toInt())
-            })
-            container.addView(row, LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(0, 0, 0, dp(8)) })
-        }
-
-        dialog = AlertDialog.Builder(this)
-            .setTitle(title)
-            .setView(ScrollView(this).apply { addView(container) })
-            .setNegativeButton("Close", null)
-            .create()
-        dialog.show()
-    }
 
     private fun showCreateTemplateDialog() {
         pickDateRange { startDate, endDate ->
@@ -404,7 +311,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
 
     private fun pickWorkoutTemplateRangeAndConfirm(template: WorkoutTemplate) {
         pickDateRange { startDate, endDate ->
-            val selectedDays = daysBetweenInclusive(startDate, endDate)
+            val selectedDays = PlannerTemplateDateUtils.daysBetweenInclusive(startDate, endDate)
             if (selectedDays > template.durationDays) {
                 AlertDialog.Builder(this)
                     .setTitle("Cannot apply template")
@@ -430,7 +337,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
                     "Exercise entries inside template: $totalExercises\n" +
                     "Already applied ranges: ${workoutTemplateAppliedCount(template)}\n" +
                     "Selected range: $startDate to $endDate ($selectedDays days)\n" +
-                    "Target dates: ${buildDateRangePreview(startDate, selectedDays)}\n\n" +
+                    "Target dates: ${PlannerTemplateDateUtils.buildDateRangePreview(startDate, selectedDays)}\n\n" +
                     "Exercises from this template will be copied into the selected calendar dates."
             )
             .setPositiveButton("Apply") { _, _ ->
@@ -466,8 +373,8 @@ class WorkoutPlanActivity : AppCompatActivity() {
                     "Start '${template.name}' after ${conflict.endDate}, or review applied workout plans first."
             )
             .setPositiveButton("Start after conflict") { _, _ ->
-                val startDate = addDaysToDate(conflict.endDate, 1)
-                val endDate = addDaysToDate(startDate, selectedDays - 1)
+                val startDate = PlannerTemplateDateUtils.addDaysToDate(conflict.endDate, 1)
+                val endDate = PlannerTemplateDateUtils.addDaysToDate(startDate, selectedDays - 1)
                 confirmWorkoutTemplateApply(template, startDate, endDate, selectedDays)
             }
             .setNeutralButton("View applied plans") { _, _ -> showAppliedWorkoutPlansDialog() }
@@ -568,47 +475,28 @@ class WorkoutPlanActivity : AppCompatActivity() {
 
     private fun showAppliedWorkoutPlansDialog() {
         val ranges = planManager.listAppliedWorkoutTemplateRanges()
-        if (ranges.isEmpty()) {
-            Toast.makeText(this, "No workout templates applied yet", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val labels = ranges.map {
-            "${it.templateName} • ${it.startDate} to ${it.endDate} • ${daysBetweenInclusive(it.startDate, it.endDate)} day(s)"
-        }.toTypedArray()
-        AlertDialog.Builder(this)
-            .setTitle("Applied Workout Plans")
-            .setItems(labels) { _, which ->
-                showAppliedWorkoutRangeActions(ranges[which])
-            }
-            .setNegativeButton("Close", null)
-            .show()
+        showAppliedTemplateRangesDialog(
+            title = "Applied Workout Plans",
+            emptyMessage = "No workout templates applied yet",
+            ranges = ranges,
+            onRangeSelected = ::showAppliedWorkoutRangeActions
+        )
     }
 
     private fun showAppliedWorkoutRangeActions(range: AppliedTemplateRange) {
-        val options = arrayOf(
-            "View applied details",
-            "Remove applied marker"
-        )
-        AlertDialog.Builder(this)
-            .setTitle(range.templateName)
-            .setMessage("Applied from ${range.startDate} to ${range.endDate} • ${daysBetweenInclusive(range.startDate, range.endDate)} day(s)")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> showAppliedWorkoutRangeDetails(range)
-                    1 -> {
-                        val removed = planManager.removeAppliedWorkoutTemplateRange(range.startDate, range.endDate)
-                        if (removed) {
-                            Toast.makeText(this, "Applied workout marker removed", Toast.LENGTH_SHORT).show()
-                            setupDateStrip()
-                        } else {
-                            Toast.makeText(this, "Unable to remove applied marker", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+        showAppliedTemplateRangeActions(
+            range = range,
+            onViewDetails = { showAppliedWorkoutRangeDetails(range) },
+            onRemoveMarker = {
+                val removed = planManager.removeAppliedWorkoutTemplateRange(range.startDate, range.endDate)
+                if (removed) {
+                    Toast.makeText(this, "Applied workout marker removed", Toast.LENGTH_SHORT).show()
+                    setupDateStrip()
+                } else {
+                    Toast.makeText(this, "Unable to remove applied marker", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        )
     }
 
     private fun showAppliedWorkoutRangeDetails(range: AppliedTemplateRange) {
@@ -616,7 +504,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
         val lines = mutableListOf<String>()
         lines += "Template: ${range.templateName}"
         lines += "Applied range: ${range.startDate} to ${range.endDate}"
-        lines += "Range length: ${daysBetweenInclusive(range.startDate, range.endDate)} day(s)"
+        lines += "Range length: ${PlannerTemplateDateUtils.daysBetweenInclusive(range.startDate, range.endDate)} day(s)"
         lines += "Calendar color: strong orange"
         if (template != null) {
             lines += ""
@@ -700,29 +588,6 @@ class WorkoutPlanActivity : AppCompatActivity() {
         startPicker.show()
     }
 
-    private fun daysBetweenInclusive(startDate: String, endDate: String): Int {
-        val start = dateFormatter.parse(startDate) ?: return 0
-        val end = dateFormatter.parse(endDate) ?: return 0
-        val millis = end.time - start.time
-        return (millis / (24L * 60L * 60L * 1000L)).toInt() + 1
-    }
-
-    private fun addDaysToDate(date: String, days: Int): String {
-        val cal = Calendar.getInstance().apply {
-            time = dateFormatter.parse(date) ?: Date()
-            add(Calendar.DAY_OF_YEAR, days)
-        }
-        return dateFormatter.format(cal.time)
-    }
-
-    private fun buildDateRangePreview(startDate: String, dayCount: Int): String {
-        if (dayCount <= 0) return startDate
-        if (dayCount <= 5) {
-            return (0 until dayCount).joinToString(", ") { addDaysToDate(startDate, it) }
-        }
-        return "${addDaysToDate(startDate, 0)}, ${addDaysToDate(startDate, 1)}, ... ${addDaysToDate(startDate, dayCount - 1)}"
-    }
-
     private fun workoutTemplateConfiguredDayCount(template: WorkoutTemplate): Int {
         return template.exercisesByDayOffset.keys.distinct().size
     }
@@ -769,6 +634,8 @@ class WorkoutPlanActivity : AppCompatActivity() {
         val groupAddedWeight = v.findViewById<View>(R.id.groupAddedWeight)
         val tvPaceSummary = v.findViewById<TextView>(R.id.tvPaceSummary)
         val groupReps = etReps.parent as View
+        TextInputPolicy.applyLimit(etName, TextInputPolicy.TITLE_LIMIT)
+        TextInputPolicy.applyLimit(etTarget, TextInputPolicy.TITLE_LIMIT)
         DialogInputHelper.hideKeyboardOnDone(
             etName,
             etTarget,
@@ -910,12 +777,24 @@ class WorkoutPlanActivity : AppCompatActivity() {
             val effort = selectedEffort()
             val intensity = intensityForEffort(effort)
             val name = etName.text.toString().trim()
-            if (requireName && name.isEmpty()) {
-                etName.error = "Required"
-                return null
+            if (requireName) {
+                val nameError = TextInputPolicy.error(name, true, "Exercise name", TextInputPolicy.TITLE_LIMIT)
+                if (nameError != null) {
+                    etName.error = nameError
+                    return null
+                }
+                etName.error = null
             }
             val safeName = name.ifEmpty { type }
             val target = etTarget.text.toString().trim().ifEmpty { defaultTargetForType(type) }
+            if (requireName) {
+                val targetError = TextInputPolicy.error(target, true, "Target area", TextInputPolicy.TITLE_LIMIT)
+                if (targetError != null) {
+                    etTarget.error = targetError
+                    return null
+                }
+                etTarget.error = null
+            }
 
             val finalSets: Int
             val finalReps: String
@@ -1379,7 +1258,7 @@ class WorkoutPlanActivity : AppCompatActivity() {
         override fun getItemCount() = items.size
 
         inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-            val ivIcon: ImageView = v.findViewById(R.id.tvEmoji)
+            val ivIcon: MealIconView = v.findViewById(R.id.tvEmoji)
             val tvTitle: TextView = v.findViewById(R.id.tvTitle)
             val tvSubtitle: TextView = v.findViewById(R.id.tvSubtitle)
             val tvTime: TextView = v.findViewById(R.id.tvTime)

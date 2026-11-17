@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Shami Kebab Patties Ambient Shadows -->
+    <path android:pathData="M 10.5,22.8 C 10.5,14 37.5,14 37.5,22.8 C 37.5,33 10.5,33 10.5,22.8 Z" android:fillColor="#22000000" />
+
+    <!-- Kebab Patty 1 (Left) -->
+    <path android:pathData="M 11,21 C 11,15 21,15 21,21 C 21,27 11,27 11,21 Z" android:fillColor="#4E342E" android:strokeColor="#2C160B" android:strokeWidth="0.65" />
+    <path android:pathData="M 12,20 C 12,16 20,16 20,20 C 20,24 12,24 12,20 Z" android:fillColor="#8D6E63" />
+    <path android:pathData="M 14,18 C 16,17 18,17 19,19" android:fillColor="#00000000" android:strokeColor="#2C160B" android:strokeWidth="0.6" android:strokeLineCap="round" />
+
+    <!-- Kebab Patty 2 (Right) -->
+    <path android:pathData="M 23,24 C 23,18 33,18 33,24 C 33,30 23,30 23,24 Z" android:fillColor="#4E342E" android:strokeColor="#2C160B" android:strokeWidth="0.65" />
+    <path android:pathData="M 24,23 C 24,19 32,19 32,23 C 32,27 24,27 24,23 Z" android:fillColor="#8D6E63" />
+    <path android:pathData="M 26,21 C 28,20 30,20 31,22" android:fillColor="#00000000" android:strokeColor="#2C160B" android:strokeWidth="0.6" android:strokeLineCap="round" />
+
+    <!-- Onion Rings, Mint Leaves & Lemon Wedge -->
+    <path android:pathData="M 13,29 A 2,2 0 1,0 17,29 A 2,2 0 1,0 13,29 Z" android:fillColor="#E1BEE7" android:strokeColor="#8E24AA" android:strokeWidth="0.3" />
+    <path android:pathData="M 18,29 Q 20,27 22,30 Z M 28,18 Q 30,16 32,19 Z" android:fillColor="#388E3C" />
+    <path android:pathData="M 28,30 Q 32,27 34,31 L 30,34 Z" android:fillColor="#F8D84F" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+</vector>

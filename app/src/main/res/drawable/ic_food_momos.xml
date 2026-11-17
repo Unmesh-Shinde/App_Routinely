@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Bamboo Steamer / Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Steamed Pleated Momos Dumplings with Drop Shadows -->
+    <!-- Momo 1 (Left) -->
+    <path android:pathData="M 9.5,22.8 Q 9.5,15.8 16.5,15.8 Q 21.5,15.8 21.5,22.8 Q 16.5,25.8 9.5,22.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 9,22 Q 9,15 16,15 Q 21,15 21,22 Q 16,25 9,22 Z" android:fillColor="#FFFDF0" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 12,17 Q 16,15 19,18 M 13,20 Q 16,18 19,21" android:fillColor="#00000000" android:strokeColor="#D7CCC8" android:strokeWidth="0.5" />
+    <path android:pathData="M 16,15 A 0.8,0.8 0 1,0 17.6,15 A 0.8,0.8 0 1,0 16,15 Z" android:fillColor="#80FFFFFF" />
+
+    <!-- Momo 2 (Right) -->
+    <path android:pathData="M 23.5,22.8 Q 23.5,15.8 30.5,15.8 Q 35.5,15.8 35.5,22.8 Q 30.5,25.8 23.5,22.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 23,22 Q 23,15 30,15 Q 35,15 35,22 Q 30,25 23,22 Z" android:fillColor="#FFFDF0" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 26,17 Q 30,15 33,18 M 27,20 Q 30,18 33,21" android:fillColor="#00000000" android:strokeColor="#D7CCC8" android:strokeWidth="0.5" />
+
+    <!-- Momo 3 (Bottom Center) -->
+    <path android:pathData="M 16.5,30.8 Q 16.5,23.8 23.5,23.8 Q 28.5,23.8 28.5,30.8 Q 23.5,33.8 16.5,30.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 16,30 Q 16,23 23,23 Q 28,23 28,30 Q 23,33 16,30 Z" android:fillColor="#FFFDF0" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 19,25 Q 23,23 26,26 M 20,28 Q 23,26 26,29" android:fillColor="#00000000" android:strokeColor="#D7CCC8" android:strokeWidth="0.5" />
+
+    <!-- Spicy Red Chili Chutney Dip Bowl -->
+    <path android:pathData="M 28.5,32.8 A 4.5,4.5 0 1,0 37.5,32.8 A 4.5,4.5 0 1,0 28.5,32.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 28,32 A 4.5,4.5 0 1,0 37,32 A 4.5,4.5 0 1,0 28,32 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.6" />
+    <path android:pathData="M 29,32 A 3.5,3.5 0 1,0 36,32 A 3.5,3.5 0 1,0 29,32 Z" android:fillColor="#D32F2F" />
+    <path android:pathData="M 31,30 C 33,29 35,29 36,31" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="0.6" android:strokeLineCap="round" />
+</vector>

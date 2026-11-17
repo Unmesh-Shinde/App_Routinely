@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Fluffy Steamed Basmati Rice Mound Base & Fluffy Crest Highlight -->
+    <path android:pathData="M 5.8,24.8 C 5.8,19.3 8.1,15.2 13.5,15.2 C 18.5,15.2 20.8,19.6 20.8,24.8 C 20.8,30.0 18.5,34.5 13.5,34.5 C 8.3,34.5 5.8,30.1 5.8,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 5.5,24 C 5.5,18.5 7.8,14.4 13.2,14.4 C 18.2,14.4 20.5,18.8 20.5,24 C 20.5,29.2 18.2,33.7 13.2,33.7 C 8,33.7 5.5,29.3 5.5,24 Z" android:fillColor="#FFF0C8" android:strokeColor="#51382B" android:strokeWidth="0.75" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,20 C 10,16 15,16 18,19 C 14,21 9,21 7,20 Z" android:fillColor="#50FFFFFF" />
+
+    <!-- Detailed Basmati Rice Grains -->
+    <path android:pathData="M 7.95,18 Q 8.65,17.28 9.9,17.8 Q 10.15,18 9.62,18.35 Q 8.65,18.72 7.95,18 Z M 13,15.95 Q 13.72,16.65 13.2,17.9 Q 13,18.15 12.65,17.62 Q 12.28,16.65 13,15.95 Z M 16.05,18.45 Q 16.95,18.05 17.95,19.35 Q 18.05,19.62 17.42,19.55 Q 16.5,19.3 16.05,18.45 Z M 6.95,22 Q 7.65,21.28 8.9,21.8 Q 9.15,22 8.62,22.35 Q 7.65,22.72 6.95,22 Z" android:fillColor="#FFFCF2" android:strokeColor="#D8B76F" android:strokeWidth="0.26" />
+
+    <!-- Ceramic Bowl of Yellow Dal Structure & Reflective Surface -->
+    <path android:pathData="M 22.5,24.8 A 8,8 0 1,0 38.5,24.8 A 8,8 0 1,0 22.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 22,24 A 8,8 0 1,0 38,24 A 8,8 0 1,0 22,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.9" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 22.9,24 A 7.1,7.1 0 1,0 37.1,24 A 7.1,7.1 0 1,0 22.9,24 Z" android:fillColor="#E99F31" android:strokeColor="#51382B" android:strokeWidth="0.55" />
+    <path android:pathData="M 23.25,24 A 6.75,6.75 0 1,0 36.75,24 A 6.75,6.75 0 1,0 23.25,24 Z" android:fillColor="#EAA33A" />
+    <path android:pathData="M 25,20 C 28,18 32,18 35,20.5" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Sputtering Tadka (Red Chili, Cumin, Mustard & Curry Leaves) -->
+    <path android:pathData="M 26.7,22 Q 27,20.9 28.1,21.1 Q 29.5,21.5 29.2,22.25 Q 28.5,23 26.7,22 Z" android:fillColor="#F2C765" android:strokeColor="#A5662D" android:strokeWidth="0.3" />
+    <path android:pathData="M 25.7,24.4 Q 26.5,21.4 28.3,21.9 Q 28.8,23.4 26.5,25.1 Z" android:fillColor="#BA4930" android:strokeColor="#51382B" android:strokeWidth="0.32" />
+    <path android:pathData="M 32.2,20.2 Q 34.6,19.9 34.6,21.5 Q 33.1,22.2 32.2,20.2 Z" android:fillColor="#43864A" android:strokeColor="#2E6323" android:strokeWidth="0.3" />
+
+    <!-- Spicy Pickle Portion & Crispy Papad Wedge -->
+    <path android:pathData="M 32.05,27 A 0.65,0.65 0 1,0 33.35,27 A 0.65,0.65 0 1,0 32.05,27 Z" android:fillColor="#B71C1C" />
+    <path android:pathData="M 12.5,29.5 Q 13.5,28.5 14.5,29.5 L 13.5,31.5 Z" android:fillColor="#F2C765" android:strokeColor="#A5662D" android:strokeWidth="0.3" />
+</vector>

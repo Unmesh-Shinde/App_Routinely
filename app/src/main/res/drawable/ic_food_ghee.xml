@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Coaster Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#B0BEC5" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#FAFAFA" android:strokeColor="#ECEFF1" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFFFF" android:strokeColor="#ECEFF1" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Coaster Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#0A000000" />
+
+    <!-- Glass/Ceramic Bowl Ambient Drop Shadow -->
+    <path android:pathData="M 12,27 A 12,12 0 1,0 36,27 A 12,12 0 1,0 12,27 Z" android:fillColor="#1A000000" />
+
+    <!-- Clean Crystal Glass / White Ceramic Bowl Body -->
+    <path android:pathData="M 11,26 C 11,18 37,18 37,26 C 37,36 11,36 11,26 Z" android:fillColor="#ECEFF1" android:strokeColor="#B0BEC5" android:strokeWidth="0.85" />
+    <path android:pathData="M 12.5,26 C 12.5,20 35.5,20 35.5,26 C 35.5,34.5 12.5,34.5 12.5,26 Z" android:fillColor="#FFFFFF" />
+
+    <!-- Pure Sunlight Yellow Melted Ghee Level & Layers -->
+    <path android:pathData="M 13.5,25 C 13.5,19.5 34.5,19.5 34.5,25 C 34.5,32.5 13.5,32.5 13.5,25 Z" android:fillColor="#FBC02D" />
+    <path android:pathData="M 14.5,25 C 14.5,20.5 33.5,20.5 33.5,25 C 33.5,31.5 14.5,31.5 14.5,25 Z" android:fillColor="#FDD835" />
+    <path android:pathData="M 15.5,24.5 C 15.5,21 32.5,21 32.5,24.5 C 32.5,30 15.5,30 15.5,24.5 Z" android:fillColor="#FFEE58" />
+    <path android:pathData="M 17,24 C 17,21.5 31,21.5 31,24 C 31,28.5 17,28.5 17,24 Z" android:fillColor="#FFF59D" />
+
+    <!-- Sunlight Yellow Liquid Specular Highlights & Glint -->
+    <path android:pathData="M 18,22.5 C 22,21 27,21 30,22.5" android:fillColor="#00000000" android:strokeColor="#FFFFFF" android:strokeWidth="1.5" android:strokeLineCap="round" />
+    <path android:pathData="M 20,25.5 C 23,26.5 26,26.5 28,25.5" android:fillColor="#00000000" android:strokeColor="#FFFF8D" android:strokeWidth="1.0" android:strokeLineCap="round" />
+
+    <!-- Stainless Steel Metallic Silver Spoon Handle -->
+    <path android:pathData="M 38,9 L 26,21 L 23.5,19 L 35.5,7 Z" android:fillColor="#CFD8DC" android:strokeColor="#78909C" android:strokeWidth="0.65" />
+    <path android:pathData="M 37.5,8.5 L 26.5,19.5" android:fillColor="#00000000" android:strokeColor="#FFFFFF" android:strokeWidth="0.9" android:strokeLineCap="round" />
+
+    <!-- Spoon Bowl carrying a pool of Bright Sunlight Yellow Ghee -->
+    <path android:pathData="M 20,23 C 18,19 25,16 28,20 C 29,22 26,26 20,23 Z" android:fillColor="#B0BEC5" android:strokeColor="#607D8B" android:strokeWidth="0.65" />
+    <path android:pathData="M 20.5,22.5 C 19,19.5 24.5,17 27.5,20.2 C 28,21.8 25.5,25 20.5,22.5 Z" android:fillColor="#FFEE58" />
+    <path android:pathData="M 21.5,21.5 C 20.5,19.8 24,18 26,20 Z" android:fillColor="#FFF9C4" />
+
+    <!-- Sunlight Yellow Ghee Droplet dripping from spoon into bowl -->
+    <path android:pathData="M 18.5,26.5 A 1.5,1.5 0 1,0 21.5,26.5 A 1.5,1.5 0 1,0 18.5,26.5 Z" android:fillColor="#FFEE58" android:strokeColor="#FBC02D" android:strokeWidth="0.3" />
+    <path android:pathData="M 19.2,26.3 A 0.5,0.5 0 1,0 20.2,26.3 A 0.5,0.5 0 1,0 19.2,26.3 Z" android:fillColor="#FFFFFF" />
+</vector>

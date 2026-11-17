@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Coaster Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Coaster Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Glass Tumbler Ambient Shadow -->
+    <path android:pathData="M 14.5,15.8 L 33.5,15.8 L 31.5,38.8 L 16.5,38.8 Z" android:fillColor="#22000000" />
+
+    <!-- Glass Tumbler Body Filled with Dark Red Rum -->
+    <path android:pathData="M 14,15 L 34,15 L 31,38 L 17,38 Z" android:fillColor="#B71C1C" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 15,17 L 33,17 L 30.5,36.5 L 17.5,36.5 Z" android:fillColor="#880E4F" />
+
+    <!-- Ice Cubes -->
+    <path android:pathData="M 18,21 L 24,19 L 26,24 L 20,26 Z" android:fillColor="#50FFFFFF" android:strokeColor="#FFFFFF" android:strokeWidth="0.5" />
+
+    <!-- Lime Wheel Slice -->
+    <path android:pathData="M 28,12 A 3,3 0 1,0 34,12 A 3,3 0 1,0 28,12 Z" android:fillColor="#7CB342" android:strokeColor="#33691E" android:strokeWidth="0.4" />
+
+    <!-- Specular Gloss Highlight -->
+    <path android:pathData="M 16,18 L 18,36" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>

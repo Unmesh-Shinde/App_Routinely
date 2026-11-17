@@ -2,14 +2,29 @@ package com.dailyroutine.app
 
 import java.io.Serializable
 
+interface PlannableItem : Serializable {
+    val id: Int
+    val name: String
+    val hour: Int
+    val minute: Int
+}
+
+interface PlannableTemplate<T : PlannableItem> : Serializable {
+    val id: String
+    val name: String
+    val durationDays: Int
+    val itemsByDayOffset: MutableMap<Int, MutableList<T>>
+}
+
 // --- Diet Plan Models ---
 
 data class MealNutritionInfo(
-    val calories: Int = 0,
-    val carbsG: Double = 0.0,
-    val proteinG: Double = 0.0,
-    val fatG: Double = 0.0,
-    val fiberG: Double = 0.0,
+    // Nullable values preserve the difference between an estimated zero and a field Gemini omitted.
+    val calories: Int? = null,
+    val carbsG: Double? = null,
+    val proteinG: Double? = null,
+    val fatG: Double? = null,
+    val fiberG: Double? = null,
     val fatBreakdown: Map<String, String> = emptyMap(),
     val carbBreakdown: Map<String, String> = emptyMap(),
     val vitamins: Map<String, String> = emptyMap(),
@@ -20,24 +35,37 @@ data class MealNutritionInfo(
 ) : Serializable
 
 data class Meal(
-    val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),
-    val name: String = "",
+    override val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),
+    override val name: String = "",
     val description: String = "",
-    val hour: Int = 12,
-    val minute: Int = 0,
+    override val hour: Int = 12,
+    override val minute: Int = 0,
     val isReminderEnabled: Boolean = true,
     val mealType: String = "Lunch", // Breakfast, Lunch, Dinner, Snack
-    val calories: Int = 0,
-    val nutritionInfo: MealNutritionInfo? = null
-) : Serializable {
+    val calories: Int? = null,
+    val nutritionInfo: MealNutritionInfo? = null,
+    val isWaterIntakeSummary: Boolean = false,
+    val isPendingOvernightRetry: Boolean = false,
+    val queuedTimestamp: Long = 0L,
+    val manualRetryAttempted: Boolean = false,
+    val nutritionErrorCode: String? = null,
+    val addedTimestamp: Long = System.currentTimeMillis(),
+    val editCount: Int = 0,
+    val nutritionDayRetriesUsed: Int = 0,
+    val nutritionOvernightRetriesUsed: Int = 0,
+    val nutritionRetryStage: String? = null,
+    val nextNutritionRetryAt: Long = 0L,
+    val nutritionAutoRetriesExhausted: Boolean = false,
+    val nutritionOvernightWindowStartAt: Long = 0L
+) : PlannableItem {
     fun formatTime(): String {
         val h = if (hour == 0 || hour == 12) 12 else hour % 12
         val amPm = if (hour < 12) "AM" else "PM"
         return "%02d:%02d %s".format(h, minute, amPm)
     }
 
-    val displayCalories: Int
-        get() = nutritionInfo?.calories ?: calories
+    val displayCalories: Int?
+        get() = nutritionInfo?.calories ?: calories?.takeIf { it > 0 }
 }
 
 data class DietPlan(
@@ -45,11 +73,14 @@ data class DietPlan(
 ) : Serializable
 
 data class MealTemplate(
-    val id: String,
-    val name: String,
-    val durationDays: Int,
+    override val id: String,
+    override val name: String,
+    override val durationDays: Int,
     val mealsByDayOffset: MutableMap<Int, MutableList<Meal>> = mutableMapOf()
-) : Serializable
+) : PlannableTemplate<Meal> {
+    override val itemsByDayOffset: MutableMap<Int, MutableList<Meal>>
+        get() = mealsByDayOffset
+}
 
 data class AppliedTemplateRange(
     val templateId: String,
@@ -62,12 +93,12 @@ data class AppliedTemplateRange(
 
 
 data class Exercise(
-    val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),
-    val name: String = "",
+    override val id: Int = (System.currentTimeMillis() % Int.MAX_VALUE).toInt() + java.util.Random().nextInt(1000),
+    override val name: String = "",
     val sets: Int = 3,
     val reps: String = "10",
-    val hour: Int = 8,
-    val minute: Int = 0,
+    override val hour: Int = 8,
+    override val minute: Int = 0,
     val isReminderEnabled: Boolean = true,
     val targetArea: String = "Full Body",
     val intensity: Int = 50, // 0..100
@@ -81,7 +112,7 @@ data class Exercise(
     val workSeconds: Int = 0,
     val addedWeightKg: Double = 0.0,
     val distanceKm: Double = 0.0
-) : Serializable {
+) : PlannableItem {
     fun formatTime(): String {
         val h = if (hour == 0 || hour == 12) 12 else hour % 12
         val amPm = if (hour < 12) "AM" else "PM"
@@ -94,8 +125,11 @@ data class WorkoutPlan(
 ) : Serializable
 
 data class WorkoutTemplate(
-    val id: String,
-    val name: String,
-    val durationDays: Int,
+    override val id: String,
+    override val name: String,
+    override val durationDays: Int,
     val exercisesByDayOffset: MutableMap<Int, MutableList<Exercise>> = mutableMapOf()
-) : Serializable
+) : PlannableTemplate<Exercise> {
+    override val itemsByDayOffset: MutableMap<Int, MutableList<Exercise>>
+        get() = exercisesByDayOffset
+}

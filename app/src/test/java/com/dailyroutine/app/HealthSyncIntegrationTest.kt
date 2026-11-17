@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.metadata.DataOrigin
@@ -33,7 +34,6 @@ import java.time.ZoneOffset
 class HealthSyncIntegrationTest {
     private lateinit var context: Context
     private lateinit var hcm: IHealthConnectManager
-    private lateinit var gfit: IGoogleFitHeartPointsManager
     private lateinit var hdm: HealthDataManager
 
     @Before
@@ -54,10 +54,7 @@ class HealthSyncIntegrationTest {
 
         hdm = HealthDataManager(context)
         hdm.setConnected(true)
-        hdm.setConnectedAppPackage("com.google.android.apps.fitness")
-        
         hcm = mock()
-        gfit = mock()
     }
 
     @Test
@@ -65,19 +62,19 @@ class HealthSyncIntegrationTest {
         val today = LocalDate.now().toString()
         
         // Mock permissions using actual SDK strings
-        whenever(hcm.getGrantedPermissions()).doReturn(setOf(
+        whenever(hcm.getGrantedPermissionsOrNull()).doReturn(setOf(
             HealthPermission.getReadPermission(StepsRecord::class),
             HealthPermission.getReadPermission(DistanceRecord::class),
             HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class)
         ))
         
         // Mock data
-        whenever(hcm.readStepsWithFallback(any(), any(), any())).doReturn(5000L)
-        whenever(hcm.readDistanceMeters(any(), any(), any())).doReturn(4200.0)
-        whenever(hcm.readActiveCalories(any(), any(), any())).doReturn(350.0)
+        whenever(hcm.readStepsWithFallback(any(), any())).doReturn(5000L)
+        whenever(hcm.readDistanceMeters(any(), any())).doReturn(4200.0)
+        whenever(hcm.readActiveCalories(any(), any())).doReturn(350.0)
 
         val manager = HealthSyncManager(context)
-        manager.performSync(hcm, gfit, HealthSyncWorker.SYNC_MODE_STEPS)
+        manager.performSync(hcm, HealthSyncWorker.SYNC_MODE_STEPS)
 
         // Verify SharedPreferences
         assertEquals(4.2, hdm.getHistoricalDistance(today), 0.01)
@@ -91,30 +88,39 @@ class HealthSyncIntegrationTest {
     }
 
     @Test
-    fun performSync_fallsBackToStrideFormulaWhenDistanceMissing() = runBlocking {
+    fun performSync_persistsWalkingDurationFromHealthConnectExerciseSessions() = runBlocking {
+        val today = LocalDate.now().toString()
+        whenever(hcm.getGrantedPermissionsOrNull()).doReturn(setOf(
+            HealthPermission.getReadPermission(StepsRecord::class),
+            HealthPermission.getReadPermission(ExerciseSessionRecord::class)
+        ))
+        whenever(hcm.readStepsWithFallback(any(), any())).doReturn(2500L)
+        whenever(hcm.readWalkingDurationMinutesOrNull(any(), any())).doReturn(37L)
+
+        HealthSyncManager(context).performSync(hcm, HealthSyncWorker.SYNC_MODE_STEPS)
+
+        assertEquals(37L, hdm.getHistoricalWalkingDuration(today))
+    }
+
+    @Test
+    fun performSync_keepsMissingHealthConnectDistanceAtZero() = runBlocking {
         val today = LocalDate.now().toString()
         UserPreferencesStore.setUserHeight(context, 180.0)
         UserPreferencesStore.setUserGender(context, "Male")
 
-        whenever(hcm.getGrantedPermissions()).doReturn(setOf(
+        whenever(hcm.getGrantedPermissionsOrNull()).doReturn(setOf(
             HealthPermission.getReadPermission(StepsRecord::class)
         ))
-        whenever(hcm.readStepsWithFallback(any(), any(), any())).doReturn(1000L)
-        whenever(hcm.readDistanceMeters(any(), any(), any())).doReturn(0.0)
+        whenever(hcm.readStepsWithFallback(any(), any())).doReturn(1000L)
+        whenever(hcm.readDistanceMeters(any(), any())).doReturn(0.0)
 
         val manager = HealthSyncManager(context)
-        manager.performSync(hcm, gfit, HealthSyncWorker.SYNC_MODE_STEPS)
+        manager.performSync(hcm, HealthSyncWorker.SYNC_MODE_STEPS)
 
         // Stay 0 in historical distance storage because sync returned 0
         assertEquals(0.0, hdm.getHistoricalDistance(today), 0.01)
         
-        // WellnessEngine should estimate it: 1000 steps * 0.747m = 0.747km
-        val stepsStr = hdm.getSteps().replace(",", "")
-        val steps = stepsStr.toIntOrNull() ?: 0
-        assertEquals(1000, steps)
-        
-        val estimatedDist = hdm.calculateDistanceKm(steps)
-        assertEquals(0.747, estimatedDist, 0.001)
+        assertEquals(1000, hdm.getHistoricalSteps(today).toInt())
     }
 
     @Test
@@ -122,16 +128,16 @@ class HealthSyncIntegrationTest {
         val today = LocalDate.now()
         val yesterday = today.minusDays(1).toString()
         
-        whenever(hcm.getGrantedPermissions()).doReturn(setOf(
+        whenever(hcm.getGrantedPermissionsOrNull()).doReturn(setOf(
             HealthPermission.getReadPermission(StepsRecord::class),
             HealthPermission.getReadPermission(DistanceRecord::class)
         ))
         
-        whenever(hcm.readStepsWithFallback(any(), any(), any())).doReturn(8000L)
-        whenever(hcm.readDistanceMeters(any(), any(), any())).doReturn(6000.0)
+        whenever(hcm.readStepsWithFallback(any(), any())).doReturn(8000L)
+        whenever(hcm.readDistanceMeters(any(), any())).doReturn(6000.0)
 
         val manager = HealthSyncManager(context)
-        manager.performSync(hcm, gfit, HealthSyncWorker.SYNC_MODE_HISTORY)
+        manager.performSync(hcm, HealthSyncWorker.SYNC_MODE_HISTORY)
 
         // Verify yesterday's data was synced
         assertEquals(6.0, hdm.getHistoricalDistance(yesterday), 0.01)
@@ -141,13 +147,13 @@ class HealthSyncIntegrationTest {
 
     @Test
     fun performSync_writesSyncLog_whenNotHistoryMode() = runBlocking {
-        whenever(hcm.getGrantedPermissions()).doReturn(setOf(
+        whenever(hcm.getGrantedPermissionsOrNull()).doReturn(setOf(
             HealthPermission.getReadPermission(StepsRecord::class)
         ))
-        whenever(hcm.readStepsWithFallback(any(), any(), any())).doReturn(3000L)
+        whenever(hcm.readStepsWithFallback(any(), any())).doReturn(3000L)
 
         val manager = HealthSyncManager(context)
-        manager.performSync(hcm, gfit, HealthSyncWorker.SYNC_MODE_STEPS)
+        manager.performSync(hcm, HealthSyncWorker.SYNC_MODE_STEPS)
 
         val logs = SyncLogManager.getLogs(context)
         assertFalse("Sync logs should not be empty after sync", logs.isEmpty())
@@ -159,7 +165,7 @@ class HealthSyncIntegrationTest {
         hdm.setConnected(false)
 
         val manager = HealthSyncManager(context)
-        val result = manager.performSync(hcm, gfit, HealthSyncWorker.SYNC_MODE_STEPS)
+        val result = manager.performSync(hcm, HealthSyncWorker.SYNC_MODE_STEPS)
 
         assertEquals(ListenableWorker.Result.success(), result)
         assertTrue("No logs should be logged when disconnected", SyncLogManager.getLogs(context).isEmpty())
@@ -168,7 +174,7 @@ class HealthSyncIntegrationTest {
     @Test
     fun performSync_whenSleepMode_readsSleepSessions() = runBlocking {
         val today = LocalDate.now().toString()
-        whenever(hcm.getGrantedPermissions()).doReturn(setOf(
+        whenever(hcm.getGrantedPermissionsOrNull()).doReturn(setOf(
             HealthPermission.getReadPermission(SleepSessionRecord::class)
         ))
 
@@ -211,13 +217,69 @@ class HealthSyncIntegrationTest {
         }
         
         val realSleepSession = recordConstructor.newInstance(*recParams) as SleepSessionRecord
-        whenever(hcm.readSleepSessions(any(), any(), any())).doReturn(listOf(realSleepSession))
+        whenever(hcm.readSleepSessions(any(), any())).doReturn(listOf(realSleepSession))
 
         val manager = HealthSyncManager(context)
-        manager.performSync(hcm, gfit, HealthSyncWorker.SYNC_MODE_SLEEP)
+        manager.performSync(hcm, HealthSyncWorker.SYNC_MODE_SLEEP)
 
         val repo = HealthMetricsRepository.create(context)
         val metric = repo.getMetric(today)
         assertEquals(8.0, metric?.sleepHours ?: 0.0, 0.01)
+    }
+
+    @Test
+    fun performSync_mergesOverlappingSleepSessionsInsteadOfDoubleCounting() = runBlocking {
+        val today = LocalDate.now().toString()
+        whenever(hcm.getGrantedPermissionsOrNull()).doReturn(setOf(
+            HealthPermission.getReadPermission(SleepSessionRecord::class)
+        ))
+
+        val now = Instant.now()
+        val dayStart = LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+        val elapsedSeconds = java.time.Duration.between(dayStart, now).seconds
+        val overlapStart = dayStart.plusSeconds(elapsedSeconds / 2)
+        val firstSession = createSleepSession(dayStart, now)
+        val overlappingDuplicate = createSleepSession(overlapStart, now)
+        whenever(hcm.readSleepSessions(any(), any())).doReturn(listOf(firstSession, overlappingDuplicate))
+
+        HealthSyncManager(context).performSync(hcm, HealthSyncWorker.SYNC_MODE_SLEEP)
+
+        val metric = HealthMetricsRepository.create(context).getMetric(today)
+        val expectedHours = java.util.concurrent.TimeUnit.SECONDS.toMinutes(elapsedSeconds) / 60.0
+        assertEquals("The overlapping half-day session must not be counted twice", expectedHours, metric?.sleepHours ?: 0.0, 0.01)
+        assertEquals(expectedHours, hdm.getHistoricalSleep(today), 0.01)
+    }
+
+    private fun createSleepSession(start: Instant, end: Instant): SleepSessionRecord {
+        val metadataConstructor = Metadata::class.java.declaredConstructors.first()
+        metadataConstructor.isAccessible = true
+        val metadataArgs = arrayOfNulls<Any>(metadataConstructor.parameterTypes.size)
+        for (i in metadataArgs.indices) {
+            metadataArgs[i] = when (metadataConstructor.parameterTypes[i]) {
+                String::class.java -> "sleep_$i"
+                DataOrigin::class.java -> DataOrigin("com.example.health-provider")
+                Instant::class.java -> start
+                Long::class.javaPrimitiveType, Long::class.javaObjectType -> 0L
+                Int::class.javaPrimitiveType, Int::class.javaObjectType -> 0
+                else -> null
+            }
+        }
+        val metadata = metadataConstructor.newInstance(*metadataArgs)
+
+        val recordConstructor = SleepSessionRecord::class.java.declaredConstructors.first()
+        recordConstructor.isAccessible = true
+        val recordArgs = arrayOfNulls<Any>(recordConstructor.parameterTypes.size)
+        var instantCount = 0
+        for (i in recordArgs.indices) {
+            recordArgs[i] = when (recordConstructor.parameterTypes[i]) {
+                Instant::class.java -> if (instantCount++ == 0) start else end
+                ZoneOffset::class.java -> ZoneOffset.UTC
+                String::class.java -> "sleep_$i"
+                Metadata::class.java -> metadata
+                List::class.java -> emptyList<Any>()
+                else -> null
+            }
+        }
+        return recordConstructor.newInstance(*recordArgs) as SleepSessionRecord
     }
 }

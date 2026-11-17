@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.text.Html
 import android.text.InputFilter
 import android.text.InputType
+import android.text.method.ReplacementTransformationMethod
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -32,6 +34,11 @@ class SettingsActivity : AppCompatActivity() {
 	private lateinit var btnChangePin: MaterialButton
 	private lateinit var btnClearLoggedLists: MaterialButton
 	private lateinit var btnClearDataAndCache: MaterialButton
+
+	private class PinMaskTransformationMethod : ReplacementTransformationMethod() {
+		override fun getOriginal(): CharArray = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
+		override fun getReplacement(): CharArray = CharArray(10) { '\u2022' }
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		enableEdgeToEdge()
@@ -152,7 +159,9 @@ class SettingsActivity : AppCompatActivity() {
 		}
 
 		if (includeCache) {
+			CalorieSearchEngine.clearCache(this)
 			getSharedPreferences("calorie_cache_pref", MODE_PRIVATE).edit().clear().apply()
+			getSharedPreferences("calorie_cache_pref_v6", MODE_PRIVATE).edit().clear().apply()
 			getSharedPreferences("workout_met_cache_pref", MODE_PRIVATE).edit().clear().apply()
 		}
 
@@ -229,27 +238,29 @@ class SettingsActivity : AppCompatActivity() {
 		methodGroup.setOnCheckedChangeListener { group, checkedId ->
 			when (checkedId) {
 				R.id.radioUnlockPin -> {
-					if (UserSettingsStore.hasManualPin(this)) {
-						UserSettingsStore.setLockMethod(this, UserSettingsStore.LOCK_METHOD_PIN)
-						AppLockCoordinator.markLockSettingsChanged(UserSettingsStore.isAppLockEnabled(this))
-						updateLockSummary()
-					} else {
+					if (!UserSettingsStore.hasManualPin(this)) {
 						showSetPinDialog(
-							onSaved = {
-								UserSettingsStore.setLockMethod(this, UserSettingsStore.LOCK_METHOD_PIN)
-								AppLockCoordinator.markLockSettingsChanged(UserSettingsStore.isAppLockEnabled(this))
-								group.check(R.id.radioUnlockPin)
-								updateLockSummary()
-							},
+							onSaved = { applyUnlockMethod(group, UserSettingsStore.LOCK_METHOD_PIN) },
 							onCancelled = { restoreUnlockMethodSelection(group) }
 						)
+					} else {
+						showVerifyPinDialog("Confirm PIN to use PIN unlock") {
+							applyUnlockMethod(group, UserSettingsStore.LOCK_METHOD_PIN)
+						}
 					}
 				}
 				R.id.radioUnlockBiometric -> {
 					if (AppLockCoordinator.isBiometricAvailable(this)) {
-						UserSettingsStore.setLockMethod(this, UserSettingsStore.LOCK_METHOD_BIOMETRIC)
-						AppLockCoordinator.markLockSettingsChanged(UserSettingsStore.isAppLockEnabled(this))
-						updateLockSummary()
+						if (!UserSettingsStore.hasManualPin(this)) {
+							showSetPinDialog(
+								onSaved = { applyUnlockMethod(group, UserSettingsStore.LOCK_METHOD_BIOMETRIC) },
+								onCancelled = { restoreUnlockMethodSelection(group) }
+							)
+						} else {
+							showVerifyPinDialog("Confirm PIN to use biometric unlock") {
+								applyUnlockMethod(group, UserSettingsStore.LOCK_METHOD_BIOMETRIC)
+							}
+						}
 					} else {
 						Toast.makeText(this, "Fingerprint or face unlock is not available/enrolled on this phone.", Toast.LENGTH_LONG).show()
 						restoreUnlockMethodSelection(group)
@@ -281,6 +292,40 @@ class SettingsActivity : AppCompatActivity() {
 				}
 			)
 		}
+	}
+
+	private fun applyUnlockMethod(group: RadioGroup, method: String) {
+		UserSettingsStore.setLockMethod(this, method)
+		AppLockCoordinator.markLockSettingsChanged(UserSettingsStore.isAppLockEnabled(this))
+		group.check(if (method == UserSettingsStore.LOCK_METHOD_BIOMETRIC) R.id.radioUnlockBiometric else R.id.radioUnlockPin)
+		updateLockSummary()
+	}
+
+	private fun showVerifyPinDialog(title: String, onVerified: () -> Unit) {
+		val input = createPinInput("Enter your current PIN")
+		val container = LinearLayout(this).apply {
+			orientation = LinearLayout.VERTICAL
+			setPadding(48, 16, 48, 0)
+			addView(input.row)
+		}
+		val dialog = AlertDialog.Builder(this)
+			.setTitle(title)
+			.setView(container)
+			.setPositiveButton("Continue", null)
+			.setNegativeButton("Cancel") { _, _ -> restoreUnlockMethodSelection(findViewById(R.id.radioGroupUnlockMethod)) }
+			.create()
+		dialog.setOnShowListener {
+			dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+				if (UserSettingsStore.verifyManualPin(this, input.editText.text.toString())) {
+					dialog.dismiss()
+					onVerified()
+				} else {
+					input.editText.error = "Enter the correct current PIN"
+				}
+			}
+		}
+		dialog.setOnCancelListener { restoreUnlockMethodSelection(findViewById(R.id.radioGroupUnlockMethod)) }
+		dialog.show()
 	}
 
 	private fun enableLockWithSelectedMethod() {
@@ -356,15 +401,15 @@ class SettingsActivity : AppCompatActivity() {
 			orientation = LinearLayout.VERTICAL
 			setPadding(48, 16, 48, 0)
 		}
-		val oldPin = if (hasExistingPin) createPinEditText("Enter your old PIN") else null
-		val pin = createPinEditText(if (hasExistingPin) "Enter new PIN" else "Enter New 6-digit PIN")
-		val confirm = createPinEditText("Confirm PIN")
+		val oldPin = if (hasExistingPin) createPinInput("Enter your old PIN") else null
+		val pin = createPinInput(if (hasExistingPin) "Enter new PIN" else "Enter New 6-digit PIN")
+		val confirm = createPinInput("Confirm PIN")
 		val hint = createHintEditText("Add a Hint").apply {
 			setText(UserSettingsStore.getManualPinHint(this@SettingsActivity))
 		}
-		oldPin?.let { container.addView(it) }
-		container.addView(pin)
-		container.addView(confirm)
+		oldPin?.let { container.addView(it.row) }
+		container.addView(pin.row)
+		container.addView(confirm.row)
 		container.addView(hint)
 
 		val dialog = AlertDialog.Builder(this)
@@ -377,15 +422,16 @@ class SettingsActivity : AppCompatActivity() {
 
 		dialog.setOnShowListener {
 			dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-				val previous = oldPin?.text?.toString().orEmpty()
-				val first = pin.text.toString()
-				val second = confirm.text.toString()
+				val previous = oldPin?.editText?.text?.toString().orEmpty()
+				val first = pin.editText.text.toString()
+				val second = confirm.editText.text.toString()
 				when {
-					hasExistingPin && !UserSettingsStore.verifyManualPin(this, previous) -> oldPin?.error = "Enter the correct current PIN"
-					!first.matches(Regex("\\d{6}")) -> pin.error = "Enter exactly 6 digits"
-					hasExistingPin && UserSettingsStore.verifyManualPin(this, first) -> pin.error = "Choose a new PIN that is different from your current PIN"
-					first != second -> confirm.error = "PINs do not match"
-					first == "000000" || first == "123456" -> pin.error = "Choose a less obvious PIN"
+					hasExistingPin && !UserSettingsStore.verifyManualPin(this, previous) -> oldPin?.editText?.error = "Enter the correct current PIN"
+					!first.matches(Regex("\\d{6}")) -> pin.editText.error = "Enter exactly 6 digits"
+					hasExistingPin && UserSettingsStore.verifyManualPin(this, first) -> pin.editText.error = "Choose a new PIN that is different from your current PIN"
+					UserSettingsStore.isManualPinPreviouslyUsed(this, first) -> pin.editText.error = "You cannot reuse your last PIN. Choose a new PIN"
+					first != second -> confirm.editText.error = "PINs do not match"
+					first == "000000" || first == "123456" -> pin.editText.error = "Choose a less obvious PIN"
 					UserSettingsStore.setManualPin(this, first, hint.text.toString()) -> {
 						dialog.dismiss()
 						onSaved()
@@ -397,13 +443,43 @@ class SettingsActivity : AppCompatActivity() {
 		dialog.show()
 	}
 
-	private fun createPinEditText(hintText: String): EditText {
-		return EditText(this).apply {
+	private data class PinInput(val row: LinearLayout, val editText: EditText)
+
+	private fun createPinInput(hintText: String): PinInput {
+		val editText = EditText(this).apply {
 			hint = hintText
-			inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+			inputType = InputType.TYPE_CLASS_NUMBER
 			filters = arrayOf(InputFilter.LengthFilter(6))
 			setSingleLine(true)
+			transformationMethod = PinMaskTransformationMethod()
 		}
+		val touchTarget = (48 * resources.displayMetrics.density).toInt()
+		var isRevealed = false
+		val eyeButton = ImageButton(this).apply {
+			setImageResource(R.drawable.ic_visibility)
+			imageTintList = editText.textColors
+			contentDescription = "Show PIN"
+			background = ContextCompat.getDrawable(this@SettingsActivity, android.R.drawable.list_selector_background)
+			scaleType = android.widget.ImageView.ScaleType.CENTER
+			val density = resources.displayMetrics.density
+			val iconPadding = (12 * density).toInt()
+			setPadding(iconPadding, iconPadding, iconPadding, iconPadding)
+			setOnClickListener {
+				val cursor = editText.selectionStart.coerceAtLeast(0)
+				isRevealed = !isRevealed
+				editText.transformationMethod = if (isRevealed) null else PinMaskTransformationMethod()
+				editText.setSelection(cursor.coerceAtMost(editText.length()))
+				setImageResource(if (isRevealed) R.drawable.ic_visibility_off else R.drawable.ic_visibility)
+				contentDescription = if (isRevealed) "Hide PIN" else "Show PIN"
+			}
+		}
+		val row = LinearLayout(this).apply {
+			orientation = LinearLayout.HORIZONTAL
+			gravity = android.view.Gravity.CENTER_VERTICAL
+			addView(editText, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+			addView(eyeButton, LinearLayout.LayoutParams(touchTarget, LinearLayout.LayoutParams.MATCH_PARENT))
+		}
+		return PinInput(row, editText)
 	}
 
 	private fun createHintEditText(hintText: String): EditText {

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Whole Wheat Bread Toast Slice Ambient Shadow -->
+    <path android:pathData="M 12.5,12.8 C 10.5,20 18.5,36 28.5,36.8 C 38.5,36.8 38.5,24 28.5,12.8 Z" android:fillColor="#22000000" />
+
+    <!-- Whole Wheat Bread Toast Body -->
+    <path android:pathData="M 12,12 C 10,19 18,35 28,36 C 38,36 38,23 28,12 Z" android:fillColor="#8D6E63" android:strokeColor="#51382B" android:strokeWidth="0.85" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 14,14 C 12,20 19,33 27,34 C 36,34 36,23 27,14 Z" android:fillColor="#C88C4D" />
+
+    <!-- Crunchy Peanut Butter Spread Surface -->
+    <path android:pathData="M 16,16 C 14,21 20,31 26,32 C 33,32 33,22 26,16 Z" android:fillColor="#A85D1B" />
+    <path android:pathData="M 18,20 A 1,1 0 1,0 20,20 A 1,1 0 1,0 18,20 Z M 25,24 A 1,1 0 1,0 27,24 A 1,1 0 1,0 25,24 Z M 21,27 A 1,1 0 1,0 23,27 A 1,1 0 1,0 21,27 Z" android:fillColor="#FFE082" />
+</vector>

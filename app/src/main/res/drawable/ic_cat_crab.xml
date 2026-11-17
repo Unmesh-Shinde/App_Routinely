@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Cooked Crab Ambient Drop Shadow -->
+    <path android:pathData="M 12.5,22.8 C 12.5,14 35.5,14 35.5,22.8 C 35.5,33 12.5,33 12.5,22.8 Z" android:fillColor="#22000000" />
+
+    <!-- Crab Walking Legs (3 on Left, 3 on Right) -->
+    <path android:pathData="M 14,21 Q 9,18 8,22 M 14,24 Q 9,23 7,27 M 15,27 Q 10,28 8,32 M 34,21 Q 39,18 40,22 M 34,24 Q 39,23 41,27 M 33,27 Q 38,28 40,32" android:fillColor="#00000000" android:strokeColor="#D32F2F" android:strokeWidth="1.2" android:strokeLineCap="round" />
+
+    <!-- Large Dual Pincers / Claws (Top Left & Top Right) -->
+    <path android:pathData="M 16,19 C 11,13 10,8 14,9 C 18,10 18,15 16,19 Z M 32,19 C 37,13 38,8 34,9 C 30,10 30,15 32,19 Z" android:fillColor="#E53935" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+
+    <!-- Central Oval Carapace Shell -->
+    <path android:pathData="M 14,23 C 14,14 34,14 34,23 C 34,31 14,31 14,23 Z" android:fillColor="#D32F2F" android:strokeColor="#51382B" android:strokeWidth="0.85" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 16,21 C 16,16 32,16 32,21 Z" android:fillColor="#FF8A80" />
+    <path android:pathData="M 18,19 C 20,16 28,16 30,19" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>

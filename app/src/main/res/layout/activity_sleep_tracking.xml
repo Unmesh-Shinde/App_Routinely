@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="Connect an App to view your Sleep data"
+                android:text="Connect Health Connect to view your Sleep data"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/textPrimary"

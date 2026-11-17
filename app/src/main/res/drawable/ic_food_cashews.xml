@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Bowl of Cashews Vessel & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,24 A 14.5,14.5 0 1,0 38.5,24 A 14.5,14.5 0 1,0 9.5,24 Z" android:fillColor="#FFF8E1" />
+
+    <!-- Crescent-Shaped Creamy Cashew Nuts (Kaju) -->
+    <path android:pathData="M 12,19 Q 15,16 19,18 Q 21,21 18,23 Q 15,22 12,19 Z" android:fillColor="#FFFDF0" android:strokeColor="#D7CCC8" android:strokeWidth="0.4" />
+    <path android:pathData="M 22,16 Q 25,13 29,15 Q 31,18 28,20 Q 25,19 22,16 Z" android:fillColor="#FFFDF0" android:strokeColor="#D7CCC8" android:strokeWidth="0.4" />
+    <path android:pathData="M 17,26 Q 20,23 24,25 Q 26,28 23,30 Q 20,29 17,26 Z" android:fillColor="#FFFDF0" android:strokeColor="#D7CCC8" android:strokeWidth="0.4" />
+    <path android:pathData="M 27,25 Q 30,22 34,24 Q 36,27 33,29 Q 30,28 27,25 Z" android:fillColor="#FFFDF0" android:strokeColor="#D7CCC8" android:strokeWidth="0.4" />
+</vector>

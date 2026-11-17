@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 7.5,24 A 16.5,16.5 0 1,0 40.5,24 A 16.5,16.5 0 1,0 7.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Wok-Tossed Soy Fried Rice Bed & Ambient Shadow -->
+    <path android:pathData="M 8.5,24.8 A 16,16 0 1,0 40.5,24.8 A 16,16 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFF0C8" android:strokeColor="#51382B" android:strokeWidth="0.65" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 10,22 C 16,12 28,12 36,18 C 30,22 22,23 10,22 Z" android:fillColor="#35FFCA28" />
+
+    <!-- Rice Texture Grains -->
+    <path android:pathData="M 12.95,12 Q 13.65,11.28 14.9,11.8 Q 15.15,12 14.62,12.35 Q 13.65,12.72 12.95,12 Z M 19,9.95 Q 19.72,10.65 19.2,11.9 Q 19,12.15 18.65,11.62 Q 18.28,10.65 19,9.95 Z" android:fillColor="#FFFCF2" android:strokeColor="#D8B76F" android:strokeWidth="0.26" />
+
+    <!-- 3D Pan-Seared Paneer Cubes with Cast Shadows -->
+    <path android:pathData="M 29.0,27.5 Q 29.3,24.9 31.5,25.0 Q 33.7,25.1 34.0,27.5 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 28.5,27 Q 28.8,24.4 31,24.5 Q 33.2,24.6 33.5,27 Q 32.5,28.5 31,28.5 Q 29.4,28.5 28.5,27 Z" android:fillColor="#FFF9C4" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+    <path android:pathData="M 30.3,27.4 L 31.7,27.4 L 32,29.2 L 30,29.2 Z" android:fillColor="#F4D991" android:strokeColor="#51382B" android:strokeWidth="0.35" />
+
+    <!-- Sweetcorn Kernels & Green Peas -->
+    <path android:pathData="M 21.15,13 A 0.85,0.85 0 1,0 22.85,13 A 0.85,0.85 0 1,0 21.15,13 Z" android:fillColor="#4CAF50" android:strokeColor="#2E6323" android:strokeWidth="0.3" />
+    <path android:pathData="M 33.15,20 A 0.85,0.85 0 1,0 34.85,20 A 0.85,0.85 0 1,0 33.15,20 Z" android:fillColor="#FFD54F" android:strokeColor="#B88B2A" android:strokeWidth="0.3" />
+    <path android:pathData="M 11.15,27 A 0.85,0.85 0 1,0 12.85,27 A 0.85,0.85 0 1,0 11.15,27 Z" android:fillColor="#4CAF50" android:strokeColor="#2E6323" android:strokeWidth="0.3" />
+
+    <!-- Diced Carrot & Capsicum Cubes -->
+    <path android:pathData="M 10,15 L 14,14 L 15,15.4 L 11,16.5 Z" android:fillColor="#FF7043" android:strokeColor="#D84315" android:strokeWidth="0.3" />
+    <path android:pathData="M 21,29 L 25,28 L 26,29.4 L 22,30.5 Z" android:fillColor="#388E3C" android:strokeColor="#2E6323" android:strokeWidth="0.3" />
+
+    <!-- Sliced Green Spring Onion Rings -->
+    <path android:pathData="M 24,25.3 Q 22.2,24.1 21.6,22.8 Q 23.9,22.3 22.8,20.9 Q 23.8,20.9 24,22.1 Q 24.4,20.7 25.4,21 Q 25.1,22.3 26.3,22.8 Q 25.7,24.2 24,25.3 Z" android:fillColor="#43864A" android:strokeColor="#2E6323" android:strokeWidth="0.35" />
+    <path android:pathData="M 24,24.7 L 24,21.5" android:fillColor="#00000000" android:strokeColor="#A5C870" android:strokeWidth="0.32" />
+</vector>

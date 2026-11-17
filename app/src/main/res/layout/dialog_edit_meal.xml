@@ -46,6 +46,46 @@
         </LinearLayout>
     </LinearLayout>
 
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardMealGuidance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#0D4CAF50"
+        app:strokeColor="#334CAF50"
+        app:strokeWidth="1dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="top">
+
+            <ImageView
+                android:id="@+id/ivMealGuidanceIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="10dp"
+                android:contentDescription="Notice"
+                app:srcCompat="@android:drawable/ic_dialog_info"
+                app:tint="@color/healthNutrition" />
+
+            <TextView
+                android:id="@+id/tvMealGuidance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Meal plan limit: Up to two active meals per category (Breakfast, Lunch, Dinner, Snack) on each date. Gemini request allowances are separate.\n\nPlease enter the meal title and details carefully without spelling or grammatical errors. The text is used directly to calculate calories and nutrients, so clear and accurate descriptions produce the best results."
+                android:textColor="@color/textSecondary"
+                android:textSize="13sp"
+                android:lineSpacingExtra="2.5dp"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <TextView
         style="@style/LabelText"
         android:text="Meal Name"/>
@@ -75,18 +115,28 @@
     <TextView
         style="@style/LabelText"
         android:layout_marginTop="18dp"
-        android:text="Notes / Details"/>
+        android:text="Meal description"/>
 
     <EditText
         android:id="@+id/etMealNotes"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_marginTop="6dp"
-        android:hint="Any specific instructions..."
+        android:hint="Describe the meal in detail"
         android:gravity="top"
         android:background="@drawable/bg_field"
         android:padding="12dp"
         android:inputType="textMultiLine|textCapSentences"/>
+
+    <TextView
+        android:id="@+id/tvMealPercentLimitWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Percent signs are limited to 5 per description."
+        android:textColor="@color/textSecondary"
+        android:textSize="12sp"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:layout_width="match_parent"

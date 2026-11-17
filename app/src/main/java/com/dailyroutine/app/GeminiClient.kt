@@ -15,16 +15,26 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 sealed class GeminiResult<out T> {
     data class Success<out T>(val data: T) : GeminiResult<T>()
-    data class Error(val code: String, val message: String) : GeminiResult<Nothing>()
+    data class Error(
+        val code: String,
+        val message: String,
+        val scope: String = "unknown",
+        val httpStatus: Int? = null,
+        val upstreamStatus: Int? = null,
+        val retryable: Boolean = false,
+        val retryAtMillis: Long? = null
+    ) : GeminiResult<Nothing>()
 }
 
 object GeminiClient {
     private const val LOG_TAG = "GeminiClient"
-    private const val MAX_BACKEND_ATTEMPTS = 3
-    private val RETRY_DELAYS_MS = longArrayOf(300L, 900L)
+    // One extra Worker request is reserved only for refreshing a rejected Firebase token.
+    private const val MAX_BACKEND_ATTEMPTS = 2
+    private val RETRY_DELAYS_MS = longArrayOf(300L)
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -40,7 +50,7 @@ object GeminiClient {
         title: String,
         description: String,
         context: Context? = null,
-    ): Int = getNutritionForMeal(title, description, context).calories
+    ): Int = getNutritionForMeal(title, description, context).calories ?: 0
 
     suspend fun getNutritionForMeal(
         title: String,
@@ -57,80 +67,95 @@ object GeminiClient {
         title: String,
         description: String,
         context: Context? = null,
+        automaticRetryCategory: String? = null,
     ): GeminiResult<MealNutritionInfo> = withContext(Dispatchers.IO) {
-        val body = JSONObject().apply {
-            put("title", title)
-            put("description", description)
-        }
+        val body = createMealNutritionRequestBody(title, description, automaticRetryCategory)
         val response = postToBackendWithDetails("/v1/ai/meal-calories", body)
         if (response.json != null) {
-            val responseJson = response.json
-            val totalCalories = optNumericDouble(responseJson, "total_calories", "calories", "totalCalories").toInt()
-            if (totalCalories > 0) {
-                val carbs = optNumericDouble(responseJson, "carbs_g", "carbs", "carbohydrates", "carbsG")
-                val protein = optNumericDouble(responseJson, "protein_g", "protein", "proteinG")
-                val fat = optNumericDouble(responseJson, "fat_g", "fat", "fatG")
-                val fiber = optNumericDouble(responseJson, "fiber_g", "fiber", "fiberG")
-
-                val fatBreakdownMap = parseFlexibleJsonMap(responseJson, "fat_breakdown")
-                val carbBreakdownMap = parseFlexibleJsonMap(responseJson, "carb_breakdown")
-                val vitaminsMap = parseFlexibleJsonMap(responseJson, "vitamins")
-                val mineralsMap = parseFlexibleJsonMap(responseJson, "minerals")
-                val aminoAcidsMap = parseFlexibleJsonMap(responseJson, "amino_acids")
-                val antioxidantsMap = parseFlexibleJsonMap(responseJson, "antioxidants")
-                val otherMap = parseFlexibleJsonMap(responseJson, "other_nutrients")
-
-                val info = MealNutritionInfo(
-                    calories = totalCalories,
-                    carbsG = carbs,
-                    proteinG = protein,
-                    fatG = fat,
-                    fiberG = fiber,
-                    fatBreakdown = fatBreakdownMap,
-                    carbBreakdown = carbBreakdownMap,
-                    vitamins = vitaminsMap,
-                    minerals = mineralsMap,
-                    aminoAcids = aminoAcidsMap,
-                    antioxidants = antioxidantsMap,
-                    otherNutrients = otherMap
-                )
-                if (info.hasDetailedNutrition()) {
-                    val enrichedInfo = CalorieEstimator.enrichMealNutrition(info)
-                    Log.d(LOG_TAG, "Meal nutrition received: $enrichedInfo")
-                    return@withContext GeminiResult.Success(enrichedInfo)
-                } else {
-                    Log.w(LOG_TAG, "AI returned incomplete macros for calories=$totalCalories (carbs=$carbs, protein=$protein, fat=$fat), rejecting with error.")
-                    return@withContext GeminiResult.Error("ai_empty_response", "AI returned incomplete nutritional details. Please try again.")
-                }
-            }
+            val info = parseMealNutritionResponse(response.json)
+            Log.d(LOG_TAG, "Meal nutrition received (partial values allowed): $info")
+            return@withContext GeminiResult.Success(info)
         }
 
         val code = response.errorCode.ifBlank { "ai_provider_error" }
         val userMessage = when (code) {
             "ai_provider_quota" -> "AI service busy due to high traffic. Please wait a minute and try again."
+            "ai_provider_rate_limited" -> "The nutrition service is handling too many requests right now. Your meal will be retried when capacity is available."
+            "ai_provider_location" -> "The nutrition service is unavailable from the server's current location. Your meal is saved while service access is checked."
+            "ai_payload_too_large" -> "The meal details are too long for a nutrition estimate. Shorten the description and try again."
+            "ai_content_blocked" -> "The current meal title or description could not be used for an estimate. Edit it to be clearer or more neutral, then try again."
+            "ai_model_unavailable" -> "The configured nutrition models are unavailable. Your meal is saved while the service is checked."
+            "ai_provider_bad_request" -> "The nutrition request could not be processed. Your meal is saved while the request is checked."
             "ai_empty_response" -> "AI returned incomplete nutrition details. Please try again."
             "ai_provider_auth_error", "unauthorized" -> "AI service authorization error. Please check server status."
+            "ai_retry_budget_exhausted" -> "The daily automatic estimate allowance for this meal category is used. The meal remains saved until the reset."
+            "ai_provider_daily_budget_reached" -> "The shared daily nutrition service limit has been reached. The meal remains saved until the reset."
+            "ai_budget_unavailable" -> "The nutrition service could not check its retry allowance. The meal remains saved for another attempt."
             "network_error" -> "Unable to connect to AI server. Please check your internet connection."
+            "ai_invalid_response" -> "The nutrition service returned an unusable response. Your meal is saved for another attempt."
             else -> "AI service temporary error. Please try again shortly."
         }
         Log.w(LOG_TAG, "AI backend error ($code): $userMessage")
-        GeminiResult.Error(code, userMessage)
+        GeminiResult.Error(
+            code = code,
+            message = userMessage,
+            scope = response.scope,
+            httpStatus = response.statusCode,
+            upstreamStatus = response.upstreamStatus,
+            retryable = response.retryable,
+            retryAtMillis = response.retryAtMillis
+        )
     }
 
-    private fun optNumericDouble(json: JSONObject, vararg keys: String): Double {
+    internal fun createMealNutritionRequestBody(
+        title: String,
+        description: String,
+        automaticRetryCategory: String? = null
+    ): JSONObject = JSONObject().apply {
+        put("title", title)
+        put("description", description)
+        if (!automaticRetryCategory.isNullOrBlank()) {
+            put("request_kind", "automatic_retry")
+            put("meal_category", automaticRetryCategory)
+        }
+    }
+
+    internal fun parseMealNutritionResponse(responseJson: JSONObject): MealNutritionInfo {
+        val totalCalories = optNumericDoubleOrNull(responseJson, "total_calories", "calories", "totalCalories")
+            ?.takeIf { it <= 20_000.0 }
+            ?.roundToInt()
+        return MealNutritionInfo(
+            calories = totalCalories,
+            carbsG = optNumericDoubleOrNull(responseJson, "carbs_g", "carbs", "carbohydrates", "carbsG"),
+            proteinG = optNumericDoubleOrNull(responseJson, "protein_g", "protein", "proteinG"),
+            fatG = optNumericDoubleOrNull(responseJson, "fat_g", "fat", "fatG"),
+            fiberG = optNumericDoubleOrNull(responseJson, "fiber_g", "fiber", "fiberG"),
+            fatBreakdown = parseFlexibleJsonMap(responseJson, "fat_breakdown"),
+            carbBreakdown = parseFlexibleJsonMap(responseJson, "carb_breakdown"),
+            vitamins = parseFlexibleJsonMap(responseJson, "vitamins"),
+            minerals = parseFlexibleJsonMap(responseJson, "minerals"),
+            aminoAcids = parseFlexibleJsonMap(responseJson, "amino_acids"),
+            antioxidants = parseFlexibleJsonMap(responseJson, "antioxidants"),
+            otherNutrients = parseFlexibleJsonMap(responseJson, "other_nutrients")
+        )
+    }
+
+    private fun optNumericDoubleOrNull(json: JSONObject, vararg keys: String): Double? {
         for (key in keys) {
             if (!json.has(key) || json.isNull(key)) continue
             val opt = json.opt(key)
-            if (opt is Number) return opt.toDouble()
-            if (opt is String) {
-                val match = Regex("""(\d+(?:\.\d+)?)""").find(opt)
-                if (match != null) {
-                    val parsed = match.groupValues[1].toDoubleOrNull()
-                    if (parsed != null) return parsed
+            val parsed = when (opt) {
+                is Number -> opt.toDouble()
+                is String -> {
+                    val text = opt.trim()
+                    text.toDoubleOrNull() ?: Regex("""[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?""")
+                        .find(text)?.value?.toDoubleOrNull()
                 }
+                else -> null
             }
+            if (parsed != null && parsed.isFinite() && parsed >= 0.0) return parsed
         }
-        return 0.0
+        return null
     }
 
     private fun parseFlexibleJsonMap(json: JSONObject, key: String): Map<String, String> {
@@ -195,14 +220,19 @@ object GeminiClient {
     private data class BackendResponse(
         val json: JSONObject?,
         val statusCode: Int = 0,
-        val errorCode: String = ""
+        val errorCode: String = "",
+        val scope: String = "unknown",
+        val upstreamStatus: Int? = null,
+        val retryable: Boolean = false,
+        val retryAtMillis: Long? = null,
+        val errorMessage: String = ""
     )
 
     private suspend fun postToBackendWithDetails(path: String, body: JSONObject): BackendResponse {
         val backendUrl = BuildConfig.AI_BACKEND_URL.trim().trimEnd('/')
         if (backendUrl.isBlank()) {
             Log.w(LOG_TAG, "AI_BACKEND_URL is blank. Configure it in local.properties.")
-            return BackendResponse(null, 0, "ai_provider_not_configured")
+            return BackendResponse(null, 0, "ai_provider_not_configured", "project")
         }
 
         var forceRefreshTokens = false
@@ -212,15 +242,30 @@ object GeminiClient {
         repeat(MAX_BACKEND_ATTEMPTS) { attemptNumber ->
             try {
                 val auth = FirebaseAuth.getInstance()
-                val user = auth.currentUser ?: Tasks.await(auth.signInAnonymously()).user
-                val idToken = user?.let { Tasks.await(it.getIdToken(forceRefreshTokens)).token }
-                val appCheckToken = Tasks.await(
-                    FirebaseAppCheck.getInstance().getAppCheckToken(forceRefreshTokens),
-                ).token
+                val user = auth.currentUser ?: try {
+                    Tasks.await(auth.signInAnonymously()).user
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "Anonymous auth failed: ${e.message}", e)
+                    null
+                }
+                val idToken = try {
+                    user?.let { Tasks.await(it.getIdToken(forceRefreshTokens)).token }
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "getIdToken failed: ${e.message}", e)
+                    null
+                }
+                val appCheckToken = try {
+                    Tasks.await(
+                        FirebaseAppCheck.getInstance().getAppCheckToken(forceRefreshTokens),
+                    ).token
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "getAppCheckToken failed: ${e.message}", e)
+                    null
+                }
 
                 if (idToken.isNullOrBlank() || appCheckToken.isNullOrBlank()) {
-                    Log.w(LOG_TAG, "Firebase security tokens are unavailable")
-                    return BackendResponse(null, 401, "unauthorized")
+                    Log.w(LOG_TAG, "Firebase security tokens unavailable (idToken=${idToken != null}, appCheckToken=${appCheckToken != null})")
+                    return BackendResponse(null, 401, "ai_provider_auth_error", "firebase")
                 }
 
                 val request = Request.Builder()
@@ -239,35 +284,76 @@ object GeminiClient {
                     }
 
                     Log.w(LOG_TAG, "Backend HTTP ${response.code}: ${rawBody.take(300)}")
-                    if (response.code == 401) {
+                    val parsedError = parseBackendError(rawBody, response.code)
+                    if (response.code == 401 && parsedError.scope == "firebase") {
                         forceRefreshTokens = true
-                        lastErrorCode = "unauthorized"
-                    } else if (response.code == 429 || rawBody.contains("ai_provider_quota")) {
-                        lastErrorCode = "ai_provider_quota"
-                        return BackendResponse(null, 429, "ai_provider_quota")
-                    } else {
-                        lastErrorCode = "ai_provider_busy"
+                        lastErrorCode = parsedError.errorCode
+                        if (attemptNumber < MAX_BACKEND_ATTEMPTS - 1) return@use
                     }
-
-                    if (!isRetryableBackendStatus(response.code) || attemptNumber == MAX_BACKEND_ATTEMPTS - 1) {
-                        return BackendResponse(null, response.code, lastErrorCode)
-                    }
+                    return BackendResponse(
+                        json = null,
+                        statusCode = response.code,
+                        errorCode = parsedError.errorCode,
+                        scope = parsedError.scope,
+                        upstreamStatus = parsedError.upstreamStatus,
+                        retryable = parsedError.retryable,
+                        retryAtMillis = parsedError.retryAtMillis,
+                        errorMessage = parsedError.message
+                    )
                 }
             } catch (error: Exception) {
-                Log.e(LOG_TAG, "AI backend request failed: ${error.message}")
-                lastErrorCode = "network_error"
-                if (attemptNumber == MAX_BACKEND_ATTEMPTS - 1 || error !is IOException) {
-                    return BackendResponse(null, lastStatusCode, "network_error")
+                Log.e(LOG_TAG, "AI backend request failed (attempt $attemptNumber): ${error.message}", error)
+                if (error is IOException) {
+                    lastErrorCode = "network_error"
+                    return BackendResponse(null, lastStatusCode, "network_error", "network", retryable = true)
+                } else {
+                    return BackendResponse(null, 0, "ai_provider_error", "client", retryable = false)
                 }
             }
 
             delay(RETRY_DELAYS_MS[attemptNumber] ?: RETRY_DELAYS_MS.last())
         }
 
-        return BackendResponse(null, lastStatusCode, lastErrorCode)
+        return BackendResponse(null, lastStatusCode, lastErrorCode, "network", retryable = lastErrorCode == "network_error")
     }
 
-    private fun isRetryableBackendStatus(status: Int): Boolean {
-        return status == 401 || status == 408 || status == 429 || status >= 500
+    internal data class ParsedBackendError(
+        val errorCode: String,
+        val scope: String,
+        val upstreamStatus: Int?,
+        val retryable: Boolean,
+        val retryAtMillis: Long?,
+        val message: String
+    )
+
+    internal fun parseBackendError(rawBody: String, httpStatus: Int): ParsedBackendError {
+        val json = runCatching { JSONObject(rawBody) }.getOrNull()
+        val errorCode = json?.optString("errorCode")?.takeIf { it.isNotBlank() }
+            ?: json?.optString("error")?.takeIf { it.isNotBlank() }
+            ?: when (httpStatus) {
+                401, 403 -> "ai_provider_auth_error"
+                413 -> "ai_payload_too_large"
+                429 -> "ai_provider_rate_limited"
+                408, 500, 502, 503, 504 -> "ai_provider_busy"
+                else -> "ai_provider_error"
+            }
+        val defaultRetryable = errorCode in setOf(
+            "network_error", "ai_provider_busy", "ai_provider_rate_limited", "ai_provider_quota", "ai_empty_response", "ai_invalid_response"
+        ) || httpStatus == 408 || (httpStatus >= 500 && httpStatus != 501)
+        return ParsedBackendError(
+            errorCode = errorCode,
+            scope = json?.optString("scope")?.takeIf { it.isNotBlank() } ?: when (httpStatus) {
+                401, 403 -> "firebase"
+                413 -> "meal_input"
+                429 -> "key_model"
+                else -> "unknown"
+            },
+            upstreamStatus = json?.takeIf { it.has("upstreamStatus") && !it.isNull("upstreamStatus") }
+                ?.optInt("upstreamStatus"),
+            retryable = json?.takeIf { it.has("retryable") }?.optBoolean("retryable") ?: defaultRetryable,
+            retryAtMillis = json?.takeIf { it.has("retryAt") && !it.isNull("retryAt") }
+                ?.optLong("retryAt")?.takeIf { it > 0L },
+            message = json?.optString("message")?.takeIf { it.isNotBlank() }.orEmpty()
+        )
     }
 }

@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.*
 
 data class TemplateApplyResult(
@@ -14,10 +15,32 @@ data class TemplateApplyResult(
     val failureReason: String? = null
 )
 
+internal const val MAX_MEALS_PER_CATEGORY_PER_DAY = 2
+
 class PlanManager(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("plans_pref", Context.MODE_PRIVATE)
     private val gson = Gson()
     private val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    private val mealTemplateManager by lazy {
+        TemplateManager(
+            lock = LOCK,
+            readTemplates = ::getMealTemplates,
+            writeTemplates = ::saveMealTemplates,
+            readRanges = ::getAppliedMealTemplateRanges,
+            writeRanges = ::saveAppliedMealTemplateRanges,
+            copyWithName = { template, name -> template.copy(name = name) }
+        )
+    }
+    private val workoutTemplateManager by lazy {
+        TemplateManager(
+            lock = LOCK,
+            readTemplates = ::getWorkoutTemplates,
+            writeTemplates = ::saveWorkoutTemplates,
+            readRanges = ::getAppliedWorkoutTemplateRanges,
+            writeRanges = ::saveAppliedWorkoutTemplateRanges,
+            copyWithName = { template, name -> template.copy(name = name) }
+        )
+    }
 
     private companion object {
         private const val KEY_DIET_CALENDAR = "diet_calendar_data"
@@ -32,12 +55,18 @@ class PlanManager(context: Context) {
 
     // --- Calendar-Based Diet Plan Management ---
 
+    @Volatile
+    private var cachedDietPlan: DietPlan? = null
+
     fun clearDietData() {
-        prefs.edit()
-            .remove(KEY_DIET_CALENDAR)
-            .remove(KEY_MEAL_TEMPLATES)
-            .remove(KEY_APPLIED_MEAL_TEMPLATE_RANGES)
-            .apply()
+        synchronized(LOCK) {
+            cachedDietPlan = null
+            prefs.edit()
+                .remove(KEY_DIET_CALENDAR)
+                .remove(KEY_MEAL_TEMPLATES)
+                .remove(KEY_APPLIED_MEAL_TEMPLATE_RANGES)
+                .apply()
+        }
     }
 
     fun clearWorkoutData() {
@@ -49,12 +78,19 @@ class PlanManager(context: Context) {
     }
 
     private fun getFullDietPlan(): DietPlan {
-        val json = prefs.getString(KEY_DIET_CALENDAR, null)
-        return if (json != null) {
-            val type = object : TypeToken<DietPlan>() {}.type
-            gson.fromJson(json, type) ?: DietPlan()
-        } else {
-            DietPlan()
+        synchronized(LOCK) {
+            if (cachedDietPlan != null) {
+                return cachedDietPlan!!
+            }
+            val json = prefs.getString(KEY_DIET_CALENDAR, null)
+            val plan = if (json != null) {
+                val type = object : TypeToken<DietPlan>() {}.type
+                gson.fromJson(json, type) ?: DietPlan()
+            } else {
+                DietPlan()
+            }
+            cachedDietPlan = plan
+            return plan
         }
     }
 
@@ -71,7 +107,10 @@ class PlanManager(context: Context) {
     }
 
     private fun saveFullDietPlan(plan: DietPlan) {
-        prefs.edit().putString(KEY_DIET_CALENDAR, gson.toJson(plan)).apply()
+        synchronized(LOCK) {
+            cachedDietPlan = plan
+            prefs.edit().putString(KEY_DIET_CALENDAR, gson.toJson(plan)).apply()
+        }
     }
 
     fun saveMealForDate(date: String, meal: Meal) {
@@ -88,16 +127,368 @@ class PlanManager(context: Context) {
     fun deleteMealForDate(date: String, meal: Meal) {
         synchronized(LOCK) {
             val plan = getFullDietPlan()
-            plan.dailyMeals[date]?.removeIf { it.id == meal.id }
+            val removed = plan.dailyMeals[date]?.removeIf { it.id == meal.id } == true
+            if (!removed) return
             if (plan.dailyMeals[date].isNullOrEmpty()) {
                 plan.dailyMeals.remove(date)
             }
             saveFullDietPlan(plan)
+            val actionDate = LocalDate.now().toString()
+            recordMealDeleteOccurred(actionDate)
+            grantReplacementCreditOnDelete(actionDate, meal.mealType)
+        }
+    }
+
+    private fun aiTokenKey(date: String, mealType: String) = "ai_token_v1|$date|${mealType.lowercase().trim()}"
+    private fun replacementCreditKey(date: String, mealType: String) = "replacement_credit_v1|$date|${mealType.lowercase().trim()}"
+    private fun dailyEditOccurredKey(date: String) = "daily_edit_occurred|$date"
+    private fun dailyDeleteOccurredKey(date: String) = "daily_delete_occurred|$date"
+
+    fun getAiTokenCount(date: String, mealType: String): Int {
+        synchronized(LOCK) {
+            return prefs.getInt(aiTokenKey(date, mealType), 0)
+        }
+    }
+
+    fun incrementAiTokenCount(date: String, mealType: String) {
+        synchronized(LOCK) {
+            val key = aiTokenKey(date, mealType)
+            prefs.edit().putInt(key, prefs.getInt(key, 0) + 1).apply()
+        }
+    }
+
+    fun tryReserveAiToken(date: String, mealType: String, baseTokenLimit: Int = 2): Boolean {
+        if (mealType.isBlank()) return false
+        synchronized(LOCK) {
+            val tokenKey = aiTokenKey(date, mealType)
+            val usedTokens = prefs.getInt(tokenKey, 0)
+            val maxAllowedTokens = baseTokenLimit + prefs.getInt(replacementCreditKey(date, mealType), 0)
+            if (usedTokens >= maxAllowedTokens) return false
+            prefs.edit().putInt(tokenKey, usedTokens + 1).apply()
+            return true
+        }
+    }
+
+    fun releaseAiTokenReservation(date: String, mealType: String) {
+        synchronized(LOCK) {
+            val key = aiTokenKey(date, mealType)
+            val current = prefs.getInt(key, 0)
+            if (current > 0) prefs.edit().putInt(key, current - 1).apply()
+        }
+    }
+
+    fun createAiRequestBudget(date: String, mealType: String): AiRequestBudget {
+        return AiRequestBudget(
+            usageDate = date,
+            mealType = mealType,
+            reserve = { tryReserveAiToken(date, mealType) },
+            release = { releaseAiTokenReservation(date, mealType) }
+        )
+    }
+
+    fun getReplacementCreditCount(date: String, mealType: String): Int {
+        synchronized(LOCK) {
+            return prefs.getInt(replacementCreditKey(date, mealType), 0)
+        }
+    }
+
+    fun grantReplacementCreditOnDelete(date: String, mealType: String) {
+        if (!mealType.isBlank()) {
+            synchronized(LOCK) {
+                val maxAllowed = getBonusAllowedReplacementCredits(date)
+                val key = replacementCreditKey(date, mealType)
+                val current = prefs.getInt(key, 0)
+                if (current < maxAllowed) {
+                    prefs.edit().putInt(key, current + 1).apply()
+                }
+            }
+        }
+    }
+
+    fun isAiTokenLimitReached(date: String, mealType: String, baseTokenLimit: Int = 2): Boolean {
+        synchronized(LOCK) {
+            val usedTokens = prefs.getInt(aiTokenKey(date, mealType), 0)
+            val maxAllowedTokens = baseTokenLimit + prefs.getInt(replacementCreditKey(date, mealType), 0)
+            return usedTokens >= maxAllowedTokens
+        }
+    }
+
+    // --- Streak & Discipline Rewards System ---
+
+    fun hasPrimaryMealLogged(date: String): Boolean {
+        synchronized(LOCK) {
+            val meals = getMealsForDate(date)
+            val primaryTypes = setOf("breakfast", "lunch", "dinner")
+            return meals.any { meal ->
+                !meal.isWaterIntakeSummary && primaryTypes.contains(meal.mealType.lowercase().trim())
+            }
+        }
+    }
+
+    fun recordMealEditOccurred(date: String) {
+        synchronized(LOCK) {
+            prefs.edit().putBoolean(dailyEditOccurredKey(date), true).putInt("edit_streak_days", 0).apply()
+        }
+    }
+
+    fun recordMealDeleteOccurred(date: String) {
+        synchronized(LOCK) {
+            prefs.edit().putBoolean(dailyDeleteOccurredKey(date), true).putInt("delete_streak_days", 0).apply()
+        }
+    }
+
+    fun evaluateStreaks(todayDate: String) {
+        synchronized(LOCK) {
+            val today = runCatching { LocalDate.parse(todayDate) }.getOrElse { LocalDate.now() }
+            val yesterday = today.minusDays(1)
+
+            fun evaluateOperationStreak(
+                streakKey: String,
+                lastEvalKey: String,
+                eventKey: (String) -> String,
+                rewardType: String,
+                bonusKeyPrefix: String
+            ) {
+                val rawLastEvaluated = prefs.getString(lastEvalKey, null)
+                val parsedLastEvaluated = rawLastEvaluated?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+                var streak = prefs.getInt(streakKey, 0)
+                if (rawLastEvaluated != null && parsedLastEvaluated == null) streak = 0
+
+                var date = parsedLastEvaluated?.plusDays(1) ?: yesterday
+                if (date.isAfter(yesterday)) return
+
+                while (!date.isAfter(yesterday)) {
+                    val qualifies = hasPrimaryMealLogged(date.toString()) &&
+                        !prefs.getBoolean(eventKey(date.toString()), false)
+                    streak = if (qualifies) streak + 1 else 0
+
+                    if (streak >= 3) {
+                        // The reward is available on the day after the third qualifying day,
+                        // and for the next two dates: exactly three calendar days in total.
+                        val activeFrom = date.plusDays(1)
+                        val activeUntil = activeFrom.plusDays(2)
+                        if (!today.isBefore(activeFrom) && !today.isAfter(activeUntil)) {
+                            prefs.edit()
+                                .putString("${bonusKeyPrefix}_from_date", activeFrom.toString())
+                                .putString("${bonusKeyPrefix}_until_date", activeUntil.toString())
+                                .apply()
+                            addPendingStreakPopup(rewardType)
+                        }
+                        streak = 0
+                    }
+                    date = date.plusDays(1)
+                }
+
+                prefs.edit()
+                    .putInt(streakKey, streak)
+                    .putString(lastEvalKey, yesterday.toString())
+                    .apply()
+            }
+
+            evaluateOperationStreak(
+                streakKey = "edit_streak_days",
+                lastEvalKey = "last_edit_eval_date",
+                eventKey = ::dailyEditOccurredKey,
+                rewardType = "edit",
+                bonusKeyPrefix = "edit_bonus"
+            )
+            evaluateOperationStreak(
+                streakKey = "delete_streak_days",
+                lastEvalKey = "last_delete_eval_date",
+                eventKey = ::dailyDeleteOccurredKey,
+                rewardType = "delete",
+                bonusKeyPrefix = "delete_bonus"
+            )
+        }
+    }
+
+    private fun addPendingStreakPopup(type: String) {
+        val existing = prefs.getString("pending_streak_popup_type", null)
+        val combined = when {
+            existing == null -> type
+            existing == type -> type
+            else -> "both"
+        }
+        prefs.edit().putString("pending_streak_popup_type", combined).apply()
+    }
+
+    fun consumePendingStreakPopup(): String? {
+        val type = prefs.getString("pending_streak_popup_type", null)
+        if (type != null) {
+            prefs.edit().remove("pending_streak_popup_type").apply()
+        }
+        return type
+    }
+
+    fun isEditBonusActive(todayDate: String): Boolean {
+        return isBonusActive("edit_bonus", todayDate)
+    }
+
+    fun isDeleteBonusActive(todayDate: String): Boolean {
+        return isBonusActive("delete_bonus", todayDate)
+    }
+
+    private fun isBonusActive(keyPrefix: String, date: String): Boolean {
+        val untilDate = prefs.getString("${keyPrefix}_until_date", null) ?: return false
+        val activeFrom = prefs.getString("${keyPrefix}_from_date", null)
+            ?: runCatching { LocalDate.parse(untilDate).minusDays(3).toString() }.getOrNull()
+            ?: return false // Legacy rewards had no start date; infer their original grant date.
+        return date >= activeFrom && date <= untilDate
+    }
+
+    fun getBonusAllowedEdits(todayDate: String): Int {
+        return if (isEditBonusActive(todayDate)) 3 else 2
+    }
+
+    fun getBonusAllowedReplacementCredits(todayDate: String): Int {
+        return if (isDeleteBonusActive(todayDate)) 2 else 1
+    }
+
+    private fun addDaysToDate(dateStr: String, days: Int): String {
+        return try {
+            val cal = Calendar.getInstance().apply {
+                time = dateFormatter.parse(dateStr) ?: Date()
+                add(Calendar.DAY_OF_YEAR, days)
+            }
+            dateFormatter.format(cal.time)
+        } catch (_: Exception) {
+            dateStr
         }
     }
 
     fun hasMealsForDate(date: String): Boolean {
         return !getFullDietPlan().dailyMeals[date].isNullOrEmpty()
+    }
+
+    fun getMealCountForCategory(date: String, mealType: String, excludeMealId: Int? = null): Int {
+        synchronized(LOCK) {
+            val meals = getMealsForDate(date)
+            return meals.count { meal ->
+                !meal.isWaterIntakeSummary &&
+                    meal.mealType.equals(mealType, ignoreCase = true) &&
+                    (excludeMealId == null || meal.id != excludeMealId)
+            }
+        }
+    }
+
+    fun isCategoryLimitReached(
+        date: String,
+        mealType: String,
+        excludeMealId: Int? = null,
+        maxLimit: Int = MAX_MEALS_PER_CATEGORY_PER_DAY
+    ): Boolean {
+        return getMealCountForCategory(date, mealType, excludeMealId) >= maxLimit
+    }
+
+    fun getPendingOvernightMeals(): List<Pair<String, Meal>> {
+        synchronized(LOCK) {
+            val result = mutableListOf<Pair<String, Meal>>()
+            val allMeals = getAllDietMealsByDate()
+            for ((date, meals) in allMeals) {
+                for (meal in meals) {
+                    if (!meal.isWaterIntakeSummary && meal.isPendingOvernightRetry && !meal.name.isBlank()) {
+                        result.add(Pair(date, meal))
+                    }
+                }
+            }
+            return result.sortedWith(compareBy<Pair<String, Meal>> { it.second.nextNutritionRetryAt }.thenBy { it.second.addedTimestamp })
+        }
+    }
+
+    fun initializeLegacyNutritionRetries(now: Long = System.currentTimeMillis()) {
+        synchronized(LOCK) {
+            val plan = getFullDietPlan()
+            var changed = false
+            for ((_, list) in plan.dailyMeals) {
+                for (index in list.indices) {
+                    val meal = list[index]
+                    if (meal.isPendingOvernightRetry && meal.nextNutritionRetryAt <= 0L && !meal.nutritionAutoRetriesExhausted) {
+                        list[index] = meal.copy(
+                            nutritionRetryStage = meal.nutritionRetryStage ?: "day",
+                            nextNutritionRetryAt = now,
+                            nutritionDayRetriesUsed = meal.nutritionDayRetriesUsed.coerceAtMost(2)
+                        )
+                        changed = true
+                    }
+                }
+            }
+            if (changed) saveFullDietPlan(plan)
+        }
+    }
+
+    fun getMealsWithNutritionTextErrors(): List<Pair<String, Meal>> {
+        synchronized(LOCK) {
+            return getAllDietMealsByDate().flatMap { (date, meals) ->
+                meals.filter { !it.isWaterIntakeSummary && it.nutritionErrorCode in setOf("ai_payload_too_large", "ai_content_blocked") }
+                    .map { date to it }
+            }.sortedWith(
+                compareBy<Pair<String, Meal>> {
+                    it.second.addedTimestamp.takeIf { timestamp -> timestamp > 0L }
+                        ?: (parseDate(it.first).timeInMillis + (it.second.hour * 60L + it.second.minute) * 60_000L)
+                }.thenBy { it.first }.thenBy { it.second.id }
+            )
+        }
+    }
+
+    fun updateMealRetryState(
+        date: String,
+        mealId: Int,
+        expectedName: String,
+        expectedDescription: String,
+        transform: (Meal) -> Meal
+    ): Meal? {
+        synchronized(LOCK) {
+            val plan = getFullDietPlan()
+            val list = plan.dailyMeals[date] ?: return null
+            val idx = list.indexOfFirst { it.id == mealId }
+            if (idx < 0) return null
+            val meal = list[idx]
+            if (meal.name != expectedName || meal.description != expectedDescription || !meal.isPendingOvernightRetry) return null
+            val updated = transform(meal)
+            list[idx] = updated
+            saveFullDietPlan(plan)
+            return updated
+        }
+    }
+
+    fun updateMealNutrition(
+        date: String,
+        mealId: Int,
+        info: MealNutritionInfo,
+        markPendingFalse: Boolean = true,
+        expectedName: String? = null,
+        expectedDescription: String? = null
+    ): Boolean {
+        if (!info.hasAnyNutrition()) return false
+        synchronized(LOCK) {
+            val plan = getFullDietPlan()
+            val list = plan.dailyMeals[date] ?: return false
+            val idx = list.indexOfFirst { it.id == mealId }
+            if (idx < 0) return false
+
+            val existingMeal = list[idx]
+            if ((expectedName != null && existingMeal.name != expectedName) ||
+                (expectedDescription != null && existingMeal.description != expectedDescription) ||
+                (markPendingFalse && !existingMeal.isPendingOvernightRetry)
+            ) return false
+            val updatedMeal = existingMeal.copy(
+                calories = info.calories ?: existingMeal.calories,
+                nutritionInfo = info,
+                nutritionErrorCode = null,
+                isPendingOvernightRetry = if (markPendingFalse) false else existingMeal.isPendingOvernightRetry,
+                nutritionDayRetriesUsed = 0,
+                nutritionOvernightRetriesUsed = 0,
+                nutritionRetryStage = null,
+                nextNutritionRetryAt = 0L,
+                nutritionAutoRetriesExhausted = false,
+                nutritionOvernightWindowStartAt = 0L,
+                queuedTimestamp = 0L,
+                manualRetryAttempted = false
+            )
+            list[idx] = updatedMeal
+            saveFullDietPlan(plan)
+            return true
+        }
     }
 
     private fun getMealTemplates(): MutableList<MealTemplate> {
@@ -110,70 +501,25 @@ class PlanManager(context: Context) {
         prefs.edit().putString(KEY_MEAL_TEMPLATES, gson.toJson(templates)).apply()
     }
 
-    fun listMealTemplates(): List<MealTemplate> = getMealTemplates().sortedBy { it.name.lowercase(Locale.US) }
+    fun listMealTemplates(): List<MealTemplate> = mealTemplateManager.list()
 
     fun createMealTemplateFromRange(name: String, startDate: String, endDate: String, allowEmpty: Boolean): Boolean {
-        synchronized(LOCK) {
-            val cleanName = name.trim()
-            if (cleanName.isEmpty()) return false
-
-            val start = parseDate(startDate)
-            val end = parseDate(endDate)
-            if (end.before(start)) return false
-
-            val totalDays = daysBetweenInclusive(start, end)
-            val templates = getMealTemplates()
-            val payload = mutableMapOf<Int, MutableList<Meal>>()
-
-            for (offset in 0 until totalDays) {
-                val date = formatDate(addDays(start, offset))
-                val meals = getMealsForDate(date)
-                if (meals.isNotEmpty()) {
-                    payload[offset] = meals.map { it.copy() }.toMutableList()
-                }
+        return mealTemplateManager.createFromRange(
+            name, startDate, endDate, allowEmpty,
+            itemsForDate = ::getMealsForDate,
+            copyItem = { it.copy() },
+            createTemplate = { cleanName, duration, payload ->
+                MealTemplate(UUID.randomUUID().toString(), cleanName, duration, payload)
             }
-
-            if (!allowEmpty && payload.isEmpty()) return false
-
-            templates.add(
-                MealTemplate(
-                    id = UUID.randomUUID().toString(),
-                    name = cleanName,
-                    durationDays = totalDays,
-                    mealsByDayOffset = payload
-                )
-            )
-            saveMealTemplates(templates)
-            return true
-        }
+        )
     }
 
     fun renameMealTemplate(templateId: String, newName: String): Boolean {
-        synchronized(LOCK) {
-            val templates = getMealTemplates()
-            val idx = templates.indexOfFirst { it.id == templateId }
-            if (idx < 0) return false
-            val cleanName = newName.trim()
-            if (cleanName.isEmpty()) return false
-            templates[idx] = templates[idx].copy(name = cleanName)
-            saveMealTemplates(templates)
-            val ranges = getAppliedMealTemplateRanges().map { range ->
-                if (range.templateId == templateId) range.copy(templateName = cleanName) else range
-            }
-            saveAppliedMealTemplateRanges(ranges)
-            return true
-        }
+        return mealTemplateManager.rename(templateId, newName)
     }
 
     fun deleteMealTemplate(templateId: String) {
-        synchronized(LOCK) {
-            val templates = getMealTemplates().toMutableList()
-            templates.removeAll { it.id == templateId }
-            saveMealTemplates(templates)
-            val ranges = getAppliedMealTemplateRanges().toMutableList()
-            ranges.removeAll { it.templateId == templateId }
-            saveAppliedMealTemplateRanges(ranges)
-        }
+        mealTemplateManager.delete(templateId)
     }
 
     private fun getAppliedMealTemplateRanges(): MutableList<AppliedTemplateRange> {
@@ -211,51 +557,50 @@ class PlanManager(context: Context) {
     }
 
     fun applyMealTemplateToRange(templateId: String, startDate: String, endDate: String): TemplateApplyResult {
-        synchronized(LOCK) {
-            val template = getMealTemplates().firstOrNull { it.id == templateId }
-                ?: return TemplateApplyResult(applied = false)
-
-            val start = parseDate(startDate)
-            val end = parseDate(endDate)
-            if (end.before(start)) return TemplateApplyResult(applied = false)
-
-            val totalDays = daysBetweenInclusive(start, end)
-            if (totalDays > template.durationDays) {
-                return TemplateApplyResult(
-                    applied = false,
-                    failureReason = "Selected range is $totalDays days, but '${template.name}' is a ${template.durationDays}-day template. Choose a range up to ${template.durationDays} days."
+        return mealTemplateManager.applyToRange(
+            templateId, startDate, endDate,
+            copyItem = {
+                it.copy(
+                    id = generateItemId(),
+                    addedTimestamp = System.currentTimeMillis(),
+                    queuedTimestamp = if (it.isPendingOvernightRetry) System.currentTimeMillis() else 0L,
+                    manualRetryAttempted = false,
+                    nutritionDayRetriesUsed = 0,
+                    nutritionOvernightRetriesUsed = 0,
+                    nutritionRetryStage = if (it.isPendingOvernightRetry) "day" else null,
+                    nextNutritionRetryAt = if (it.isPendingOvernightRetry) System.currentTimeMillis() else 0L,
+                    nutritionAutoRetriesExhausted = false,
+                    nutritionOvernightWindowStartAt = 0L
                 )
-            }
-
-            val conflict = findOverlap(getAppliedMealTemplateRanges(), start, end)
-            if (conflict != null) {
-                return TemplateApplyResult(applied = false, conflictRange = conflict)
-            }
-
-            val plan = getFullDietPlan()
-            for (offset in 0 until totalDays) {
-                val templateOffset = offset % template.durationDays
-                val meals = template.mealsByDayOffset[templateOffset] ?: emptyList()
-                val targetDate = formatDate(addDays(start, offset))
-                val targetMeals = plan.dailyMeals.getOrPut(targetDate) { mutableListOf() }
-                meals.forEach { original ->
-                    targetMeals.add(original.copy(id = generateItemId()))
+            },
+            saveCopiedItemsByDate = { copiedByDate ->
+                val plan = getFullDietPlan()
+                copiedByDate.forEach { (date, meals) ->
+                    plan.dailyMeals.getOrPut(date) { mutableListOf() }.addAll(meals)
                 }
+                saveFullDietPlan(plan)
+            },
+            validateCopiedItems = { copiedByDate ->
+                val plan = getFullDietPlan()
+                var failureReason: String? = null
+                for ((date, copiedMeals) in copiedByDate) {
+                    val existingMeals = plan.dailyMeals[date].orEmpty()
+                        .filterNot { it.isWaterIntakeSummary }
+                    val categories = (existingMeals + copiedMeals.filterNot { it.isWaterIntakeSummary })
+                        .groupingBy { it.mealType.lowercase(Locale.US).trim() }
+                        .eachCount()
+                    val exceededCategory = categories.entries.firstOrNull {
+                        it.value > MAX_MEALS_PER_CATEGORY_PER_DAY
+                    }?.key
+                    if (exceededCategory != null) {
+                        val categoryLabel = exceededCategory.replaceFirstChar { it.uppercase(Locale.US) }
+                        failureReason = "Applying this template would exceed the limit of $MAX_MEALS_PER_CATEGORY_PER_DAY $categoryLabel meals on $date. Remove or reschedule meals first."
+                        break
+                    }
+                }
+                failureReason
             }
-            saveFullDietPlan(plan)
-
-            val ranges = getAppliedMealTemplateRanges().toMutableList()
-            ranges.add(
-                AppliedTemplateRange(
-                    templateId = template.id,
-                    templateName = template.name,
-                    startDate = formatDate(start),
-                    endDate = formatDate(end)
-                )
-            )
-            saveAppliedMealTemplateRanges(ranges)
-            return TemplateApplyResult(applied = true, appliedEndDate = formatDate(end))
-        }
+        )
     }
 
     // --- Calendar-Based Workout Plan Management ---
@@ -315,70 +660,25 @@ class PlanManager(context: Context) {
         prefs.edit().putString(KEY_WORKOUT_TEMPLATES, gson.toJson(templates)).apply()
     }
 
-    fun listWorkoutTemplates(): List<WorkoutTemplate> = getWorkoutTemplates().sortedBy { it.name.lowercase(Locale.US) }
+    fun listWorkoutTemplates(): List<WorkoutTemplate> = workoutTemplateManager.list()
 
     fun createWorkoutTemplateFromRange(name: String, startDate: String, endDate: String, allowEmpty: Boolean): Boolean {
-        synchronized(LOCK) {
-            val cleanName = name.trim()
-            if (cleanName.isEmpty()) return false
-
-            val start = parseDate(startDate)
-            val end = parseDate(endDate)
-            if (end.before(start)) return false
-
-            val totalDays = daysBetweenInclusive(start, end)
-            val templates = getWorkoutTemplates()
-            val payload = mutableMapOf<Int, MutableList<Exercise>>()
-
-            for (offset in 0 until totalDays) {
-                val date = formatDate(addDays(start, offset))
-                val exercises = getExercisesForDate(date)
-                if (exercises.isNotEmpty()) {
-                    payload[offset] = exercises.map { it.copy() }.toMutableList()
-                }
+        return workoutTemplateManager.createFromRange(
+            name, startDate, endDate, allowEmpty,
+            itemsForDate = ::getExercisesForDate,
+            copyItem = { it.copy() },
+            createTemplate = { cleanName, duration, payload ->
+                WorkoutTemplate(UUID.randomUUID().toString(), cleanName, duration, payload)
             }
-
-            if (!allowEmpty && payload.isEmpty()) return false
-
-            templates.add(
-                WorkoutTemplate(
-                    id = UUID.randomUUID().toString(),
-                    name = cleanName,
-                    durationDays = totalDays,
-                    exercisesByDayOffset = payload
-                )
-            )
-            saveWorkoutTemplates(templates)
-            return true
-        }
+        )
     }
 
     fun renameWorkoutTemplate(templateId: String, newName: String): Boolean {
-        synchronized(LOCK) {
-            val templates = getWorkoutTemplates()
-            val idx = templates.indexOfFirst { it.id == templateId }
-            if (idx < 0) return false
-            val cleanName = newName.trim()
-            if (cleanName.isEmpty()) return false
-            templates[idx] = templates[idx].copy(name = cleanName)
-            saveWorkoutTemplates(templates)
-            val ranges = getAppliedWorkoutTemplateRanges().map { range ->
-                if (range.templateId == templateId) range.copy(templateName = cleanName) else range
-            }
-            saveAppliedWorkoutTemplateRanges(ranges)
-            return true
-        }
+        return workoutTemplateManager.rename(templateId, newName)
     }
 
     fun deleteWorkoutTemplate(templateId: String) {
-        synchronized(LOCK) {
-            val templates = getWorkoutTemplates().toMutableList()
-            templates.removeAll { it.id == templateId }
-            saveWorkoutTemplates(templates)
-            val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
-            ranges.removeAll { it.templateId == templateId }
-            saveAppliedWorkoutTemplateRanges(ranges)
-        }
+        workoutTemplateManager.delete(templateId)
     }
 
     private fun getAppliedWorkoutTemplateRanges(): MutableList<AppliedTemplateRange> {
@@ -416,51 +716,17 @@ class PlanManager(context: Context) {
     }
 
     fun applyWorkoutTemplateToRange(templateId: String, startDate: String, endDate: String): TemplateApplyResult {
-        synchronized(LOCK) {
-            val template = getWorkoutTemplates().firstOrNull { it.id == templateId }
-                ?: return TemplateApplyResult(applied = false)
-
-            val start = parseDate(startDate)
-            val end = parseDate(endDate)
-            if (end.before(start)) return TemplateApplyResult(applied = false)
-
-            val totalDays = daysBetweenInclusive(start, end)
-            if (totalDays > template.durationDays) {
-                return TemplateApplyResult(
-                    applied = false,
-                    failureReason = "Selected range is $totalDays days, but '${template.name}' is a ${template.durationDays}-day template. Choose a range up to ${template.durationDays} days."
-                )
-            }
-
-            val conflict = findOverlap(getAppliedWorkoutTemplateRanges(), start, end)
-            if (conflict != null) {
-                return TemplateApplyResult(applied = false, conflictRange = conflict)
-            }
-
-            val plan = getFullWorkoutPlan()
-            for (offset in 0 until totalDays) {
-                val templateOffset = offset % template.durationDays
-                val exercises = template.exercisesByDayOffset[templateOffset] ?: emptyList()
-                val targetDate = formatDate(addDays(start, offset))
-                val targetExercises = plan.dailyExercises.getOrPut(targetDate) { mutableListOf() }
-                exercises.forEach { original ->
-                    targetExercises.add(original.copy(id = generateItemId()))
+        return workoutTemplateManager.applyToRange(
+            templateId, startDate, endDate,
+            copyItem = { it.copy(id = generateItemId()) },
+            saveCopiedItemsByDate = { copiedByDate ->
+                val plan = getFullWorkoutPlan()
+                copiedByDate.forEach { (date, exercises) ->
+                    plan.dailyExercises.getOrPut(date) { mutableListOf() }.addAll(exercises)
                 }
+                saveFullWorkoutPlan(plan)
             }
-            saveFullWorkoutPlan(plan)
-
-            val ranges = getAppliedWorkoutTemplateRanges().toMutableList()
-            ranges.add(
-                AppliedTemplateRange(
-                    templateId = template.id,
-                    templateName = template.name,
-                    startDate = formatDate(start),
-                    endDate = formatDate(end)
-                )
-            )
-            saveAppliedWorkoutTemplateRanges(ranges)
-            return TemplateApplyResult(applied = true, appliedEndDate = formatDate(end))
-        }
+        )
     }
 
 
@@ -522,29 +788,6 @@ class PlanManager(context: Context) {
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-        }
-    }
-
-    private fun formatDate(calendar: Calendar): String = dateFormatter.format(calendar.time)
-
-    private fun addDays(calendar: Calendar, days: Int): Calendar {
-        return (calendar.clone() as Calendar).apply { add(Calendar.DAY_OF_YEAR, days) }
-    }
-
-    private fun daysBetweenInclusive(start: Calendar, end: Calendar): Int {
-        val millis = end.timeInMillis - start.timeInMillis
-        return (millis / (24L * 60L * 60L * 1000L)).toInt() + 1
-    }
-
-    private fun findOverlap(
-        ranges: List<AppliedTemplateRange>,
-        desiredStart: Calendar,
-        desiredEnd: Calendar
-    ): AppliedTemplateRange? {
-        return ranges.firstOrNull { range ->
-            val rangeStart = parseDate(range.startDate)
-            val rangeEnd = parseDate(range.endDate)
-            !desiredEnd.before(rangeStart) && !desiredStart.after(rangeEnd)
         }
     }
 

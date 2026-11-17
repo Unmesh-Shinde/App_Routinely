@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "420538867344",
-    "project_id": "app-routinely",
-    "storage_bucket": "app-routinely.firebasestorage.app"
+    "project_number": "104566110788",
+    "project_id": "routinely-firebase-don-tdelete",
+    "storage_bucket": "routinely-firebase-don-tdelete.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:420538867344:android:496ce1c11559d95475c215",
+        "mobilesdk_app_id": "1:104566110788:android:2937834e00d772257bda11",
         "android_client_info": {
           "package_name": "com.dailyroutine.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDT2dGTBoB1iqqtmoYiLCjmlYSjMxpIgeY"
+          "current_key": "AIzaSyBc55KFVL3k1UPeSCErPwYa4xn3gAMJnzM"
         }
       ],
       "services": {

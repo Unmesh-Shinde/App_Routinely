@@ -212,4 +212,24 @@ class HealthSyncWorkerTest {
         assertTrue("Sleep sync should be scheduled (morning & evening)", sleepWork.size >= 2)
         assertTrue("History sync should be scheduled", historyWork.isNotEmpty())
     }
+
+    @Test
+    fun scheduleAutoSync_queuesFullHistoryWhenSourceChangesToAllHealthConnectOrigins() {
+        WorkManager.getInstance(context).cancelAllWork().result.get()
+        val prefs = context.getSharedPreferences("health_data_pref", Context.MODE_PRIVATE)
+        prefs.edit().clear().putBoolean("is_fitness_connected", true)
+            .putBoolean("initial_history_sync_done", true)
+            .putString("synced_health_connect_source_pkg", "com.google.android.apps.fitness")
+            .commit()
+
+        HealthSyncWorker.scheduleAutoSync(context)
+
+        val historyWork = WorkManager.getInstance(context)
+            .getWorkInfosByTag(HealthSyncWorker.TAG_HISTORY_SYNC)
+            .get()
+        assertTrue(
+            "A provider-specific completion marker must trigger a full all-origin history pass",
+            historyWork.isNotEmpty()
+        )
+    }
 }

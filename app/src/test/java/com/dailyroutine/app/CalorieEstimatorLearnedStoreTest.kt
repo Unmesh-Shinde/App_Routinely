@@ -43,7 +43,7 @@ class CalorieEstimatorLearnedStoreTest {
 
         val retrieved = CalorieEstimator.getLearnedMealNutrition(context, "Avocado Protein Bowl", "With poached egg and sourdough")
         assertNotNull(retrieved)
-        assertEquals(620, retrieved?.calories)
+        assertEquals(620, retrieved?.calories ?: -1)
         assertEquals(75.0, retrieved?.carbsG ?: 0.0, 0.01)
         assertEquals(32.0, retrieved?.proteinG ?: 0.0, 0.01)
         assertEquals("45 mg", retrieved?.vitamins?.get("Vitamin C"))
@@ -69,7 +69,7 @@ class CalorieEstimatorLearnedStoreTest {
         // 95%+ similar query
         val estimatedNutrition = CalorieEstimator.getLearnedMealNutrition(context, "Custom Smoothie Bowls", "Mixed berries and chia seeds")
         assertNotNull(estimatedNutrition)
-        assertEquals(780, estimatedNutrition?.calories)
+        assertEquals(780, estimatedNutrition?.calories ?: -1)
         assertEquals(90.0, estimatedNutrition?.carbsG ?: 0.0, 0.01)
 
         // Distinct meal (< 95% similarity) should return null
@@ -102,21 +102,23 @@ class CalorieEstimatorLearnedStoreTest {
         assertEquals(1, savedMeals.size)
         val savedMeal = savedMeals.single()
         assertEquals("Grilled Chicken Salad", savedMeal.name)
-        assertEquals(450, savedMeal.calories)
+        assertEquals(450, savedMeal.calories ?: -1)
         assertNotNull(savedMeal.nutritionInfo)
         assertEquals(50.0, savedMeal.nutritionInfo?.carbsG ?: 0.0, 0.01)
         assertEquals("1.2 mcg", savedMeal.nutritionInfo?.vitamins?.get("Vitamin B12"))
     }
 
     @Test
-    fun getLearnedMealNutrition_purgesAndIgnoresStaleZeroMacroCacheEntries() {
-        // Save corrupted/stale 0-macro entry
-        val staleEntry = MealNutritionInfo(calories = 500, carbsG = 0.0, proteinG = 0.0, fatG = 0.0)
-        CalorieEstimator.saveLearnedMeal(context, "Stale Bowl", "No macros", staleEntry)
+    fun getLearnedMealNutrition_acceptsExplicitZeroMacroValues() {
+        val zeroMacroMeal = MealNutritionInfo(calories = 3, carbsG = 0.0, proteinG = 0.0, fatG = 0.0)
+        CalorieEstimator.saveLearnedMeal(context, "Lemon Water", "Water with a squeeze of lemon", zeroMacroMeal)
 
-        // Retrieval should return null and purge the corrupted entry
-        val retrieved = CalorieEstimator.getLearnedMealNutrition(context, "Stale Bowl", "No macros")
-        assertNull(retrieved)
+        val retrieved = CalorieEstimator.getLearnedMealNutrition(context, "Lemon Water", "Water with a squeeze of lemon")
+        assertNotNull(retrieved)
+        assertEquals(3, retrieved?.calories ?: -1)
+        assertEquals(0.0, retrieved?.carbsG ?: -1.0, 0.01)
+        assertEquals(0.0, retrieved?.proteinG ?: -1.0, 0.01)
+        assertEquals(0.0, retrieved?.fatG ?: -1.0, 0.01)
     }
 
     @Test

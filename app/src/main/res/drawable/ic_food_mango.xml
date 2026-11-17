@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Whole Ripe Golden Mango Ambient Drop Shadow -->
+    <path android:pathData="M 12.5,20.8 C 12.5,11 31.5,11 34.5,20.8 C 37.5,31 20.5,37 12.5,20.8 Z" android:fillColor="#22000000" />
+
+    <!-- Whole Ripe Mango Body with Red Blush & Green Leaf Stem -->
+    <path android:pathData="M 12,20 C 12,10 31,10 34,20 C 37,30 20,36 12,20 Z" android:fillColor="#FFB300" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 14,18 C 18,12 28,12 31,18 Z" android:fillColor="#FF7043" />
+    <path android:pathData="M 15,16 C 18,12 26,12 30,16" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1" android:strokeLineCap="round" />
+
+    <!-- Green Leaf & Stem -->
+    <path android:pathData="M 23,10 Q 20,7 21,4 M 23,10 Q 27,7 28,10 Z" android:fillColor="#4CAF50" android:strokeColor="#1B5E20" android:strokeWidth="0.4" />
+</vector>

@@ -25,43 +25,40 @@ class HealthMetricsRepository(private val dao: DailyHealthMetricDao) {
         heartPoints: Double? = null,
         distanceKm: Double? = null,
         weightKg: Double? = null,
+        source: String? = null,
         updatedAtMs: Long = System.currentTimeMillis()
     ): DailyHealthMetricEntity {
-        val existing = dao.getMetric(date)
-        val merged = mergeMetric(existing, date, steps, stepsSynced, sleepHours, activeCalories, totalCalories, heartPoints, distanceKm, weightKg, updatedAtMs)
-        dao.upsert(merged)
-        return merged
+        val patch = DailyHealthMetricEntity(
+            date = date,
+            steps = steps,
+            stepsSynced = stepsSynced ?: false,
+            stepsSyncStatus = if (steps != null) "SYNCED" else "UNKNOWN",
+            stepsSource = if (steps != null) source else null,
+            sleepHours = sleepHours,
+            sleepHoursSyncStatus = if (sleepHours != null) "SYNCED" else "UNKNOWN",
+            sleepHoursSource = if (sleepHours != null) source else null,
+            activeCalories = activeCalories,
+            activeCaloriesSyncStatus = if (activeCalories != null) "SYNCED" else "UNKNOWN",
+            activeCaloriesSource = if (activeCalories != null) source else null,
+            totalCalories = totalCalories,
+            totalCaloriesSyncStatus = if (totalCalories != null) "SYNCED" else "UNKNOWN",
+            totalCaloriesSource = if (totalCalories != null) source else null,
+            heartPoints = heartPoints,
+            heartPointsSyncStatus = if (heartPoints != null) "SYNCED" else "UNKNOWN",
+            heartPointsSource = if (heartPoints != null) source else null,
+            distanceKm = distanceKm,
+            distanceKmSyncStatus = if (distanceKm != null) "SYNCED" else "UNKNOWN",
+            distanceKmSource = if (distanceKm != null) source else null,
+            weightKg = weightKg,
+            weightKgSyncStatus = if (weightKg != null) "SYNCED" else "UNKNOWN",
+            weightKgSource = if (weightKg != null) source else null,
+            updatedAtMs = updatedAtMs
+        )
+        return dao.mergeMetricPatch(patch)
     }
 
     suspend fun upsertAllMetrics(metrics: List<DailyHealthMetricEntity>) {
-        dao.upsertAll(metrics)
-    }
-
-    private fun mergeMetric(
-        existing: DailyHealthMetricEntity?,
-        date: String,
-        steps: Long? = null,
-        stepsSynced: Boolean? = null,
-        sleepHours: Double? = null,
-        activeCalories: Double? = null,
-        totalCalories: Double? = null,
-        heartPoints: Double? = null,
-        distanceKm: Double? = null,
-        weightKg: Double? = null,
-        updatedAtMs: Long = System.currentTimeMillis()
-    ): DailyHealthMetricEntity {
-        return DailyHealthMetricEntity(
-            date = date,
-            steps = steps ?: existing?.steps,
-            stepsSynced = stepsSynced ?: existing?.stepsSynced ?: false,
-            sleepHours = sleepHours ?: existing?.sleepHours,
-            activeCalories = activeCalories ?: existing?.activeCalories,
-            totalCalories = totalCalories ?: existing?.totalCalories,
-            heartPoints = heartPoints ?: existing?.heartPoints,
-            distanceKm = distanceKm ?: existing?.distanceKm,
-            weightKg = weightKg ?: existing?.weightKg,
-            updatedAtMs = updatedAtMs
-        )
+        metrics.forEach { dao.mergeMetricPatch(it) }
     }
 
     suspend fun upsertSteps(date: String, steps: Long, synced: Boolean = true): DailyHealthMetricEntity {

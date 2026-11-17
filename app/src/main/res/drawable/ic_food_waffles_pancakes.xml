@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Grid Waffle Ambient Shadow -->
+    <path android:pathData="M 12.5,12.8 L 35.5,12.8 L 35.5,35.8 L 12.5,35.8 Z" android:fillColor="#22000000" />
+
+    <!-- Golden Grid Waffle Body -->
+    <path android:pathData="M 12,12 L 36,12 L 36,36 L 12,36 Z" android:fillColor="#FFC107" android:strokeColor="#51382B" android:strokeWidth="0.85" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 13,13 L 35,13 L 35,35 L 13,35 Z" android:fillColor="#FFE082" />
+
+    <!-- Waffle Grid Lines & Pocket Shadows -->
+    <path android:pathData="M 12,20 L 36,20 M 12,28 L 36,28 M 20,12 L 20,36 M 28,12 L 28,36" android:fillColor="#00000000" android:strokeColor="#A85D1B" android:strokeWidth="0.75" />
+
+    <!-- Dripping Maple Syrup / Honey Pool -->
+    <path android:pathData="M 16,18 C 22,14 30,14 34,18 C 30,22 20,24 16,18 Z" android:fillColor="#E65100" />
+
+    <!-- Square Pure Butter Cube -->
+    <path android:pathData="M 21,17 L 27,17 L 27,23 L 21,23 Z" android:fillColor="#FFF5C0" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+</vector>

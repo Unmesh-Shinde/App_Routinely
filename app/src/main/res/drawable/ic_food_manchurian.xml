@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Ceramic Bowl of Manchurian Gravy Vessel & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,24 A 14.5,14.5 0 1,0 38.5,24 A 14.5,14.5 0 1,0 9.5,24 Z" android:fillColor="#3E2723" />
+    <path android:pathData="M 12,20 C 18,14 30,14 36,18 C 30,22 22,23 12,20 Z" android:fillColor="#4E342E" />
+
+    <!-- Spherical Manchurian Dumpling Balls Submerged in Gravy -->
+    <path android:pathData="M 13.5,19.8 A 4.5,4.5 0 1,0 22.5,19.8 A 4.5,4.5 0 1,0 13.5,19.8 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 13,19 A 4.5,4.5 0 1,0 22,19 A 4.5,4.5 0 1,0 13,19 Z" android:fillColor="#5D4037" android:strokeColor="#2C160B" android:strokeWidth="0.4" />
+    <path android:pathData="M 15,18 C 17,16 20,16 21,18" android:fillColor="#00000000" android:strokeColor="#8D6E63" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <path android:pathData="M 23.5,21.8 A 4.5,4.5 0 1,0 32.5,21.8 A 4.5,4.5 0 1,0 23.5,21.8 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 23,21 A 4.5,4.5 0 1,0 32,21 A 4.5,4.5 0 1,0 23,21 Z" android:fillColor="#5D4037" android:strokeColor="#2C160B" android:strokeWidth="0.4" />
+    <path android:pathData="M 25,20 C 27,18 30,18 31,20" android:fillColor="#00000000" android:strokeColor="#8D6E63" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <path android:pathData="M 18.5,28.8 A 4.5,4.5 0 1,0 27.5,28.8 A 4.5,4.5 0 1,0 18.5,28.8 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 18,28 A 4.5,4.5 0 1,0 27,28 A 4.5,4.5 0 1,0 18,28 Z" android:fillColor="#5D4037" android:strokeColor="#2C160B" android:strokeWidth="0.4" />
+
+    <!-- Glossy Soy Sauce Reflection & Green Spring Onions -->
+    <path android:pathData="M 12,18 C 18,12 28,12 34,16" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 20,24 Q 18,22 21,20 Z M 28,26 Q 26,24 29,22 Z" android:fillColor="#4CAF50" />
+</vector>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Potato Chips Pile Ambient Shadow -->
+    <path android:pathData="M 10.5,24.8 C 10.5,14 37.5,14 37.5,24.8 C 37.5,35 10.5,35 10.5,24.8 Z" android:fillColor="#22000000" />
+
+    <!-- Layered Oval Wavy Potato Chip Slices -->
+    <!-- Chip 1 (Bottom Left) -->
+    <path android:pathData="M 10,24 C 10,18 20,18 22,24 C 20,30 10,30 10,24 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.65" />
+    <path android:pathData="M 12,22 Q 16,20 20,22 M 11,25 Q 15,23 19,25" android:fillColor="#00000000" android:strokeColor="#FFD54F" android:strokeWidth="0.5" />
+
+    <!-- Chip 2 (Bottom Right) -->
+    <path android:pathData="M 24,25 C 24,19 36,19 36,25 C 36,31 24,31 24,25 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.65" />
+    <path android:pathData="M 26,23 Q 30,21 34,23 M 25,26 Q 29,24 33,26" android:fillColor="#00000000" android:strokeColor="#FFD54F" android:strokeWidth="0.5" />
+
+    <!-- Chip 3 (Top Center Main) -->
+    <path android:pathData="M 15,18 C 15,12 31,12 31,18 C 31,24 15,24 15,18 Z" android:fillColor="#FFC107" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 17,16 Q 23,14 29,16 M 16,19 Q 22,17 28,19 M 18,21 Q 23,19 27,21" android:fillColor="#00000000" android:strokeColor="#FFE082" android:strokeWidth="0.6" />
+
+    <!-- Chili Seasoning Specks & Salt Flakes -->
+    <path android:pathData="M 19,17 A 0.5,0.5 0 1,0 20,17 A 0.5,0.5 0 1,0 19,17 Z M 25,18 A 0.5,0.5 0 1,0 26,18 A 0.5,0.5 0 1,0 25,18 Z M 21,20 A 0.5,0.5 0 1,0 22,20 A 0.5,0.5 0 1,0 21,20 Z" android:fillColor="#E53935" />
+    <path android:pathData="M 18,25 A 0.4,0.4 0 1,0 18.8,25 A 0.4,0.4 0 1,0 18,25 Z M 28,26 A 0.4,0.4 0 1,0 28.8,26 A 0.4,0.4 0 1,0 28,26 Z" android:fillColor="#FFFFFF" />
+</vector>

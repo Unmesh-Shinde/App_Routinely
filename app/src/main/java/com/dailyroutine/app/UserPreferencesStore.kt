@@ -58,6 +58,7 @@ object UserPreferencesStore {
     fun setUserHeight(context: Context, height: Double) = getPrefs(context).edit().putFloat(KEY_USER_HEIGHT, height.toFloat()).apply()
 
     fun getUserWeight(context: Context): Double = getPrefs(context).getFloat(KEY_USER_WEIGHT, 70.0f).toDouble()
+    fun hasUserWeight(context: Context): Boolean = getPrefs(context).contains(KEY_USER_WEIGHT)
     fun setUserWeight(context: Context, weight: Double) = getPrefs(context).edit().putFloat(KEY_USER_WEIGHT, weight.toFloat()).apply()
 
     fun getUserGender(context: Context): String = getPrefs(context).getString(KEY_USER_GENDER, "Male") ?: "Male"

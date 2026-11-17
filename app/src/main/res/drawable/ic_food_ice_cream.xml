@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Glass Sundae Bowl Base & Shadow -->
+    <path android:pathData="M 14.5,25.8 C 14.5,35 33.5,35 33.5,25.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 14,25 C 14,35 34,35 34,25 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 21,34 L 27,34 L 25,39 L 23,39 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+
+    <!-- 3D Ice Cream Scoops (Vanilla, Strawberry & Chocolate) -->
+    <!-- Left Scoop (Vanilla) -->
+    <path android:pathData="M 13,24 A 5.5,5.5 0 1,0 24,24 A 5.5,5.5 0 1,0 13,24 Z" android:fillColor="#FFF8E1" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <!-- Right Scoop (Strawberry) -->
+    <path android:pathData="M 23,24 A 5.5,5.5 0 1,0 34,24 A 5.5,5.5 0 1,0 23,24 Z" android:fillColor="#F8BBD0" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <!-- Top Center Scoop (Chocolate) -->
+    <path android:pathData="M 18,17 A 6,6 0 1,0 30,17 A 6,6 0 1,0 18,17 Z" android:fillColor="#8D6E63" android:strokeColor="#51382B" android:strokeWidth="0.6" />
+
+    <!-- Chocolate Fudge Drizzle with Specular Gloss -->
+    <path android:pathData="M 18,15 C 22,18 26,13 30,16 C 28,19 24,19 20,18 Z" android:fillColor="#4E342E" />
+    <path android:pathData="M 19,14 C 22,16 25,12 28,15" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="0.6" android:strokeLineCap="round" />
+
+    <!-- Red Maraschino Cherry on Top with Stem & Gloss -->
+    <path android:pathData="M 21.5,10.5 A 2.5,2.5 0 1,0 26.5,10.5 A 2.5,2.5 0 1,0 21.5,10.5 Z" android:fillColor="#D50000" android:strokeColor="#8E0000" android:strokeWidth="0.3" />
+    <path android:pathData="M 22.5,9.5 A 0.8,0.8 0 1,0 24.1,9.5 A 0.8,0.8 0 1,0 22.5,9.5 Z" android:fillColor="#80FFFFFF" />
+    <path android:pathData="M 24,8 C 25,6 27,5 28,7" android:fillColor="#00000000" android:strokeColor="#388E3C" android:strokeWidth="0.5" android:strokeLineCap="round" />
+
+    <!-- Rainbow Sprinkles -->
+    <path android:pathData="M 16,21 L 18,20 M 28,21 L 30,22 M 20,23 L 22,24 M 25,22 L 27,21" android:fillColor="#00000000" android:strokeColor="#FF5252" android:strokeWidth="0.6" android:strokeLineCap="round" />
+</vector>

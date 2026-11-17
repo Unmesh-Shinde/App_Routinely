@@ -41,6 +41,19 @@ class UserSettingsStoreTest {
     }
 
     @Test
+    fun setManualPin_rejectsTheCurrentAndMostRecentlyReplacedPins() {
+        assertTrue(UserSettingsStore.setManualPin(context, "123456"))
+        assertTrue(UserSettingsStore.setManualPin(context, "246810"))
+
+        assertTrue(UserSettingsStore.isManualPinPreviouslyUsed(context, "123456"))
+        assertFalse(UserSettingsStore.setManualPin(context, "123456"))
+        assertFalse(UserSettingsStore.setManualPin(context, "246810"))
+        assertTrue(UserSettingsStore.setManualPin(context, "987654"))
+        assertFalse(UserSettingsStore.isManualPinPreviouslyUsed(context, "123456"))
+        assertTrue(UserSettingsStore.isManualPinPreviouslyUsed(context, "246810"))
+    }
+
+    @Test
     fun verifyManualPin_migratesLegacySha256PinAfterSuccessfulUnlock() {
         val pin = "246810"
         val salt = Base64.encodeToString(byteArrayOf(1, 3, 5, 7, 9, 11, 13, 15), Base64.NO_WRAP)
@@ -74,6 +87,18 @@ class UserSettingsStoreTest {
         assertFalse(UserSettingsStore.verifyManualPin(context, "222222"))
         assertFalse(prefs.contains("pin_algorithm"))
         assertEquals(legacyHash, prefs.getString("pin_hash", null))
+    }
+
+    @Test
+    fun nutritionPolicyAcknowledgment_persistsStateAndDate() {
+        assertFalse(UserSettingsStore.hasAcknowledgedNutritionPolicy(context))
+        assertEquals(null, UserSettingsStore.getNutritionPolicyAcknowledgedDate(context))
+
+        val ackDate = "2026-10-26"
+        UserSettingsStore.setNutritionPolicyAcknowledged(context, ackDate)
+
+        assertTrue(UserSettingsStore.hasAcknowledgedNutritionPolicy(context))
+        assertEquals(ackDate, UserSettingsStore.getNutritionPolicyAcknowledgedDate(context))
     }
 
     private fun legacySha256(pin: String, salt: String): String {

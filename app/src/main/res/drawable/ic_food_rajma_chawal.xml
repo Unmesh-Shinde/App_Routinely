@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Steamed Basmati Rice Base & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF0" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 10,22 C 16,12 28,12 36,18 C 30,22 22,23 10,22 Z" android:fillColor="#FFFFFF" />
+
+    <!-- Dark Red Kidney Bean Rajma Curry Pool -->
+    <path android:pathData="M 14,20 C 14,14 34,14 34,20 C 34,28 14,28 14,20 Z" android:fillColor="#B71C1C" />
+    <path android:pathData="M 16,19 C 16,15 32,15 32,19 C 32,26 16,26 16,19 Z" android:fillColor="#880E4F" />
+
+    <!-- Whole Dark Red Kidney Beans (Rajma) -->
+    <path android:pathData="M 18,18 Q 20,16 22,18 M 24,20 Q 26,18 28,20 M 20,23 Q 22,21 24,23 M 26,24 Q 28,22 30,24" android:fillColor="#00000000" android:strokeColor="#C62828" android:strokeWidth="1.2" android:strokeLineCap="round" />
+
+    <!-- Diced Onions & Cilantro -->
+    <path android:pathData="M 19,17 L 20,16 L 20.5,17.5 Z M 27,18 L 28,17 L 28.5,18.5 Z" android:fillColor="#E1BEE7" />
+    <path android:pathData="M 22,21 Q 24,19 26,22 Z" android:fillColor="#4CAF50" />
+</vector>

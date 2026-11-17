@@ -61,7 +61,7 @@ class ReminderAdapter(
     override fun getItemCount() = items.size
 
     inner class VH(view: View) : RecyclerView.ViewHolder(view) {
-        private val ivIcon: ImageView = view.findViewById(R.id.tvEmoji)
+        private val ivIcon: MealIconView = view.findViewById(R.id.tvEmoji)
         private val tvTitle: TextView = view.findViewById(R.id.tvTitle)
         private val tvSubtitle: TextView = view.findViewById(R.id.tvSubtitle)
         private val tvTime: TextView = view.findViewById(R.id.tvTime)

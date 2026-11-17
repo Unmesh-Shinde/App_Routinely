@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Kathi Roll Ambient Drop Shadow -->
+    <path android:pathData="M 16.5,10.8 L 33.5,15.8 L 29.5,39.8 L 12.5,34.8 Z" android:fillColor="#22000000" />
+
+    <!-- Rolled Flaky Paratha Wrap Body -->
+    <path android:pathData="M 16,10 L 33,15 L 29,39 L 12,34 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.85" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 17.5,11 L 31.5,15 L 28,37.5 L 14,33.5 Z" android:fillColor="#FFC107" />
+
+    <!-- Paratha Flaky Sear Lines & Silver Foil Wrapper Bottom -->
+    <path android:pathData="M 19,16 L 29,19 M 18,21 L 28,24 M 17,26 L 27,29" android:fillColor="#00000000" android:strokeColor="#A85D1B" android:strokeWidth="0.6" android:strokeLineCap="round" />
+    <path android:pathData="M 13,31 L 28.5,35.5 L 29,39 L 12,34 Z" android:fillColor="#B0BEC5" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+
+    <!-- Open Top Overflowing Spiced Paneer/Chicken Filling & Chutney -->
+    <path android:pathData="M 16,10 C 18,7 28,8 33,15 L 26,17 C 22,14 18,13 16,10 Z" android:fillColor="#FF6F00" />
+    <path android:pathData="M 21,11.5 C 23,10 27,11 29,14" android:fillColor="#00000000" android:strokeColor="#388E3C" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 23,12 A 1,1 0 1,0 25,12 A 1,1 0 1,0 23,12 Z" android:fillColor="#E1BEE7" />
+</vector>

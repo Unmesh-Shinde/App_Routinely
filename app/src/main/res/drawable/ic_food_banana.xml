@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Curved Yellow Banana Ambient Shadow -->
+    <path android:pathData="M 12.5,29.8 C 10.5,18.8 28.5,10.8 37.5,14.8 L 35.5,19.8 C 28.5,16.8 14.5,22.8 16.5,31.8 Z" android:fillColor="#22000000" />
+
+    <!-- Peeled Yellow Banana Body & Open Peel Flaps -->
+    <path android:pathData="M 12,29 C 10,18 28,10 37,14 L 35,19 C 28,16 14,22 16,31 Z" android:fillColor="#FFD54F" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 14,27 C 12,20 26,14 34,16 L 33,18 C 26,16 14,21 16,28 Z" android:fillColor="#FFFDF0" />
+
+    <!-- Banana Stem Tip -->
+    <path android:pathData="M 37,14 L 39,12" android:fillColor="#00000000" android:strokeColor="#388E3C" android:strokeWidth="1.2" android:strokeLineCap="round" />
+
+    <!-- Banana Slice Round Accent -->
+    <path android:pathData="M 26.5,27.8 A 4,4 0 1,0 34.5,27.8 A 4,4 0 1,0 26.5,27.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 26,27 A 4,4 0 1,0 34,27 A 4,4 0 1,0 26,27 Z" android:fillColor="#FFF9C4" android:strokeColor="#FBC02D" android:strokeWidth="0.5" />
+    <path android:pathData="M 28,27 A 2,2 0 1,0 32,27 A 2,2 0 1,0 28,27 Z" android:fillColor="#FFFDF0" />
+</vector>

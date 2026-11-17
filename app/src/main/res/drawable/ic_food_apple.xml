@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Whole Apple Ambient Shadow -->
+    <path android:pathData="M 9.5,22.8 C 9.5,12 28.5,12 28.5,22.8 C 28.5,32 9.5,32 9.5,22.8 Z" android:fillColor="#22000000" />
+
+    <!-- Whole Ripe Red Apple -->
+    <path android:pathData="M 9,22 C 9,12 18,11 19,14 C 20,11 29,12 28,22 C 27,31 20,32 19,28 C 18,32 10,31 9,22 Z" android:fillColor="#E53935" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 12,18 C 14,14 24,14 26,18 Z" android:fillColor="#FF8A80" />
+    <path android:pathData="M 19,14 L 19,10" android:fillColor="#00000000" android:strokeColor="#51382B" android:strokeWidth="1" android:strokeLineCap="round" />
+    <path android:pathData="M 19,11 Q 23,8 25,11 Z" android:fillColor="#4CAF50" android:strokeColor="#1B5E20" android:strokeWidth="0.3" />
+
+    <!-- Sliced Apple Wedge -->
+    <path android:pathData="M 26,24 Q 30,21 34,25 L 30,28 Z" android:fillColor="#FFFDF0" android:strokeColor="#E53935" android:strokeWidth="0.6" />
+</vector>

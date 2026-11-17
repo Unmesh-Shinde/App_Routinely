@@ -19,12 +19,16 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.round
@@ -82,30 +86,291 @@ class DietPlanActivity : AppCompatActivity() {
         }
     }
 
-    private fun deleteSelectedMeals() {
-        val dateStr = dateFormatter.format(calendar.time)
-        val selectedIds = adapter.getSelectedIds()
-        val meals = planManager.getMealsForDate(dateStr).filter { selectedIds.contains(it.id) }
-        
-        AlertDialog.Builder(this)
-            .setTitle("Delete Meals?")
-            .setMessage("Remove ${meals.size} selected meals from your plan?")
-            .setPositiveButton("Delete") { _, _ ->
-                meals.forEach { meal ->
-                    planManager.deleteMealForDate(dateStr, meal)
-                }
-                adapter.clearSelection()
-                refreshMeals()
-            }
+    private fun showUnifiedMealNoticeDialog(
+        title: String,
+        statusMessage: String,
+        explanation: String,
+        nextSteps: String,
+        positiveButtonText: String = "Got It",
+        onPositive: (() -> Unit)? = null
+    ) {
+        val fullMessage = StringBuilder().apply {
+            append(statusMessage)
+            if (explanation.isNotBlank()) append("\n\n").append(explanation)
+            if (nextSteps.isNotBlank()) append("\n\n").append(nextSteps)
+        }.toString()
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(fullMessage)
+            .setPositiveButton(positiveButtonText) { _, _ -> onPositive?.invoke() }
+            .setCancelable(true)
+            .show()
+    }
+
+    private fun showUnifiedMealDeleteGuidanceDialog(
+        meal: Meal,
+        onEditChosen: () -> Unit,
+        onDeleteConfirmed: () -> Unit
+    ) {
+        val statusMessage = "Are you sure you want to delete '${meal.name}'?"
+        val explanation = "Tip: Each meal can be updated up to 2 times to adjust its name, category, or details without deleting it. Deleting a meal grants 1 replacement AI calculation for ${meal.mealType} today."
+        val nextSteps = "Would you like to edit this meal instead, or proceed with deletion?"
+
+        val fullMessage = "$statusMessage\n\n$explanation\n\n$nextSteps"
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Delete Meal Guidance")
+            .setMessage(fullMessage)
+            .setNeutralButton("Edit Meal") { _, _ -> onEditChosen() }
+            .setPositiveButton("Delete") { _, _ -> onDeleteConfirmed() }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private data class TemplateDialogAction(
-        val title: String,
-        val description: String,
-        val onClick: () -> Unit
-    )
+    private fun checkStreakRewards() {
+        val todayStr = dateFormatter.format(Date())
+        lifecycleScope.launch(Dispatchers.IO) {
+            planManager.evaluateStreaks(todayStr)
+            val pendingPopup = planManager.consumePendingStreakPopup()
+            if (pendingPopup != null) {
+                withContext(Dispatchers.Main) {
+                    showPersistentStreakRewardDialog(pendingPopup)
+                }
+            }
+        }
+    }
+
+    private fun showPersistentStreakRewardDialog(type: String) {
+        val (title, status, rewardText) = when (type) {
+            "edit" -> Triple(
+                "Streak Reward: Extra Edit Unlocked!",
+                "Great discipline! You logged a primary meal and made no edits on 3 consecutive days.",
+                "You have unlocked +1 bonus edit per meal (3 edits total per meal) for 3 calendar days, starting today. Any unused bonus expires after the third day."
+            )
+            "delete" -> Triple(
+                "Streak Reward: Replacement Bonus Unlocked!",
+                "Excellent planning! You logged a primary meal and deleted no meals on 3 consecutive days.",
+                "You have unlocked +1 extra delete-and-replace AI credit per category for 3 calendar days, starting today. Any unused bonus expires after the third day."
+            )
+            else -> Triple(
+                "Streak Reward: Dual Bonus Unlocked!",
+                "Outstanding discipline! You logged a primary meal and made no edits or deletions on 3 consecutive days.",
+                "You have unlocked +1 bonus edit per meal and +1 extra delete-and-replace credit per category for 3 calendar days, starting today. Any unused bonuses expire after the third day."
+            )
+        }
+
+        val explanation = "Limits exist to ensure optimal AI performance and preserve server resources for all users."
+        val fullMessage = "$status\n\n$explanation\n\n$rewardText"
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(title)
+            .setMessage(fullMessage)
+            .setPositiveButton("Understood", null)
+            .setCancelable(false)
+            .show()
+    }
+
+    private var firstTimeGuideDialog: androidx.appcompat.app.AlertDialog? = null
+
+    override fun onResume() {
+        super.onResume()
+        checkFirstTimeNutritionGuide()
+        window.decorView.postDelayed({ showNutritionTextErrorPopupIfNeeded() }, 350L)
+    }
+
+    private fun showNutritionTextErrorPopupIfNeeded() {
+        if (!::planManager.isInitialized || isFinishing || isDestroyed ||
+            !lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED) ||
+            !UserSettingsStore.hasAcknowledgedNutritionPolicy(this)) return
+        val errors = planManager.getMealsWithNutritionTextErrors()
+        if (errors.isEmpty()) return
+
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(18), dp(8), dp(18), dp(8))
+        }
+        content.addView(TextView(this).apply {
+            text = "These meals need a title or description edit before their calorie estimate can be calculated. This reminder will appear again until they are resolved."
+            textSize = 14f
+            setTextColor(ContextCompat.getColor(this@DietPlanActivity, R.color.textSecondary))
+            setPadding(0, 0, 0, dp(12))
+        })
+        val scroll = ScrollView(this).apply { addView(content) }
+        var issueDialog: androidx.appcompat.app.AlertDialog? = null
+        errors.forEach { (date, meal) ->
+            val warning = NutritionWarningPresentation.forMeal(meal.nutritionErrorCode)
+            val fallbackAddedAt = (dateFormatter.parse(date)?.time ?: 0L) +
+                (meal.hour * 60L + meal.minute) * 60_000L
+            val whenAdded = java.text.SimpleDateFormat("MMM d, yyyy 'at' h:mm a", Locale.getDefault())
+                .format(Date(meal.addedTimestamp.takeIf { it > 0L } ?: fallbackAddedAt))
+            val row = TextView(this).apply {
+                text = "${meal.name}\n${warning.dashboardDetail.orEmpty()}\nAdded $whenAdded · Meal date $date\nTap to open this meal"
+                textSize = 14f
+                setTextColor(when (warning.tone) {
+                    NutritionWarningTone.AMBER -> Color.rgb(183, 103, 0)
+                    NutritionWarningTone.RED -> Color.rgb(183, 28, 28)
+                    NutritionWarningTone.NONE -> ContextCompat.getColor(this@DietPlanActivity, R.color.textSecondary)
+                })
+                setPadding(dp(14), dp(13), dp(14), dp(13))
+                setBackgroundResource(R.drawable.bg_chip)
+                setOnClickListener {
+                    issueDialog?.dismiss()
+                    calendar.time = dateFormatter.parse(date) ?: Date()
+                    findViewById<TextView>(R.id.tvSelectedDate).text = displayFormatter.format(calendar.time)
+                    refreshMeals()
+                    val mealList = findViewById<RecyclerView>(R.id.rvMeals)
+                    mealList.post {
+                        val visibleMeals = WaterIntakeSummary.mealsWithSummaryLast(planManager.getMealsForDate(date))
+                        val index = visibleMeals.indexOfFirst { it.id == meal.id }
+                        if (index >= 0) mealList.scrollToPosition(index)
+                    }
+                }
+            }
+            content.addView(row, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                bottomMargin = dp(10)
+            })
+        }
+        issueDialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Meals Need Attention")
+            .setView(scroll)
+            .setPositiveButton("Close", null)
+            .create()
+        issueDialog?.show()
+    }
+
+    private fun checkFirstTimeNutritionGuide() {
+        if (!UserSettingsStore.hasAcknowledgedNutritionPolicy(this)) {
+            if (firstTimeGuideDialog == null || !firstTimeGuideDialog!!.isShowing) {
+                showFirstTimeNutritionGuideDialog()
+            }
+        } else {
+            firstTimeGuideDialog?.dismiss()
+            firstTimeGuideDialog = null
+        }
+    }
+
+    private fun showFirstTimeNutritionGuideDialog() {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(56, 44, 56, 44)
+        }
+
+        val tvTitle = TextView(this).apply {
+            text = "Welcome to AI Nutrition Logging"
+            textSize = 20f
+            setTypeface(typeface, Typeface.BOLD)
+            setTextColor(ContextCompat.getColor(this@DietPlanActivity, R.color.healthNutrition))
+        }
+        layout.addView(tvTitle)
+
+        val tvSub = TextView(this).apply {
+            text = "Quick Summary of Fair Use Guidelines:"
+            textSize = 14.5f
+            setTypeface(typeface, Typeface.BOLD)
+            setPadding(0, 16, 0, 10)
+            setTextColor(ContextCompat.getColor(this@DietPlanActivity, R.color.textPrimary))
+        }
+        layout.addView(tvSub)
+
+        val tvSummary = TextView(this).apply {
+            text = "• Meal plan: Max $MAX_MEALS_PER_CATEGORY_PER_DAY active meals per category and date. This controls saved plan entries.\n" +
+                   "• AI usage: Separate request allowances control Gemini calls (2 user-initiated calls/category/day; up to 8 automatic retry calls/category/day). Memory cache is 0 cost.\n" +
+                   "• Edits: Max 2 updates to Title/Details/Category per meal. Time/reminder edits are unlimited.\n" +
+                   "• Automatic retries: after 30 minutes, then 45 minutes, then 1 hour; overnight retry windows are 12 AM, 2 AM, 6 AM, and 8 AM.\n" +
+                   "• 3-Day Streaks: Logging primary meals 3 days in a row unlocks bonus edits & replacement credits."
+            textSize = 13.5f
+            setLineSpacing(4f, 1.15f)
+            setTextColor(ContextCompat.getColor(this@DietPlanActivity, R.color.textSecondary))
+        }
+        layout.addView(tvSummary)
+
+        val btnFullGuide = com.google.android.material.button.MaterialButton(this, null, com.google.android.material.R.attr.borderlessButtonStyle).apply {
+            text = "Read Complete Guide in Profile >"
+            textSize = 13.5f
+            setTextColor(ContextCompat.getColor(this@DietPlanActivity, R.color.primary))
+            setPadding(0, 16, 0, 16)
+        }
+        layout.addView(btnFullGuide)
+
+        val cbAgree = CheckBox(this).apply {
+            text = "I have read and agree to the Fair Use Policy."
+            textSize = 13.5f
+            setTextColor(ContextCompat.getColor(this@DietPlanActivity, R.color.textPrimary))
+        }
+        layout.addView(cbAgree)
+
+        val btnAck = com.google.android.material.button.MaterialButton(this).apply {
+            text = "Acknowledge"
+            isEnabled = false
+            textSize = 14.5f
+            setBackgroundColor(ContextCompat.getColor(this@DietPlanActivity, R.color.healthNutrition))
+            setTextColor(Color.WHITE)
+            cornerRadius = (12 * resources.displayMetrics.density).toInt()
+        }
+        val params = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (52 * resources.displayMetrics.density).toInt()).apply {
+            topMargin = 20
+        }
+        layout.addView(btnAck, params)
+
+        cbAgree.setOnCheckedChangeListener { _, isChecked ->
+            btnAck.isEnabled = isChecked
+        }
+
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setView(layout)
+            .setCancelable(true)
+            .create()
+
+        dialog.setOnCancelListener {
+            if (!UserSettingsStore.hasAcknowledgedNutritionPolicy(this)) {
+                finish()
+            }
+        }
+
+        firstTimeGuideDialog = dialog
+
+        btnFullGuide.setOnClickListener {
+            dialog.dismiss()
+            firstTimeGuideDialog = null
+            startActivity(Intent(this, NutritionPolicyActivity::class.java))
+        }
+
+        btnAck.setOnClickListener {
+            val dateStr = dateFormatter.format(calendar.time)
+            UserSettingsStore.setNutritionPolicyAcknowledged(this, dateStr)
+            Toast.makeText(this, "Fair Use Policy Acknowledged!", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+            firstTimeGuideDialog = null
+            window.decorView.postDelayed({ showNutritionTextErrorPopupIfNeeded() }, 250L)
+        }
+
+        dialog.show()
+    }
+
+    private fun deleteSelectedMeals() {
+        val dateStr = dateFormatter.format(calendar.time)
+        val selectedIds = adapter.getSelectedIds()
+        val meals = planManager.getMealsForDate(dateStr).filter { selectedIds.contains(it.id) }
+        val firstMeal = meals.firstOrNull() ?: return
+
+        showUnifiedMealDeleteGuidanceDialog(
+            meal = firstMeal,
+            onEditChosen = {
+                adapter.clearSelection()
+                showEditMealDialog(firstMeal)
+            },
+            onDeleteConfirmed = {
+                meals.forEach { meal ->
+                    planManager.deleteMealForDate(dateStr, meal)
+                }
+                rescheduleNutritionRetries()
+                adapter.clearSelection()
+                refreshMeals()
+            }
+        )
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -122,10 +387,13 @@ class DietPlanActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
 
         planManager = PlanManager(this)
+        lifecycleScope.launch(Dispatchers.IO) { NutritionRetryScheduler.schedule(applicationContext) }
         
         setupRecyclerView()
         setupDatePickers()
         refreshMeals()
+        checkStreakRewards()
+        checkFirstTimeNutritionGuide()
 
         findViewById<FloatingActionButton>(R.id.fabAddMeal).setOnClickListener {
             showEditMealDialog(null)
@@ -174,55 +442,24 @@ class DietPlanActivity : AppCompatActivity() {
     private fun updateDaysStrip() {
         val scrollView = findViewById<HorizontalScrollView>(R.id.hsvDays)
         val llDays = findViewById<LinearLayout>(R.id.llDays)
-        llDays.removeAllViews()
-        
-        val tempCal = calendar.clone() as Calendar
-        tempCal.add(Calendar.DAY_OF_YEAR, -dateStripPastDays)
-
-        val stripDateFormatter = SimpleDateFormat("EEE\ndd", Locale.US)
-        val todayStr = dateFormatter.format(Date())
-        var selectedButton: Button? = null
-
-        repeat(dateStripPastDays + dateStripFutureDays + 1) {
-            val dateStr = dateFormatter.format(tempCal.time)
-            val isSelected = dateStr == dateFormatter.format(calendar.time)
-            val isToday = dateStr == todayStr
-            val hasMeals = planManager.hasMealsForDate(dateStr)
-            val inTemplateRange = planManager.isDateInAppliedMealTemplateRange(dateStr)
-
-            val btn = Button(this, null, android.R.attr.buttonStyleSmall).apply {
-                text = if (isToday) "Today\n${SimpleDateFormat("dd", Locale.US).format(tempCal.time)}" else stripDateFormatter.format(tempCal.time)
-                setAllCaps(false)
-                minWidth = (64 * resources.displayMetrics.density).toInt()
-                setPadding(10, 6, 10, 6)
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    val margin = (4 * resources.displayMetrics.density).toInt()
-                    setMargins(margin, 0, margin, 0)
-                }
-                setOnClickListener {
-                    val clickedCal = Calendar.getInstance()
-                    clickedCal.time = dateFormatter.parse(dateStr) ?: Date()
-                    calendar.time = clickedCal.time
-                    this@DietPlanActivity.findViewById<TextView>(R.id.tvSelectedDate).text = displayFormatter.format(calendar.time)
-                    refreshMeals()
-                    updateDaysStrip()
-                }
-                alpha = 1f
+        PlannerDateStrip.render(
+            activity = this,
+            scrollView = scrollView,
+            container = llDays,
+            selectedDate = calendar.time,
+            dateFormatter = dateFormatter,
+            pastDays = dateStripPastDays,
+            futureDays = dateStripFutureDays,
+            hasItems = planManager::hasMealsForDate,
+            isInTemplateRange = planManager::isDateInAppliedMealTemplateRange,
+            styleButton = ::styleMealStripButton,
+            onDateSelected = { dateStr ->
+                calendar.time = dateFormatter.parse(dateStr) ?: Date()
+                findViewById<TextView>(R.id.tvSelectedDate).text = displayFormatter.format(calendar.time)
+                refreshMeals()
+                updateDaysStrip()
             }
-            styleMealStripButton(btn, isSelected, isToday, inTemplateRange, hasMeals)
-            if (isSelected) selectedButton = btn
-            llDays.addView(btn)
-            tempCal.add(Calendar.DAY_OF_YEAR, 1)
-        }
-        selectedButton?.let { button ->
-            scrollView.post {
-                val targetX = button.left - ((scrollView.width - button.width) / 2)
-                scrollView.smoothScrollTo(targetX.coerceAtLeast(0), 0)
-            }
-        }
+        )
     }
 
     private fun styleMealStripButton(button: Button, isSelected: Boolean, isToday: Boolean, inTemplateRange: Boolean, hasMeals: Boolean) {
@@ -275,63 +512,6 @@ class DietPlanActivity : AppCompatActivity() {
         )
     }
 
-    private fun showTemplateActionDialog(title: String, message: String, actions: List<TemplateDialogAction>) {
-        val isNightMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        val container = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(12), dp(20), dp(8))
-        }
-
-        container.addView(TextView(this).apply {
-            text = message
-            textSize = 13f
-            setTextColor(if (isNightMode) Color.argb(220, 255, 255, 255) else Color.argb(210, 0, 0, 0))
-            setPadding(0, 0, 0, dp(10))
-        })
-
-        var dialog: AlertDialog? = null
-        actions.forEach { action ->
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
-                isClickable = true
-                isFocusable = true
-                setPadding(dp(14), dp(12), dp(14), dp(12))
-                background = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = dp(12).toFloat()
-                    setColor(if (isNightMode) 0xFF17351E.toInt() else 0xFFEAF7EA.toInt())
-                    setStroke(dp(1), if (isNightMode) 0xFF81C784.toInt() else 0xFF4CAF50.toInt())
-                }
-                setOnClickListener {
-                    dialog?.dismiss()
-                    action.onClick()
-                }
-            }
-            row.addView(TextView(this).apply {
-                text = action.title
-                textSize = 16f
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-                setTextColor(if (isNightMode) Color.WHITE else 0xFF1B5E20.toInt())
-            })
-            row.addView(TextView(this).apply {
-                text = action.description
-                textSize = 12f
-                setPadding(0, dp(3), 0, 0)
-                setTextColor(if (isNightMode) Color.argb(220, 255, 255, 255) else 0xFF2E7D32.toInt())
-            })
-            container.addView(row, LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply { setMargins(0, 0, 0, dp(8)) })
-        }
-
-        dialog = AlertDialog.Builder(this)
-            .setTitle(title)
-            .setView(ScrollView(this).apply { addView(container) })
-            .setNegativeButton("Close", null)
-            .create()
-        dialog.show()
-    }
 
     private fun showCreateTemplateDialog() {
         pickDateRange { startDate, endDate ->
@@ -353,7 +533,7 @@ class DietPlanActivity : AppCompatActivity() {
 
     private fun pickMealTemplateRangeAndConfirm(template: MealTemplate) {
         pickDateRange { startDate, endDate ->
-            val selectedDays = daysBetweenInclusive(startDate, endDate)
+            val selectedDays = PlannerTemplateDateUtils.daysBetweenInclusive(startDate, endDate)
             if (selectedDays > template.durationDays) {
                 AlertDialog.Builder(this)
                     .setTitle("Cannot apply template")
@@ -379,7 +559,7 @@ class DietPlanActivity : AppCompatActivity() {
                     "Meal entries inside template: $totalMeals\n" +
                     "Already applied ranges: ${mealTemplateAppliedCount(template)}\n" +
                     "Selected range: $startDate to $endDate ($selectedDays days)\n" +
-                    "Target dates: ${buildDateRangePreview(startDate, selectedDays)}\n\n" +
+                    "Target dates: ${PlannerTemplateDateUtils.buildDateRangePreview(startDate, selectedDays)}\n\n" +
                     "Meals from this template will be copied into the selected calendar dates."
             )
             .setPositiveButton("Apply") { _, _ ->
@@ -393,6 +573,7 @@ class DietPlanActivity : AppCompatActivity() {
         val result = planManager.applyMealTemplateToRange(template.id, startDate, endDate)
         if (result.applied) {
             Toast.makeText(this, "Template applied for $startDate to $endDate", Toast.LENGTH_LONG).show()
+            rescheduleNutritionRetries()
             refreshMeals()
         } else if (result.conflictRange != null) {
             showMealTemplateOverlapDialog(template, result.conflictRange, selectedDays)
@@ -415,8 +596,8 @@ class DietPlanActivity : AppCompatActivity() {
                     "Start '${template.name}' after ${conflict.endDate}, or review applied meal plans first."
             )
             .setPositiveButton("Start after conflict") { _, _ ->
-                val startDate = addDaysToDate(conflict.endDate, 1)
-                val endDate = addDaysToDate(startDate, selectedDays - 1)
+                val startDate = PlannerTemplateDateUtils.addDaysToDate(conflict.endDate, 1)
+                val endDate = PlannerTemplateDateUtils.addDaysToDate(startDate, selectedDays - 1)
                 confirmMealTemplateApply(template, startDate, endDate, selectedDays)
             }
             .setNeutralButton("View applied plans") { _, _ -> showAppliedMealPlansDialog() }
@@ -517,47 +698,28 @@ class DietPlanActivity : AppCompatActivity() {
 
     private fun showAppliedMealPlansDialog() {
         val ranges = planManager.listAppliedMealTemplateRanges()
-        if (ranges.isEmpty()) {
-            Toast.makeText(this, "No meal templates applied yet", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val labels = ranges.map {
-            "${it.templateName} • ${it.startDate} to ${it.endDate} • ${daysBetweenInclusive(it.startDate, it.endDate)} day(s)"
-        }.toTypedArray()
-        AlertDialog.Builder(this)
-            .setTitle("Applied Meal Plans")
-            .setItems(labels) { _, which ->
-                showAppliedMealRangeActions(ranges[which])
-            }
-            .setNegativeButton("Close", null)
-            .show()
+        showAppliedTemplateRangesDialog(
+            title = "Applied Meal Plans",
+            emptyMessage = "No meal templates applied yet",
+            ranges = ranges,
+            onRangeSelected = ::showAppliedMealRangeActions
+        )
     }
 
     private fun showAppliedMealRangeActions(range: AppliedTemplateRange) {
-        val options = arrayOf(
-            "View applied details",
-            "Remove applied marker"
-        )
-        AlertDialog.Builder(this)
-            .setTitle(range.templateName)
-            .setMessage("Applied from ${range.startDate} to ${range.endDate} • ${daysBetweenInclusive(range.startDate, range.endDate)} day(s)")
-            .setItems(options) { _, which ->
-                when (which) {
-                    0 -> showAppliedMealRangeDetails(range)
-                    1 -> {
-                        val removed = planManager.removeAppliedMealTemplateRange(range.startDate, range.endDate)
-                        if (removed) {
-                            Toast.makeText(this, "Applied meal marker removed", Toast.LENGTH_SHORT).show()
-                            updateDaysStrip()
-                        } else {
-                            Toast.makeText(this, "Unable to remove applied marker", Toast.LENGTH_SHORT).show()
-                        }
-                    }
+        showAppliedTemplateRangeActions(
+            range = range,
+            onViewDetails = { showAppliedMealRangeDetails(range) },
+            onRemoveMarker = {
+                val removed = planManager.removeAppliedMealTemplateRange(range.startDate, range.endDate)
+                if (removed) {
+                    Toast.makeText(this, "Applied meal marker removed", Toast.LENGTH_SHORT).show()
+                    updateDaysStrip()
+                } else {
+                    Toast.makeText(this, "Unable to remove applied marker", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        )
     }
 
     private fun showAppliedMealRangeDetails(range: AppliedTemplateRange) {
@@ -565,7 +727,7 @@ class DietPlanActivity : AppCompatActivity() {
         val lines = mutableListOf<String>()
         lines += "Template: ${range.templateName}"
         lines += "Applied range: ${range.startDate} to ${range.endDate}"
-        lines += "Range length: ${daysBetweenInclusive(range.startDate, range.endDate)} day(s)"
+        lines += "Range length: ${PlannerTemplateDateUtils.daysBetweenInclusive(range.startDate, range.endDate)} day(s)"
         lines += "Calendar color: strong red"
         if (template != null) {
             lines += ""
@@ -650,29 +812,6 @@ class DietPlanActivity : AppCompatActivity() {
         startPicker.show()
     }
 
-    private fun daysBetweenInclusive(startDate: String, endDate: String): Int {
-        val start = dateFormatter.parse(startDate) ?: return 0
-        val end = dateFormatter.parse(endDate) ?: return 0
-        val millis = end.time - start.time
-        return (millis / (24L * 60L * 60L * 1000L)).toInt() + 1
-    }
-
-    private fun addDaysToDate(date: String, days: Int): String {
-        val cal = Calendar.getInstance().apply {
-            time = dateFormatter.parse(date) ?: Date()
-            add(Calendar.DAY_OF_YEAR, days)
-        }
-        return dateFormatter.format(cal.time)
-    }
-
-    private fun buildDateRangePreview(startDate: String, dayCount: Int): String {
-        if (dayCount <= 0) return startDate
-        if (dayCount <= 5) {
-            return (0 until dayCount).joinToString(", ") { addDaysToDate(startDate, it) }
-        }
-        return "${addDaysToDate(startDate, 0)}, ${addDaysToDate(startDate, 1)}, ... ${addDaysToDate(startDate, dayCount - 1)}"
-    }
-
     private fun mealTemplateConfiguredDayCount(template: MealTemplate): Int {
         return template.mealsByDayOffset.keys.distinct().size
     }
@@ -689,10 +828,14 @@ class DietPlanActivity : AppCompatActivity() {
         return (value * resources.displayMetrics.density).toInt()
     }
 
+    private fun rescheduleNutritionRetries() {
+        lifecycleScope.launch(Dispatchers.IO) { NutritionRetryScheduler.schedule(applicationContext) }
+    }
+
     private fun refreshMeals() {
         val dateStr = dateFormatter.format(calendar.time)
         val todayStr = dateFormatter.format(Date())
-        val meals = planManager.getMealsForDate(dateStr).sortedBy { it.hour * 60 + it.minute }
+        val meals = WaterIntakeSummary.mealsWithSummaryLast(planManager.getMealsForDate(dateStr))
         adapter.setMeals(meals)
         
         val count = meals.size
@@ -717,13 +860,41 @@ class DietPlanActivity : AppCompatActivity() {
         val v = LayoutInflater.from(this).inflate(R.layout.dialog_edit_meal, null)
         val etName = v.findViewById<EditText>(R.id.etMealName)
         val etDesc = v.findViewById<EditText>(R.id.etMealNotes)
+        val percentLimitWarning = v.findViewById<TextView>(R.id.tvMealPercentLimitWarning)
         val spinner = v.findViewById<Spinner>(R.id.spinnerMealType)
         val tvTime = v.findViewById<TextView>(R.id.tvMealTime)
         val swReminder = v.findViewById<androidx.appcompat.widget.SwitchCompat>(R.id.swMealReminder)
+        val cardMealGuidance = v.findViewById<View>(R.id.cardMealGuidance)
+        val tvMealGuidance = v.findViewById<TextView>(R.id.tvMealGuidance)
+
+        TextInputPolicy.applyLimit(etName, TextInputPolicy.TITLE_LIMIT)
+        TextInputPolicy.applyDescriptionLimit(etDesc)
+        TextInputPolicy.bindPercentLimitWarning(etDesc, percentLimitWarning)
 
         val types = arrayOf("Breakfast", "Lunch", "Dinner", "Snack")
         spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, types)
         DialogInputHelper.hideKeyboardOnDone(etName, etDesc)
+
+        val currentEditCount = meal?.editCount ?: 0
+        val maxAllowedEdits = planManager.getBonusAllowedEdits(dateFormatter.format(Date()))
+        val remainingEdits = (maxAllowedEdits - currentEditCount).coerceAtLeast(0)
+
+        if (meal != null) {
+            when {
+                remainingEdits > 1 -> {
+                    tvMealGuidance.text = "Edits Remaining: $remainingEdits of $maxAllowedEdits. Updating name, details, or category recalculates AI nutrition info."
+                }
+                remainingEdits == 1 -> {
+                    tvMealGuidance.text = "Edits Remaining: 1 of $maxAllowedEdits (Final Edit). Changing name or details will use your last allowed edit for this meal."
+                }
+                else -> {
+                    tvMealGuidance.text = "Edits Remaining: 0 of $maxAllowedEdits (Limit Reached). AI fields (Name, Category, Description) are locked. You can still adjust time and reminders."
+                    etName.isEnabled = false
+                    etDesc.isEnabled = false
+                    spinner.isEnabled = false
+                }
+            }
+        }
 
         var h = meal?.hour ?: 12
         var m = meal?.minute ?: 0
@@ -752,22 +923,121 @@ class DietPlanActivity : AppCompatActivity() {
         v.findViewById<Button>(R.id.btnPickMealTime).setOnClickListener { showMealTimePicker() }
         DialogInputHelper.makeTimeLabelClickable(tvTime, "Change meal time") { showMealTimePicker() }
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle(if (meal == null) "Add Meal" else "Edit Meal")
             .setView(v)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton("Save", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 DialogInputHelper.hideKeyboard(v)
                 val name = etName.text.toString().trim()
                 val desc = etDesc.text.toString().trim()
-                if (name.isEmpty()) {
-                    Toast.makeText(this, "Meal name is required", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
+                val selectedCategory = spinner.selectedItem.toString()
+
+                val nameError = TextInputPolicy.error(name, true, "Meal name", TextInputPolicy.TITLE_LIMIT)
+                val descError = TextInputPolicy.error(desc, false, "Meal details", TextInputPolicy.DESCRIPTION_LIMIT, allowPercent = true)
+                if (nameError != null || descError != null) {
+                    etName.error = nameError
+                    etDesc.error = descError
+                    (if (nameError != null) etName else etDesc).requestFocus()
+                    return@setOnClickListener
                 }
-                
+
+                val isAiFieldChanged = meal == null || name != meal.name || desc != meal.description || selectedCategory != meal.mealType
+                val operationDate = dateFormatter.format(Date())
+
+                if (meal != null && currentEditCount >= maxAllowedEdits && isAiFieldChanged) {
+                    showUnifiedMealNoticeDialog(
+                        title = "Meal Edit Limit Reached",
+                        statusMessage = "This meal has reached its limit ($maxAllowedEdits edits) for AI recalculations.",
+                        explanation = "Limits exist to ensure optimal AI performance and preserve server resources for all users.",
+                        nextSteps = "You can still adjust meal time or reminder settings freely, or create a new meal entry."
+                    )
+                    return@setOnClickListener
+                }
+
+                if (planManager.isCategoryLimitReached(dateStr, selectedCategory, excludeMealId = meal?.id, maxLimit = 2)) {
+                    showUnifiedMealNoticeDialog(
+                        title = "Category Limit Reached",
+                        statusMessage = "Maximum $MAX_MEALS_PER_CATEGORY_PER_DAY meals allowed for $selectedCategory on this date.",
+                        explanation = "This limit controls how many meals can be saved in each category for a date. Gemini request allowances are separate and control AI usage.",
+                        nextSteps = "You can edit existing $selectedCategory meals or choose a different meal category."
+                    )
+                    return@setOnClickListener
+                }
+
+                etName.error = null
+                etDesc.error = null
+                dialog.dismiss()
+
+                val nextEditCount = if (meal != null && isAiFieldChanged) currentEditCount + 1 else currentEditCount
+
+                if (!isAiFieldChanged && meal != null) {
+                    val updatedMeal = meal.copy(
+                        hour = h,
+                        minute = m,
+                        isReminderEnabled = swReminder.isChecked
+                    )
+                    planManager.saveMealForDate(dateStr, updatedMeal)
+                    planManager.syncMealReminder(this@DietPlanActivity, updatedMeal, dateStr)
+                    refreshMeals()
+                    return@setOnClickListener
+                }
+
+                val cachedNutrition = CalorieEstimator.getLearnedMealNutrition(this, name, desc)
+                if (cachedNutrition != null && cachedNutrition.hasAnyNutrition()) {
+                    val newMeal = (meal ?: Meal()).copy(
+                        name = name,
+                        description = desc,
+                        mealType = selectedCategory,
+                        hour = h,
+                        minute = m,
+                        isReminderEnabled = swReminder.isChecked,
+                        calories = cachedNutrition.calories,
+                        nutritionInfo = cachedNutrition,
+                        isPendingOvernightRetry = false,
+                        queuedTimestamp = 0L,
+                        manualRetryAttempted = false,
+                        nutritionErrorCode = null,
+                        nutritionDayRetriesUsed = 0,
+                        nutritionOvernightRetriesUsed = 0,
+                        nutritionRetryStage = null,
+                        nextNutritionRetryAt = 0L,
+                        nutritionAutoRetriesExhausted = false,
+                        nutritionOvernightWindowStartAt = 0L,
+                        editCount = nextEditCount
+                    )
+                    planManager.saveMealForDate(dateStr, newMeal)
+                    if (meal != null) planManager.recordMealEditOccurred(operationDate)
+                    planManager.syncMealReminder(this@DietPlanActivity, newMeal, dateStr)
+                    rescheduleNutritionRetries()
+                    refreshMeals()
+                    return@setOnClickListener
+                }
+
+                val aiUsageDate = java.time.LocalDate.now().toString()
+                if (planManager.isAiTokenLimitReached(aiUsageDate, selectedCategory)) {
+                    showUnifiedMealNoticeDialog(
+                        title = "Daily AI Limit Reached",
+                        statusMessage = "Maximum daily AI calculations reached for $selectedCategory today.",
+                        explanation = "Daily AI calculation limits exist to preserve server resources and maintain optimal performance for all users.",
+                        nextSteps = "Please try adding meals to this category tomorrow or select a different meal category."
+                    )
+                    return@setOnClickListener
+                }
+
                 val loading = Toast.makeText(this, "Fetching calories and nutritional values...", Toast.LENGTH_SHORT)
                 loading.show()
-                
-                CalorieSearchEngine.getMealNutritionResult(this, name, desc) { result ->
+
+                CalorieSearchEngine.getMealNutritionWithRetries(
+                    this,
+                    name,
+                    desc,
+                    maxImmediateRetries = 1,
+                    budget = planManager.createAiRequestBudget(aiUsageDate, selectedCategory)
+                ) { result ->
                     loading.cancel()
                     when (result) {
                         is NutritionResult.Success -> {
@@ -775,54 +1045,167 @@ class DietPlanActivity : AppCompatActivity() {
                             val newMeal = (meal ?: Meal()).copy(
                                 name = name,
                                 description = desc,
-                                mealType = spinner.selectedItem.toString(),
+                                mealType = selectedCategory,
                                 hour = h,
                                 minute = m,
                                 isReminderEnabled = swReminder.isChecked,
                                 calories = nutrition.calories,
-                                nutritionInfo = nutrition
+                                nutritionInfo = nutrition,
+                                isPendingOvernightRetry = false,
+                                queuedTimestamp = 0L,
+                                manualRetryAttempted = false,
+                                nutritionErrorCode = null,
+                                nutritionDayRetriesUsed = 0,
+                                nutritionOvernightRetriesUsed = 0,
+                                nutritionRetryStage = null,
+                                nextNutritionRetryAt = 0L,
+                                nutritionAutoRetriesExhausted = false,
+                                nutritionOvernightWindowStartAt = 0L,
+                                editCount = nextEditCount
                             )
                             planManager.saveMealForDate(dateStr, newMeal)
+                            if (meal != null) planManager.recordMealEditOccurred(operationDate)
                             planManager.syncMealReminder(this@DietPlanActivity, newMeal, dateStr)
+                            rescheduleNutritionRetries()
                             refreshMeals()
                         }
                         is NutritionResult.Error -> {
+                            if (result.code == "ai_daily_limit_reached") {
+                                showUnifiedMealNoticeDialog(
+                                    title = "Daily AI Limit Reached",
+                                    statusMessage = result.message,
+                                    explanation = "No estimate request was started, so this meal was not saved or queued.",
+                                    nextSteps = "Try again tomorrow or use a previously estimated meal."
+                                )
+                                return@getMealNutritionWithRetries
+                            }
+                            val isQuotaError = result.code in setOf("ai_provider_quota", "ai_provider_rate_limited")
+                            val isAuthOrConfigError = result.code == "ai_provider_auth_error" ||
+                                result.code == "unauthorized" || result.code == "ai_provider_not_configured"
+                            val isMealTextError = result.code == "ai_payload_too_large" || result.code == "ai_content_blocked"
+                            // Keep every failed estimate recoverable, including auth/config and quota failures.
+                            val isRetryable = result.retryable || result.code in setOf("ai_provider_quota", "ai_provider_rate_limited")
+                            val shouldQueueOvernight = !isMealTextError && isRetryable
+
+                            val nowMs = System.currentTimeMillis()
+                            val firstRetryState = if (shouldQueueOvernight) {
+                                NutritionRetryPolicy.queueFirstRetry(meal ?: Meal(), result.code, nowMs)
+                            } else null
                             val newMeal = (meal ?: Meal()).copy(
                                 name = name,
                                 description = desc,
-                                mealType = spinner.selectedItem.toString(),
+                                mealType = selectedCategory,
                                 hour = h,
                                 minute = m,
-                                isReminderEnabled = swReminder.isChecked
+                                isReminderEnabled = swReminder.isChecked,
+                                calories = null,
+                                nutritionInfo = null,
+                                isPendingOvernightRetry = firstRetryState != null,
+                                queuedTimestamp = firstRetryState?.queuedTimestamp ?: 0L,
+                                manualRetryAttempted = false,
+                                nutritionErrorCode = result.code,
+                                nutritionDayRetriesUsed = firstRetryState?.nutritionDayRetriesUsed ?: 0,
+                                nutritionOvernightRetriesUsed = firstRetryState?.nutritionOvernightRetriesUsed ?: 0,
+                                nutritionRetryStage = firstRetryState?.nutritionRetryStage,
+                                nextNutritionRetryAt = firstRetryState?.nextNutritionRetryAt ?: 0L,
+                                nutritionAutoRetriesExhausted = !isMealTextError && !shouldQueueOvernight,
+                                nutritionOvernightWindowStartAt = 0L,
+                                editCount = nextEditCount
                             )
                             planManager.saveMealForDate(dateStr, newMeal)
+                            if (meal != null) planManager.recordMealEditOccurred(operationDate)
                             planManager.syncMealReminder(this@DietPlanActivity, newMeal, dateStr)
+                            rescheduleNutritionRetries()
                             refreshMeals()
 
-                            MaterialAlertDialogBuilder(this@DietPlanActivity)
-                                .setTitle("Nutrition Fetch Notice")
-                                .setMessage(result.message)
-                                .setPositiveButton("OK", null)
-                                .show()
+                            if (isMealTextError) {
+                                showUnifiedMealNoticeDialog(
+                                    title = if (result.code == "ai_payload_too_large") "Meal Details Too Long" else "Meal Details Need Editing",
+                                    statusMessage = result.message,
+                                    explanation = "The meal is saved, but this error needs a change to its title or description before another estimate can work.",
+                                    nextSteps = "Edit the meal title or description to continue.",
+                                    positiveButtonText = "Edit Meal",
+                                    onPositive = { showEditMealDialog(newMeal) }
+                                )
+                            } else if (isAuthOrConfigError) {
+                                showUnifiedMealNoticeDialog(
+                                    title = "Authentication Issue",
+                                    statusMessage = result.message,
+                                    explanation = "Your meal is saved without a calorie estimate. Automatic retries are paused for authentication or configuration errors.",
+                                    nextSteps = "Check your connection or service settings, then edit and save the meal to start a new estimate."
+                                )
+                            } else if (isQuotaError) {
+                                showUnifiedMealNoticeDialog(
+                                    title = "AI Quota Reached — Estimate Queued",
+                                    statusMessage = result.message,
+                                    explanation = "Your meal is saved and remains queued for a later estimate.",
+                                    nextSteps = "Automatic retries are scheduled after 30 minutes, 45 minutes later, and 1 hour later, followed by the overnight and morning retry windows."
+                                )
+                            } else {
+                                showUnifiedMealNoticeDialog(
+                                    title = "Calorie Estimate Queued",
+                                    statusMessage = result.message,
+                                    explanation = "Your meal is saved and remains queued for automatic retry.",
+                                    nextSteps = "You can view or edit this meal anytime."
+                                )
+                            }
                         }
                     }
                 }
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+        dialog.show()
     }
 
     private fun showMealNutritionPopup(meal: Meal) {
+        if (meal.nutritionErrorCode == "ai_payload_too_large" || meal.nutritionErrorCode == "ai_content_blocked") {
+            val isPayloadTooLarge = meal.nutritionErrorCode == "ai_payload_too_large"
+            showUnifiedMealNoticeDialog(
+                title = if (isPayloadTooLarge) "Meal Details Too Long" else "Meal Details Need Editing",
+                statusMessage = if (isPayloadTooLarge) {
+                    "The meal details exceed the nutrition service's input limit."
+                } else {
+                    "The current meal title or description could not be used for an estimate."
+                },
+                explanation = "No automatic estimate will be attempted until the meal text is changed.",
+                nextSteps = if (isPayloadTooLarge) "Shorten the description, then save the meal again." else "Edit the title or description to make it clearer or more neutral.",
+                positiveButtonText = "Edit Meal",
+                onPositive = { showEditMealDialog(meal) }
+            )
+            return
+        }
+        if (!meal.isWaterIntakeSummary && (meal.isPendingOvernightRetry || (meal.nutritionInfo?.hasAnyNutrition() != true && meal.displayCalories == null))) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(when {
+                    meal.nutritionAutoRetriesExhausted -> "Estimate Not Available"
+                    meal.isPendingOvernightRetry -> "Estimate Retry Scheduled"
+                    else -> "No Estimate Yet"
+                })
+                .setMessage(
+                    when {
+                    meal.nutritionAutoRetriesExhausted -> {
+                        "Automatic retries are finished or paused for this error. Edit and save the meal to start a new estimate."
+                    }
+                    meal.isPendingOvernightRetry -> {
+                        "The first retry is after 30 minutes, the next is 45 minutes after that, and the third is 1 hour later. If still needed, the final retry windows are 12 AM, 2 AM, 6 AM, and 8 AM. Please wait."
+                    }
+                    else -> "Edit and save this meal to start a new estimate."
+                })
+                .setPositiveButton("Edit Meal") { _, _ -> showEditMealDialog(meal) }
+                .setNegativeButton("Close", null)
+                .show()
+            return
+        }
         val dateStr = dateFormatter.format(calendar.time)
         fun displayDialog(info: MealNutritionInfo) {
             val v = LayoutInflater.from(this).inflate(R.layout.dialog_meal_nutrition_info, null)
-            v.findViewById<ImageView>(R.id.ivMealIcon).apply {
-                setImageResource(RoutineIconMapper.iconForMealType(meal.mealType))
-                setBackgroundResource(RoutineIconMapper.badgeForMealType(meal.mealType))
+            v.findViewById<MealIconView>(R.id.ivMealIcon).apply {
+                val icons = FoodIconResolver.getIconsForMeal(meal.name, meal.description, meal.mealType)
+                setIconResList(icons, RoutineIconMapper.badgeForMealType(meal.mealType))
             }
             v.findViewById<TextView>(R.id.tvMealTitle).text = meal.name
             v.findViewById<TextView>(R.id.tvMealCategory).text = "${meal.mealType} • ${meal.formatTime()}"
-            v.findViewById<TextView>(R.id.tvMealCalories).text = "${info.calories} kcal"
+            v.findViewById<TextView>(R.id.tvMealCalories).text = info.calories?.let { "$it kcal" } ?: "Calories not provided"
 
             val tvNotes = v.findViewById<TextView>(R.id.tvMealNotes)
             if (meal.description.isNotBlank()) {
@@ -835,14 +1218,22 @@ class DietPlanActivity : AppCompatActivity() {
             val personalRda = PersonalizedRdaCalculator.calculate(this)
 
             // Macro Ratio Split
-            val totalMacroG = (info.carbsG + info.proteinG + info.fatG).coerceAtLeast(1.0)
-            val carbsPct = round((info.carbsG / totalMacroG) * 100).toInt()
-            val proteinPct = round((info.proteinG / totalMacroG) * 100).toInt()
-            val fatPct = (100 - carbsPct - proteinPct).coerceAtLeast(0)
+            val macroValues = listOf(info.carbsG, info.proteinG, info.fatG)
+            val allMacrosKnown = macroValues.all { it != null }
+            val totalMacroG = macroValues.filterNotNull().sum()
+            fun formatMacroRatio(value: Double?): String {
+                if (value == null) return "Not provided"
+                val amount = "%.1fg".format(value)
+                return if (allMacrosKnown && totalMacroG > 0.0) {
+                    "$amount (${round((value / totalMacroG) * 100).toInt()}%)"
+                } else {
+                    amount
+                }
+            }
 
-            v.findViewById<TextView>(R.id.tvCarbsRatio).text = "%.1fg (%d%%)".format(info.carbsG, carbsPct)
-            v.findViewById<TextView>(R.id.tvProteinRatio).text = "%.1fg (%d%%)".format(info.proteinG, proteinPct)
-            v.findViewById<TextView>(R.id.tvFatRatio).text = "%.1fg (%d%%)".format(info.fatG, fatPct)
+            v.findViewById<TextView>(R.id.tvCarbsRatio).text = formatMacroRatio(info.carbsG)
+            v.findViewById<TextView>(R.id.tvProteinRatio).text = formatMacroRatio(info.proteinG)
+            v.findViewById<TextView>(R.id.tvFatRatio).text = formatMacroRatio(info.fatG)
 
             val llTabs = v.findViewById<LinearLayout>(R.id.llCategoryTabs)
             val llList = v.findViewById<LinearLayout>(R.id.llNutrientsList)
@@ -891,21 +1282,21 @@ class DietPlanActivity : AppCompatActivity() {
 
                 // MACROS (Category 0 = All or Category 1 = Macros)
                 if (catIndex == 0 || catIndex == 1) {
-                    addNutrientRow("Carbohydrates", "%.1f g".format(info.carbsG), cMacros, R.drawable.bg_nutrient_progress_macros)
+                    addNutrientRow("Carbohydrates", info.carbsG?.let { "%.1f g".format(it) } ?: "Not provided", cMacros, R.drawable.bg_nutrient_progress_macros)
                     info.carbBreakdown.forEach { (key, valStr) ->
                         val isAddedSugarWarning = key.lowercase().contains("added sugar") && parseNum(valStr) > 25.0
                         addNutrientRow(key, valStr, cMacros, R.drawable.bg_nutrient_progress_macros, isChild = true, isWarning = isAddedSugarWarning)
                     }
 
-                    addNutrientRow("Protein", "%.1f g".format(info.proteinG), cMacros, R.drawable.bg_nutrient_progress_macros)
+                    addNutrientRow("Protein", info.proteinG?.let { "%.1f g".format(it) } ?: "Not provided", cMacros, R.drawable.bg_nutrient_progress_macros)
 
-                    addNutrientRow("Fat", "%.1f g".format(info.fatG), cMacros, R.drawable.bg_nutrient_progress_macros)
+                    addNutrientRow("Fat", info.fatG?.let { "%.1f g".format(it) } ?: "Not provided", cMacros, R.drawable.bg_nutrient_progress_macros)
                     info.fatBreakdown.forEach { (key, valStr) ->
                         val isTransFatWarning = key.lowercase().contains("trans fat") && parseNum(valStr) > 0.0
                         addNutrientRow(key, valStr, cMacros, R.drawable.bg_nutrient_progress_macros, isChild = true, isWarning = isTransFatWarning)
                     }
 
-                    if (info.fiberG > 0) {
+                    if (info.fiberG != null) {
                         addNutrientRow("Dietary Fiber", "%.1f g".format(info.fiberG), cMacros, R.drawable.bg_nutrient_progress_macros)
                     }
                 }
@@ -943,6 +1334,15 @@ class DietPlanActivity : AppCompatActivity() {
                     info.otherNutrients.forEach { (key, valStr) ->
                         addNutrientRow(key, valStr, cOther, R.drawable.bg_nutrient_progress_others)
                     }
+                }
+
+                if (llList.childCount == 0) {
+                    val padding = (16 * resources.displayMetrics.density).toInt()
+                    llList.addView(TextView(this@DietPlanActivity).apply {
+                        text = "No nutrient details provided"
+                        textSize = 14f
+                        setPadding(padding, padding, padding, padding)
+                    })
                 }
             }
 
@@ -1006,46 +1406,40 @@ class DietPlanActivity : AppCompatActivity() {
                 .show()
         }
 
+        if (meal.isPendingOvernightRetry) {
+            return
+        }
+
         val existingInfo = meal.nutritionInfo
-        if (existingInfo != null && existingInfo.hasDetailedNutrition()) {
+        if (meal.isWaterIntakeSummary) {
+            displayDialog(MealNutritionInfo(otherNutrients = mapOf("Water intake" to meal.description)))
+        } else if (existingInfo != null && existingInfo.hasAnyNutrition()) {
             displayDialog(existingInfo)
+        } else if (meal.calories != null) {
+            displayDialog(MealNutritionInfo(calories = meal.calories))
         } else {
-            val progress = Toast.makeText(this, "Fetching calories and nutritional values...", Toast.LENGTH_SHORT)
-            progress.show()
-            CalorieSearchEngine.getMealNutritionResult(this, meal.name, meal.description) { result ->
-                progress.cancel()
-                when (result) {
-                    is NutritionResult.Success -> {
-                        val info = result.info
-                        val updatedMeal = meal.copy(calories = info.calories, nutritionInfo = info)
-                        planManager.saveMealForDate(dateStr, updatedMeal)
-                        displayDialog(info)
-                    }
-                    is NutritionResult.Error -> {
-                        MaterialAlertDialogBuilder(this)
-                            .setTitle("Nutrition Error")
-                            .setMessage(result.message)
-                            .setPositiveButton("Close", null)
-                            .show()
-                    }
-                }
-            }
+            MaterialAlertDialogBuilder(this)
+                .setTitle("No Estimate Yet")
+                .setMessage("Edit and save this meal to start a new estimate.")
+                .setPositiveButton("Edit Meal") { _, _ -> showEditMealDialog(meal) }
+                .setNegativeButton("Close", null)
+                .show()
         }
     }
 
     private fun deleteMeal(mealId: Int) {
         val dateStr = dateFormatter.format(calendar.time)
         val meal = planManager.getMealsForDate(dateStr).find { it.id == mealId } ?: return
-        
-        AlertDialog.Builder(this)
-            .setTitle("Delete Meal?")
-            .setMessage("Remove ${meal.name} from your plan?")
-            .setPositiveButton("Delete") { _, _ ->
+
+        showUnifiedMealDeleteGuidanceDialog(
+            meal = meal,
+            onEditChosen = { showEditMealDialog(meal) },
+            onDeleteConfirmed = {
                 planManager.deleteMealForDate(dateStr, meal)
+                rescheduleNutritionRetries()
                 refreshMeals()
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        )
     }
 
     inner class MealAdapter(
@@ -1087,32 +1481,50 @@ class DietPlanActivity : AppCompatActivity() {
             val m = items[position]
             val isSelected = selectedIds.contains(m.id)
             
-            holder.ivIcon.setImageResource(RoutineIconMapper.iconForMealType(m.mealType))
-            holder.ivIcon.setBackgroundResource(RoutineIconMapper.badgeForMealType(m.mealType))
-            holder.tvTitle.text = m.name
+            val icons = FoodIconResolver.getIconsForMeal(m.name, m.description, m.mealType)
+            holder.ivIcon.setIconResList(icons, RoutineIconMapper.badgeForMealType(m.mealType))
+            holder.tvTitle.text = if (m.isWaterIntakeSummary) {
+                "${m.name} · ${WaterIntakeSummary.amountLabel(m)}"
+            } else {
+                m.name
+            }
+            holder.tvTitle.textSize = if (m.isWaterIntakeSummary) 14f else 16f
             holder.tvSubtitle.text = m.mealType
             holder.tvSubtitle.setBackgroundResource(R.drawable.bg_chip)
             holder.tvSubtitle.visibility = View.VISIBLE
             
-            val hasDetails = m.nutritionInfo?.hasDetailedNutrition() == true
-            if (m.calories == 0 || !hasDetails) {
-                val targetDate = dateFormatter.format(calendar.time)
-                CalorieSearchEngine.getMealNutrition(this@DietPlanActivity, m.name, m.description) { info ->
-                    if (info.hasDetailedNutrition()) {
-                        val updatedMeal = m.copy(calories = info.calories, nutritionInfo = info)
-                        planManager.saveMealForDate(targetDate, updatedMeal)
-                    }
-                }
+            val mealCalories = m.nutritionInfo?.calories ?: m.calories?.takeIf { it > 0 }
+            val cardWarning = when (m.nutritionErrorCode) {
+                "ai_payload_too_large" -> "Warning: shorten meal details"
+                "ai_content_blocked" -> "Warning: edit title or description"
+                else -> if (m.nutritionAutoRetriesExhausted) "Estimate unavailable • edit meal" else null
             }
-
-            if (m.calories > 0) {
-                holder.tvTime.text = "${m.formatTime()} • ${m.calories} kcal"
+            if (m.isWaterIntakeSummary) {
+                holder.tvTime.visibility = View.GONE
+            } else if (mealCalories != null) {
+                holder.tvTime.visibility = View.VISIBLE
+                holder.tvTime.text = "${m.formatTime()} • $mealCalories kcal"
+                holder.tvTime.setTextColor(ContextCompat.getColor(this@DietPlanActivity, R.color.textSecondary))
             } else {
-                holder.tvTime.text = m.formatTime()
+                holder.tvTime.visibility = View.VISIBLE
+                val estimateStatus = cardWarning ?: when {
+                    m.isPendingOvernightRetry -> "Automatic retry scheduled"
+                    m.nutritionInfo?.hasAnyNutrition() == true -> "Partial estimate"
+                    else -> "No estimate"
+                }
+                holder.tvTime.text = "${m.formatTime()} • $estimateStatus"
+                holder.tvTime.setTextColor(
+                    when (m.nutritionErrorCode) {
+                        "ai_payload_too_large" -> Color.rgb(183, 103, 0)
+                        "ai_content_blocked" -> Color.rgb(183, 28, 28)
+                        else -> if (m.nutritionAutoRetriesExhausted) Color.rgb(183, 103, 0) else ContextCompat.getColor(this@DietPlanActivity, R.color.textSecondary)
+                    }
+                )
             }
 
+            val hasFullNutrition = m.nutritionInfo?.hasAnyNutrition() == true || (m.calories != null && m.calories > 0)
             val tvHint = holder.itemView.findViewById<TextView>(R.id.tvHint)
-            tvHint.visibility = if (selectedIds.isNotEmpty()) View.GONE else View.VISIBLE
+            tvHint.visibility = if (m.isWaterIntakeSummary || selectedIds.isNotEmpty() || m.isPendingOvernightRetry || cardWarning != null || !hasFullNutrition) View.GONE else View.VISIBLE
 
             val cardView = holder.itemView as MaterialCardView
             val isNightMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -1127,27 +1539,34 @@ class DietPlanActivity : AppCompatActivity() {
             }
 
             holder.itemView.setOnLongClickListener {
-                if (selectedIds.isEmpty()) {
+                if (!m.isWaterIntakeSummary && selectedIds.isEmpty()) {
                     toggleSelection(m.id)
                 }
                 true
             }
 
             holder.itemView.setOnClickListener { 
-                if (selectedIds.isNotEmpty()) {
+                if (m.isWaterIntakeSummary) {
+                    return@setOnClickListener
+                } else if (selectedIds.isNotEmpty()) {
                     toggleSelection(m.id)
+                } else if (m.isPendingOvernightRetry) {
+                    showMealNutritionPopup(m)
                 } else {
                     showMealNutritionPopup(m) 
                 }
             }
             
             val btnDelete = holder.itemView.findViewById<View>(R.id.btnDelete)
-            btnDelete.visibility = if (selectedIds.isNotEmpty()) View.GONE else View.VISIBLE
+            btnDelete.visibility = if (WaterIntakeSummary.allowsDelete(m) && selectedIds.isEmpty()) View.VISIBLE else View.GONE
             btnDelete.setOnClickListener { onDelete(m.id) }
 
             val btnEdit = holder.itemView.findViewById<View>(R.id.btnEdit)
             btnEdit.visibility = if (selectedIds.isNotEmpty()) View.GONE else View.VISIBLE
-            btnEdit.setOnClickListener { onEdit(m) }
+            btnEdit.setOnClickListener {
+                if (m.isWaterIntakeSummary) showWaterSummaryAdjustMenu(dateFormatter.format(calendar.time))
+                else onEdit(m)
+            }
             
             // Hide switch as it's not used here
             holder.itemView.findViewById<View>(R.id.switchEnabled).visibility = View.GONE
@@ -1156,10 +1575,24 @@ class DietPlanActivity : AppCompatActivity() {
         override fun getItemCount() = items.size
 
         inner class VH(v: View) : RecyclerView.ViewHolder(v) {
-            val ivIcon: ImageView = v.findViewById(R.id.tvEmoji)
+            val ivIcon: MealIconView = v.findViewById(R.id.tvEmoji)
             val tvTitle: TextView = v.findViewById(R.id.tvTitle)
             val tvSubtitle: TextView = v.findViewById(R.id.tvSubtitle)
             val tvTime: TextView = v.findViewById(R.id.tvTime)
         }
+    }
+
+    private fun showWaterSummaryAdjustMenu(date: String) {
+        val labels = WaterIntakeSummary.adjustmentAmountsMl.map { amount ->
+            val action = if (amount > 0) "Add" else "Remove"
+            "$action ${kotlin.math.abs(amount)} ml"
+        }.toTypedArray()
+        MaterialAlertDialogBuilder(this)
+            .setItems(labels) { _, which ->
+                val updated = WaterIntakeSummary.adjustDate(this, date, WaterIntakeSummary.adjustmentAmountsMl[which])
+                refreshMeals()
+                Toast.makeText(this, "Total water intake: ${WaterIntakeSummary.formatLiters(updated)} L", Toast.LENGTH_SHORT).show()
+            }
+            .show()
     }
 }

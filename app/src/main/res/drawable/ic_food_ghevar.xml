@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Honeycomb Disc Ghevar Base & Shadow -->
+    <path android:pathData="M 8.5,22.8 A 12.5,12.5 0 1,0 33.5,22.8 A 12.5,12.5 0 1,0 8.5,22.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,22 A 12.5,12.5 0 1,0 33,22 A 12.5,12.5 0 1,0 8,22 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,22 A 11,11 0 1,0 31.5,22 A 11,11 0 1,0 9.5,22 Z" android:fillColor="#FFC107" />
+
+    <!-- Center Hole & Porous Honeycomb Texture -->
+    <path android:pathData="M 17.5,22 A 3,3 0 1,0 23.5,22 A 3,3 0 1,0 17.5,22 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <path android:pathData="M 12,18 A 0.8,0.8 0 1,0 13.6,18 A 0.8,0.8 0 1,0 12,18 Z M 27,18 A 0.8,0.8 0 1,0 28.6,18 A 0.8,0.8 0 1,0 27,18 Z M 13,26 A 0.8,0.8 0 1,0 14.6,26 A 0.8,0.8 0 1,0 13,26 Z M 28,26 A 0.8,0.8 0 1,0 29.6,26 A 0.8,0.8 0 1,0 28,26 Z" android:fillColor="#A85D1B" />
+
+    <!-- Silver Vark Foil Coat & Pistachio Flakes -->
+    <path android:pathData="M 13,16 L 19,14 L 21,17 L 15,19 Z" android:fillColor="#ECEFF1" />
+    <path android:pathData="M 15,22 A 1,1 0 1,0 17,22 A 1,1 0 1,0 15,22 Z M 24,24 A 1,1 0 1,0 26,24 A 1,1 0 1,0 24,24 Z" android:fillColor="#7CB342" />
+</vector>

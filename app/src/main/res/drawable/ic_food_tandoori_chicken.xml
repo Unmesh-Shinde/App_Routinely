@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Tandoori Chicken Drumstick Ambient Drop Shadow -->
+    <path android:pathData="M 11.5,19.8 Q 11.5,13.8 17.5,13.3 Q 22.5,12.8 24.5,16.3 Q 25.5,19.3 22.5,22.8 Q 18.5,25.8 13.5,23.3 Z" android:fillColor="#22000000" />
+
+    <!-- Char-Grilled Red Tandoori Chicken Drumstick Head -->
+    <path android:pathData="M 11,19 Q 11,13 17,12.5 Q 22,12 24,15.5 Q 25,18.5 22,22 Q 18,25 13,22.5 Q 10.8,20.5 11,19 Z" android:fillColor="#D32F2F" android:strokeColor="#51382B" android:strokeWidth="0.65" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 13,17 C 15,14 20,13.5 22,16.5 C 20,19 15,19.5 13,17 Z" android:fillColor="#FF7043" />
+
+    <!-- Tandoori Charcoal Sear Marks -->
+    <path android:pathData="M 13,15 L 16,17 M 15,17.5 L 18,19.5 M 17,19.5 L 20,21 M 20,15.5 L 22,18" android:fillColor="#00000000" android:strokeColor="#212121" android:strokeWidth="0.6" android:strokeLineCap="round" />
+
+    <!-- Silver Foil Wrapped Bone Stem -->
+    <path android:pathData="M 21.8,19.8 L 27.8,25.8" android:fillColor="#00000000" android:strokeColor="#51382B" android:strokeWidth="2.2" android:strokeLineCap="round" />
+    <path android:pathData="M 21.8,19.8 L 27.8,25.8" android:fillColor="#00000000" android:strokeColor="#B0BEC5" android:strokeWidth="1.5" android:strokeLineCap="round" />
+    <path android:pathData="M 27.1,26.2 A 1.2,1.2 0 1,0 29.5,26.2 A 1.2,1.2 0 1,0 27.1,26.2 Z" android:fillColor="#FFF8E1" android:strokeColor="#51382B" android:strokeWidth="0.35" />
+
+    <!-- Onion Rings & Lemon Wedge Garnish -->
+    <path android:pathData="M 12,28 A 2,2 0 1,0 16,28 A 2,2 0 1,0 12,28 Z M 18,31 A 2,2 0 1,0 22,31 A 2,2 0 1,0 18,31 Z" android:fillColor="#E1BEE7" android:strokeColor="#8E24AA" android:strokeWidth="0.3" />
+    <path android:pathData="M 28,30 Q 32,27 34,31 L 30,34 Z" android:fillColor="#F8D84F" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+</vector>

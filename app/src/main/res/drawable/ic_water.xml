@@ -1,3 +1,9 @@
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="@color/iconHydration" android:pathData="M12,22C8.1,22 5,19 5,15.2C5,11.1 10.4,3.9 11.3,2.7C11.7,2.2 12.3,2.2 12.7,2.7C13.6,3.9 19,11.1 19,15.2C19,19 15.9,22 12,22ZM8.5,15.4C8.5,17.3 10.1,18.8 12,18.8V16.8C11.2,16.8 10.5,16.2 10.5,15.4H8.5Z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/iconHydration"
+        android:pathData="M12,2C12.4,2 12.8,2.2 13,2.6C15,5.8 20,12.9 20,16.8C20,21.1 16.6,24 12,24C7.4,24 4,21.1 4,16.8C4,12.9 9,5.8 11,2.6C11.2,2.2 11.6,2 12,2Z" />
 </vector>

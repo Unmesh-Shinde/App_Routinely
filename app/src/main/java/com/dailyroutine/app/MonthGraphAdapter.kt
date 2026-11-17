@@ -53,7 +53,7 @@ class MonthGraphAdapter(private val items: List<MonthData>) : RecyclerView.Adapt
             goalOverlay.setGoalLines(m.goalLines)
 
             m.barValues.forEach { bar ->
-                val barLayoutRes = if (bar.data.isDoubleBar) R.layout.item_step_heart_bar else R.layout.item_calorie_bar
+                val barLayoutRes = if (bar.data.isDoubleBar) R.layout.item_dual_metric_bar else R.layout.item_calorie_bar
                 val barView = LayoutInflater.from(itemView.context).inflate(barLayoutRes, llWeeks, false)
 
                 barView.findViewById<TextView>(R.id.tvBarLabel).text = bar.data.label
@@ -62,8 +62,8 @@ class MonthGraphAdapter(private val items: List<MonthData>) : RecyclerView.Adapt
                 val tvEmpty = barView.findViewById<TextView>(R.id.tvEmptyError)
 
                 if (bar.data.isDoubleBar) {
-                    val tvSteps = barView.findViewById<TextView>(R.id.tvStepValue)
-                    val tvHP = barView.findViewById<TextView>(R.id.tvHeartValue)
+                    val tvSteps = barView.findViewById<TextView>(R.id.tvPrimaryValue)
+                    val tvHP = barView.findViewById<TextView>(R.id.tvSecondaryValue)
                     val barContainer = barView.findViewById<View>(R.id.llBarContainer)
                     
                     if (bar.data.isEmpty) {
@@ -80,8 +80,8 @@ class MonthGraphAdapter(private val items: List<MonthData>) : RecyclerView.Adapt
                         tvHP?.text = bar.data.secondaryValueDisplay ?: "-"
                     }
 
-                    val vStep = barView.findViewById<View>(R.id.viewStepBar)
-                    val vHeart = barView.findViewById<View>(R.id.viewHeartBar)
+                    val vStep = barView.findViewById<View>(R.id.viewPrimaryBar)
+                    val vHeart = barView.findViewById<View>(R.id.viewSecondaryBar)
 
                     tvSteps.setTextColor(bar.data.color)
                     bar.data.secondaryColor?.let { tvHP.setTextColor(it) }

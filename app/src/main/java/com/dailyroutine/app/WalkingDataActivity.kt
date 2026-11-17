@@ -30,9 +30,7 @@ class WalkingDataActivity : AppCompatActivity() {
     private companion object {
         private const val BAR_MAX_HEIGHT_DP = 200
         private const val WEEKLY_STEPS_BAR_SCALE = 20_000
-        private const val WEEKLY_HEART_POINTS_BAR_SCALE = 135
         private const val MONTHLY_STEPS_BAR_SCALE = 140_000
-        private const val MONTHLY_HEART_POINTS_BAR_SCALE = 700
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,9 +58,6 @@ class WalkingDataActivity : AppCompatActivity() {
 
         // Navigation shortcuts to Weekly tab
         findViewById<View>(R.id.tvCurrentSteps).setOnClickListener {
-            findViewById<TabLayout>(R.id.tabLayout).getTabAt(1)?.select()
-        }
-        findViewById<View>(R.id.cardHeartPoints).setOnClickListener {
             findViewById<TabLayout>(R.id.tabLayout).getTabAt(1)?.select()
         }
 
@@ -157,21 +152,10 @@ class WalkingDataActivity : AppCompatActivity() {
         
         findViewById<TextView>(R.id.tvCurrentSteps).text = "%,d".format(steps)
         
-        // 1. Priority: Synced Distance from Google Fit/Health Connect
         val syncedDistance = healthDataManager.getHistoricalDistance(todayStr)
-        val distance = if (syncedDistance > 0.0) syncedDistance else healthDataManager.calculateDistanceKm(steps)
-        
-        findViewById<TextView>(R.id.tvDistance).text = getString(R.string.distance_km_value, distance)
-
-        val duration = healthDataManager.calculateDurationMin(steps)
+        findViewById<TextView>(R.id.tvDistance).text = getString(R.string.distance_km_value, syncedDistance)
+        val duration = healthDataManager.getHistoricalWalkingDuration(todayStr)
         findViewById<TextView>(R.id.tvDuration).text = getString(R.string.duration_min_value, duration)
-
-        val heartPoints = healthDataManager.getHeartPoints()
-        val isConnected = healthDataManager.isConnected()
-
-        android.util.Log.d("WalkingDataActivity", "Today Heart Points: $heartPoints, isConnected: $isConnected")
-
-        findViewById<TextView>(R.id.tvHeartPoints).text = heartPoints.toString()
     }
 
     private fun refreshWeeklyView() {
@@ -190,7 +174,6 @@ class WalkingDataActivity : AppCompatActivity() {
 
             val graphItems = mutableListOf<WeeklyGraphItem>()
             val stepGraphColor = ContextCompat.getColor(this@WalkingDataActivity, R.color.graphSteps)
-            val hpGraphColor = ContextCompat.getColor(this@WalkingDataActivity, R.color.healthCalories)
 
             weekGroups.forEachIndexed { weekIndex, weekDates ->
                 weekDates.forEach { calendar ->
@@ -204,17 +187,9 @@ class WalkingDataActivity : AppCompatActivity() {
                         metrics?.steps?.toInt() ?: healthDataManager.getHistoricalSteps(dateStr).toInt()
                     } else 0
                     
-                    // The weekly heart-points bar must reflect an explicit synced
-                    // value for that date. Do not fall back to legacy cached values:
-                    // they can belong to an earlier sync and create a false bar.
-                    val dailyHP = if (isConnected) {
-                        metrics?.heartPoints?.toInt()?.coerceAtLeast(0) ?: 0
-                    } else 0
-                    
-                    val hasSignal = dailySteps >= 200 || dailyHP > 0
+                    val hasSignal = dailySteps >= 200
 
                     val sHeight = if (hasSignal && dailySteps > 0) (dailySteps.toDouble() * BAR_MAX_HEIGHT_DP.toDouble() / WEEKLY_STEPS_BAR_SCALE).toInt().coerceAtLeast(2) else 0
-                    val hHeight = if (hasSignal && dailyHP > 0) (dailyHP.toDouble() * BAR_MAX_HEIGHT_DP.toDouble() / WEEKLY_HEART_POINTS_BAR_SCALE).toInt().coerceAtLeast(2) else 0
 
                     graphItems.add(WeeklyGraphItem(
                         dayLabel = dayLabelFormatter.format(calendar.time),
@@ -223,12 +198,9 @@ class WalkingDataActivity : AppCompatActivity() {
                         primaryHeightPx = dpToPx(sHeight.coerceAtMost(BAR_MAX_HEIGHT_DP)),
                         primaryColor = stepGraphColor,
                         primaryBackgroundRes = R.drawable.bg_step_bar_rounded,
-                        // Keep the zero label, while hiding the zero-value heart-points bar.
-                        secondaryValue = dailyHP.toString(),
-                        secondaryHeightPx = dpToPx(hHeight.coerceAtMost(BAR_MAX_HEIGHT_DP)),
-                        secondaryColor = hpGraphColor,
-                        secondaryBackgroundRes = R.drawable.bg_calorie_bar,
-                        showSecondaryBar = dailyHP > 0,
+                        secondaryValue = null,
+                        secondaryHeightPx = 0,
+                        showSecondaryBar = false,
                         hasSignal = hasSignal
                     ))
                 }
@@ -290,22 +262,17 @@ class WalkingDataActivity : AppCompatActivity() {
                 if (isCurrentMonth) {
                     HistoryDateOrder.monthWeeksForMonthlyView(calendar, today).forEach { week ->
                         var weekSteps = 0L
-                        var weekHP = 0L
 
-                        if (week.isComplete) {
-                            week.dates.forEach { day ->
-                                val dateKey = dateFormatter.format(day.time)
-                                if (!day.before(oldestSyncedDay) && !day.after(today)) {
-                                    val m = metricsMap[dateKey]
-                                    weekSteps += m?.steps ?: healthDataManager.getHistoricalSteps(dateKey)
-                                    weekHP += (m?.heartPoints?.toLong() ?: healthDataManager.getHistoricalHeartPoints(dateKey).toLong())
-                                }
+                        week.dates.forEach { day ->
+                            val dateKey = dateFormatter.format(day.time)
+                            if (!day.before(oldestSyncedDay) && !day.after(today)) {
+                                val m = metricsMap[dateKey]
+                                weekSteps += m?.steps ?: healthDataManager.getHistoricalSteps(dateKey)
                             }
                         }
 
                         // Standardized 200dp logic
                         val heightSteps = (weekSteps.toDouble() * 200.0 / MONTHLY_STEPS_BAR_SCALE.toDouble()).toInt().coerceIn(if (weekSteps > 0) 2 else 0, 200)
-                        val heightHP = (weekHP.toDouble() * 200.0 / MONTHLY_HEART_POINTS_BAR_SCALE.toDouble()).toInt().coerceIn(if (weekHP > 0) 2 else 0, 200)
 
                         barItems.add(BarItem(BarData(
                             label = "Week $weekIndex",
@@ -314,11 +281,8 @@ class WalkingDataActivity : AppCompatActivity() {
                             heightPx = dpToPx(heightSteps),
                             color = stepGraphColor,
                             backgroundRes = R.drawable.bg_step_bar_rounded,
-                            isDoubleBar = true,
-                            secondaryValueDisplay = if (weekHP > 0) weekHP.toString() else "0",
-                            secondaryHeightPx = dpToPx(heightHP),
-                            secondaryBackgroundRes = R.drawable.bg_calorie_bar,
-                            isEmpty = weekSteps < 200 && weekHP == 0L
+                            isDoubleBar = false,
+                            isEmpty = weekSteps < 200
                         )))
                         weekIndex++
                     }
@@ -333,7 +297,6 @@ class WalkingDataActivity : AppCompatActivity() {
 
                 while (calendar.get(Calendar.MONTH) == currentMonth) {
                     var weekSteps = 0L
-                    var weekHP = 0L
                     val weekStart = calendar.time
 
                     var isWeekOver = false
@@ -342,7 +305,6 @@ class WalkingDataActivity : AppCompatActivity() {
                         if (!calendar.before(oldestSyncedDay) && !calendar.after(today)) {
                             val m = metricsMap[dateKey]
                             weekSteps += m?.steps ?: healthDataManager.getHistoricalSteps(dateKey)
-                            weekHP += (m?.heartPoints?.toLong() ?: healthDataManager.getHistoricalHeartPoints(dateKey).toLong())
                         }
 
                         val isSunday = (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)
@@ -357,11 +319,9 @@ class WalkingDataActivity : AppCompatActivity() {
                     }
 
                     val displayValSteps = if (weekSteps > 0) formatStepText(weekSteps.toInt()) else "-"
-                    val displayValHP = if (weekHP > 0) weekHP.toString() else "-"
 
                     // Standardized 200dp logic
                     val heightSteps = (weekSteps.toDouble() * 200.0 / MONTHLY_STEPS_BAR_SCALE.toDouble()).toInt().coerceIn(if (weekSteps > 0) 2 else 0, 200)
-                    val heightHP = (weekHP.toDouble() * 200.0 / MONTHLY_HEART_POINTS_BAR_SCALE.toDouble()).toInt().coerceIn(if (weekHP > 0) 2 else 0, 200)
 
                     barItems.add(BarItem(BarData(
                         label = "Week $weekIndex",
@@ -370,10 +330,7 @@ class WalkingDataActivity : AppCompatActivity() {
                         heightPx = dpToPx(heightSteps),
                         color = stepGraphColor,
                         backgroundRes = R.drawable.bg_step_bar_rounded,
-                        isDoubleBar = true,
-                        secondaryValueDisplay = displayValHP,
-                        secondaryHeightPx = dpToPx(heightHP),
-                        secondaryBackgroundRes = R.drawable.bg_calorie_bar
+                        isDoubleBar = false
                     )))
                     weekIndex++
                 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Bowl of Rich Orange-Red Vegetable Curry Vessel & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,24 A 14.5,14.5 0 1,0 38.5,24 A 14.5,14.5 0 1,0 9.5,24 Z" android:fillColor="#E65100" />
+    <path android:pathData="M 12,20 C 18,14 30,14 36,18 C 30,22 22,23 12,20 Z" android:fillColor="#FF7043" />
+
+    <!-- Diced Veggies & Butter Dollop -->
+    <path android:pathData="M 15,19 L 19,19 L 19,23 L 15,23 Z M 27,18 L 31,18 L 31,22 L 27,22 Z" android:fillColor="#FFFDF0" android:strokeColor="#D7CCC8" android:strokeWidth="0.3" />
+    <path android:pathData="M 22,17 C 23,15 27,15 28,17 C 29,19 23,20 22,17 Z" android:fillColor="#FFF5C0" />
+    <path android:pathData="M 20,24 Q 22,22 24,25 Z" android:fillColor="#4CAF50" />
+</vector>

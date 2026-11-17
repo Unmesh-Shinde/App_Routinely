@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Muskmelon Slice Ambient Shadow -->
+    <path android:pathData="M 10.5,31.8 C 19.5,36.8 29.5,36.8 38.5,31.8 L 36.5,33.8 C 27.5,38.8 17.5,38.8 12.5,33.8 Z" android:fillColor="#22000000" />
+
+    <!-- Outer Webbed Tan/Green Rind -->
+    <path android:pathData="M 10,31 C 19,36 29,36 38,31 L 36,33 C 27,38 17,38 12,33 Z" android:fillColor="#8D6E63" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 11,31.5 C 20,36.5 28,36.5 37,31.5 L 36,32.5 C 27,37.5 17,37.5 12,32.5 Z" android:fillColor="#7CB342" />
+
+    <!-- Sweet Orange Muskmelon Flesh -->
+    <path android:pathData="M 10,31 C 19,22 29,22 38,31 C 29,35 19,35 10,31 Z" android:fillColor="#FF9800" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 12,30 C 20,23 28,23 36,30 C 28,33 20,33 12,30 Z" android:fillColor="#FFA726" />
+
+    <!-- Central Seed Cavity & Seeds -->
+    <path android:pathData="M 18,27 C 22,25 26,25 30,27 C 26,29 22,29 18,27 Z" android:fillColor="#FFE082" />
+    <path android:pathData="M 20,27 A 0.5,0.5 0 1,0 21,27 A 0.5,0.5 0 1,0 20,27 Z M 24,26.5 A 0.5,0.5 0 1,0 25,26.5 A 0.5,0.5 0 1,0 24,26.5 Z M 27,27 A 0.5,0.5 0 1,0 28,27 A 0.5,0.5 0 1,0 27,27 Z" android:fillColor="#FFFDF0" />
+</vector>

@@ -18,14 +18,12 @@
         android:padding="15dp"
         android:gravity="center_vertical">
 
-        <ImageView
+        <com.dailyroutine.app.MealIconView
             android:id="@+id/tvEmoji"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:background="@drawable/bg_emoji_badge"
-            android:contentDescription="Reminder type"
-            android:padding="13dp"
-            app:srcCompat="@drawable/ic_reminder"/>
+            android:contentDescription="Reminder type"/>
 
         <!-- Text block -->
         <LinearLayout
@@ -71,7 +69,9 @@
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
                     android:textColor="@color/textSecondary"
-                    android:layout_marginStart="8dp"/>
+                    android:layout_marginStart="8dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
             </LinearLayout>
 
             <!-- Hint text for clickable meal card -->

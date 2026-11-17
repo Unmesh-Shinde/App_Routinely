@@ -19,6 +19,7 @@
     <color name="healthSync">#F06292</color>
     <color name="healthReminder">#FFD54F</color>
     <color name="healthProfile">#78909C</color>
+    <color name="reportExportHintText">#FFE08A</color>
     <color name="healthWellness">#69F0AE</color>
     <color name="healthHydration">#4FC3F7</color>
     <color name="textOnReminder">#2D2100</color>

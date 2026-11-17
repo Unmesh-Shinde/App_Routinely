@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 7.5,24 A 16.5,16.5 0 1,0 40.5,24 A 16.5,16.5 0 1,0 7.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Saffron & Spice Masala Basmati Rice Bed Mound -->
+    <path android:pathData="M 8.5,24.8 A 16,16 0 1,0 40.5,24.8 A 16,16 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFF0C8" android:strokeColor="#51382B" android:strokeWidth="0.65" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 10,22 C 16,12 28,12 36,18 C 30,22 22,23 10,22 Z" android:fillColor="#35FFCA28" />
+
+    <!-- Long-Grain Basmati Rice Flakes -->
+    <path android:pathData="M 12.95,12 Q 13.65,11.28 14.9,11.8 Q 15.15,12 14.62,12.35 Q 13.65,12.72 12.95,12 Z M 19,9.95 Q 19.72,10.65 19.2,11.9 Q 19,12.15 18.65,11.62 Q 18.28,10.65 19,9.95 Z M 23.05,11.45 Q 23.95,11.05 24.95,12.35 Q 25.05,12.62 24.42,12.55 Q 23.5,12.3 23.05,11.45 Z M 27.95,12 Q 28.65,11.28 29.9,11.8 Q 30.15,12 29.62,12.35 Q 28.65,12.72 27.95,12 Z" android:fillColor="#FFFCF2" android:strokeColor="#D8B76F" android:strokeWidth="0.26" />
+
+    <!-- Caramelized Fried Onions (Birista) Threads -->
+    <path android:pathData="M 11,28 Q 13,27 15,29 M 22,32 Q 24,31 26,33 M 28,22 Q 30,21 32,23" android:fillColor="#00000000" android:strokeColor="#6D3C1B" android:strokeWidth="0.5" android:strokeLineCap="round" />
+
+    <!-- Detailed Roasted Chicken Leg/Drumstick with Sear Marks & Ambient Drop Shadow -->
+    <path android:pathData="M 9.5,19.8 Q 9.5,15.8 13.5,15.3 Q 17.5,14.8 19,18.3 Q 20,21.3 17,23.8 Q 13.5,25.8 10.5,23.3 Z" android:fillColor="#28000000" />
+    <path android:pathData="M 9,19 Q 9,15 13,14.5 Q 17,14 18.5,17.5 Q 19.5,20.5 16.5,23 Q 13,25 10,22.5 Q 8.8,21 9,19 Z" android:fillColor="#A94B2E" android:strokeColor="#51382B" android:strokeWidth="0.55" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Roasted Sear Lines & Meat Shading -->
+    <path android:pathData="M 11,16.5 L 14,18 M 12.5,18.5 L 15.5,20 M 14,20.5 L 17,21.5" android:fillColor="#00000000" android:strokeColor="#5C1F0E" android:strokeWidth="0.5" android:strokeLineCap="round" />
+    <path android:pathData="M 11,16 C 13,15 16,16 17,18 C 15,18 12,18 11,16 Z" android:fillColor="#50FFFFFF" />
+    <!-- Bone Joint -->
+    <path android:pathData="M 15.8,21.8 L 19.8,25.8" android:fillColor="#FFF7E6" android:strokeColor="#51382B" android:strokeWidth="1.25" android:strokeLineCap="round" />
+    <path android:pathData="M 19.1,26.2 A 1.1,1.1 0 1,0 21.3,26.2 A 1.1,1.1 0 1,0 19.1,26.2 Z" android:fillColor="#FFF7E6" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+
+    <!-- Halved Boiled Egg with Golden Yolk & Specular Glint -->
+    <path android:pathData="M 28.8,17.6 C 26.7,15.3 27.1,11.3 29.7,9.6 C 32.6,7.9 36.1,9.5 37,12.3 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 28.8,16.8 C 26.7,14.5 27.1,10.5 29.7,8.8 C 32.6,7.1 36.1,8.7 37,11.5 C 38,14.7 35.8,18 32.9,18.8 C 30.8,19.4 28.6,18.1 28,16.1 C 27.6,14.7 28.7,13.8 29.9,14.4 C 31,15 30.9,16.1 30.1,16.8 Z" android:fillColor="#FFFAEF" android:strokeColor="#51382B" android:strokeWidth="0.68" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 27.95,26.4 A 1.55,1.55 0 1,0 31.05,26.4 A 1.55,1.55 0 1,0 27.95,26.4 Z" android:fillColor="#F3C54D" android:strokeColor="#D58C2A" android:strokeWidth="0.35" />
+    <path android:pathData="M 29,25.8 A 0.6,0.6 0 1,0 30.2,25.8 A 0.6,0.6 0 1,0 29,25.8 Z" android:fillColor="#80FFFFFF" />
+
+    <!-- Fresh Mint Sprig -->
+    <path android:pathData="M 19,33.3 Q 17.2,32.1 16.6,30.8 Q 17.9,30.3 17.8,28.9 Q 18.8,28.9 19,30.1 Q 19.4,28.7 20.4,29 Q 20.1,30.3 21.3,30.8 Q 20.7,32.2 19,33.3 Z" android:fillColor="#43864A" android:strokeColor="#2E6323" android:strokeWidth="0.35" android:strokeLineCap="round" />
+    <path android:pathData="M 19,32.7 L 19,29.5" android:fillColor="#00000000" android:strokeColor="#A5C870" android:strokeWidth="0.32" />
+</vector>

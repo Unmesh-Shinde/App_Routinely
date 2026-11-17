@@ -1,8 +1,6 @@
 package com.dailyroutine.app
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.View
 import android.widget.*
 import android.widget.FrameLayout
@@ -10,7 +8,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.PermissionController
+import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.lifecycle.lifecycleScope
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
@@ -23,8 +27,12 @@ import java.util.*
 class SleepTrackingActivity : AppCompatActivity() {
 
     private lateinit var healthDataManager: HealthDataManager
+    private lateinit var healthConnectManager: IHealthConnectManager
     private lateinit var weeklyAdapter: WeeklyGraphAdapter
     private var isConnected = false
+    private val requestSleepPermissionLauncher = registerForActivityResult(
+        PermissionController.createRequestPermissionResultContract()
+    ) { lifecycleScope.launch { completeHealthConnectSetup() } }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -40,6 +48,7 @@ class SleepTrackingActivity : AppCompatActivity() {
         toolbar.setNavigationOnClickListener { finish() }
 
         healthDataManager = HealthDataManager(this)
+        healthConnectManager = HealthConnectManager(this)
         isConnected = healthDataManager.isConnected()
 
         if (!isConnected) {
@@ -55,41 +64,57 @@ class SleepTrackingActivity : AppCompatActivity() {
         findViewById<View>(R.id.tabLayoutSleep).visibility = View.GONE
 
         val container = findViewById<LinearLayout>(R.id.llAppList)
-        val tvStatus = findViewById<TextView>(R.id.tvFoundApps)
+        findViewById<TextView>(R.id.tvFoundApps).text =
+            "Routinely reads sleep data through Android Health Connect."
+        container.removeAllViews()
+        container.addView(Button(this, null, android.R.attr.buttonStyleSmall).apply {
+            text = "Connect Health Connect"
+            setOnClickListener { requestHealthConnectSleepAccess() }
+        })
+    }
 
-        val apps = HealthAppScanner.getInstalledFitnessApps(this)
-        
-        if (apps.isEmpty()) {
-            tvStatus.text = "No health apps detected. Please install Google Fit, Samsung Health, or a similar app to sync data."
-        } else {
-            tvStatus.text = "Select your preferred health source to sync data:"
-            apps.forEach { app ->
-                val btn = Button(this, null, android.R.attr.buttonStyleSmall).apply {
-                    text = "Connect ${app.name}"
-                    setOnClickListener { startSync(app.name) }
-                }
-                container.addView(btn)
+    private fun requestHealthConnectSleepAccess() {
+        if (HealthConnectClient.getSdkStatus(this) != HealthConnectClient.SDK_AVAILABLE) {
+            Toast.makeText(this, "Health Connect is not available on this device.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            val granted = healthConnectManager.getGrantedPermissionsOrNull()
+            if (granted == null) {
+                Toast.makeText(this@SleepTrackingActivity, "Could not check Health Connect permissions. Please try again.", Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            val sleepPermission = HealthPermission.getReadPermission(SleepSessionRecord::class)
+            if (sleepPermission in granted) {
+                completeHealthConnectSetup()
+            } else {
+                requestSleepPermissionLauncher.launch(setOf(sleepPermission))
             }
         }
     }
 
-    private fun startSync(appName: String) {
-        findViewById<LinearLayout>(R.id.llAppList).visibility = View.GONE
-        findViewById<ProgressBar>(R.id.pbSyncing).visibility = View.VISIBLE
-        findViewById<TextView>(R.id.tvSyncing).apply {
-            visibility = View.VISIBLE
-            text = "Syncing with $appName..."
+    private suspend fun completeHealthConnectSetup() {
+        val granted = healthConnectManager.getGrantedPermissionsOrNull()
+        if (granted == null) {
+            Toast.makeText(this, "Could not check Health Connect permissions. Please try again.", Toast.LENGTH_LONG).show()
+            return
+        }
+        val sleepPermission = HealthPermission.getReadPermission(SleepSessionRecord::class)
+        if (sleepPermission !in granted) {
+            Toast.makeText(this, "Allow Sleep access in Health Connect to sync sleep data.", Toast.LENGTH_LONG).show()
+            return
         }
 
-        healthDataManager.setConnectedAppName(appName)
         healthDataManager.setConnected(true)
-
-        // Simulate a brief connection wait then show analytics
-        Handler(Looper.getMainLooper()).postDelayed({
-            isConnected = true
-            showAnalytics()
-            Toast.makeText(this, "Successfully connected to $appName! 🌙", Toast.LENGTH_SHORT).show()
-        }, 1500)
+        isConnected = true
+        showAnalytics()
+        val request = OneTimeWorkRequestBuilder<HealthSyncWorker>()
+            .setInputData(androidx.work.workDataOf(HealthSyncWorker.KEY_SYNC_MODE to HealthSyncWorker.SYNC_MODE_SLEEP))
+            .addTag(HealthSyncWorker.TAG_SLEEP_SYNC)
+            .build()
+        WorkManager.getInstance(applicationContext).enqueue(request)
+        Toast.makeText(this, "Connected to Health Connect. Sleep sync started.", Toast.LENGTH_SHORT).show()
     }
 
     private fun showAnalytics() {

@@ -18,7 +18,7 @@
         android:layout_marginBottom="4dp">
 
         <TextView
-            android:id="@+id/tvStepValue"
+            android:id="@+id/tvPrimaryValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="11sp"
@@ -29,7 +29,7 @@
             tools:text="10.5k"/>
 
         <TextView
-            android:id="@+id/tvHeartValue"
+            android:id="@+id/tvSecondaryValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="11sp"
@@ -68,14 +68,14 @@
             android:layout_gravity="center_horizontal">
 
             <View
-                android:id="@+id/viewStepBar"
+                android:id="@+id/viewPrimaryBar"
                 android:layout_width="15dp"
                 android:layout_height="0dp"
                 android:layout_marginEnd="2dp"
                 android:background="@drawable/bg_step_bar" />
 
             <LinearLayout
-                android:id="@+id/viewHeartBar"
+                android:id="@+id/viewSecondaryBar"
                 android:layout_width="15dp"
                 android:layout_height="0dp"
                 android:orientation="vertical"

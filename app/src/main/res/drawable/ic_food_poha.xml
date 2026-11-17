@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 7.5,24 A 16.5,16.5 0 1,0 40.5,24 A 16.5,16.5 0 1,0 7.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Poha Bed Mound Base & Shading -->
+    <path android:pathData="M 8,24.5 A 16,16 0 1,0 40,24.5 A 16,16 0 1,0 8,24.5 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 7.5,24 A 16.5,16.5 0 1,0 40.5,24 A 16.5,16.5 0 1,0 7.5,24 Z" android:fillColor="#F3C94F" android:strokeColor="#51382B" android:strokeWidth="0.7" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 10,22 C 12,12 28,10 36,18 C 30,22 22,23 10,22 Z" android:fillColor="#40FFF5C0" />
+
+    <!-- Organic Flattened Rice Flakes (Turmeric Flakes with Light Tops) -->
+    <path android:pathData="M 24.7,24 L 25.2,23.35 L 26.3,23.6 L 26.1,24.4 Z M 21.2,25.7 L 21.7,25.1 L 22.8,25.3 L 22.6,26.1 Z M 23.4,20.6 L 23.9,19.9 L 25.0,20.2 L 24.8,21.0 Z M 25.6,27.1 L 26.1,26.5 L 27.2,26.7 L 27.0,27.5 Z M 18.7,23.2 L 19.2,22.5 L 20.3,22.8 L 20.1,23.6 Z M 27.4,21.3 L 27.9,20.6 L 29.0,20.9 L 28.8,21.7 Z M 21.7,29.2 L 22.2,28.6 L 23.3,28.8 L 23.1,29.6 Z M 20.5,18.8 L 21.0,18.1 L 22.1,18.4 L 21.9,19.2 Z" android:fillColor="#FFE8A0" android:strokeColor="#B88B2A" android:strokeWidth="0.25" />
+
+    <!-- Sev Crisp Noodle Strands -->
+    <path android:pathData="M 13,23 Q 14,22 15,23 M 24,29 Q 25,28 26,29 M 32,14 Q 33,13 34,14 M 18,31 Q 19,30 20,31 M 28,24 Q 29,23 30,24" android:fillColor="#00000000" android:strokeColor="#FFE082" android:strokeWidth="0.6" android:strokeLineCap="round" />
+
+    <!-- Diced Red Onion Bits & Green Chili Rings -->
+    <path android:pathData="M 14,21 L 15,20.5 L 15.5,21.5 Z M 23,26 L 24,25.5 L 24.5,26.5 Z M 31,23 L 32,22.5 L 32.5,23.5 Z" android:fillColor="#E1BEE7" android:strokeColor="#8E24AA" android:strokeWidth="0.25" />
+    <path android:pathData="M 21,17 A 0.8,0.8 0 1,0 22.6,17 A 0.8,0.8 0 1,0 21,17 Z M 28,27 A 0.8,0.8 0 1,0 29.6,27 A 0.8,0.8 0 1,0 28,27 Z" android:fillColor="#4CAF50" android:strokeColor="#1B5E20" android:strokeWidth="0.25" />
+
+    <!-- Roasted Peanuts with Skin Seam Lines & Shadow -->
+    <path android:pathData="M 13.5,17 Q 14.5,16.3 15.5,17 Q 15.8,17.9 14.5,17.95 Q 13.2,17.9 13.5,17 Z M 22.5,13 Q 23.5,12.3 24.5,13 Q 24.8,13.9 23.5,13.95 Q 22.2,13.9 22.5,13 Z M 31.5,18 Q 32.5,17.3 33.5,18 Q 33.8,18.9 32.5,18.95 Q 31.2,18.9 31.5,18 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 13,16.6 Q 14,15.9 15,16.6 Q 15.3,17.5 14,17.55 Q 12.7,17.5 13,16.6 Z" android:fillColor="#C88C4D" android:strokeColor="#51382B" android:strokeWidth="0.3" />
+    <path android:pathData="M 13.2,17 L 14.8,17.1" android:fillColor="#00000000" android:strokeColor="#7A3E1D" android:strokeWidth="0.3" />
+    <path android:pathData="M 22,12.6 Q 23,11.9 24,12.6 Q 24.3,13.5 23,13.55 Q 21.7,13.5 22,12.6 Z" android:fillColor="#C88C4D" android:strokeColor="#51382B" android:strokeWidth="0.3" />
+    <path android:pathData="M 22.2,13 L 23.8,13.1" android:fillColor="#00000000" android:strokeColor="#7A3E1D" android:strokeWidth="0.3" />
+    <path android:pathData="M 31,17.6 Q 32,16.9 33,17.6 Q 33.3,18.5 32,18.55 Q 30.7,18.5 31,17.6 Z" android:fillColor="#C88C4D" android:strokeColor="#51382B" android:strokeWidth="0.3" />
+
+    <!-- Mustard Seeds (Rai) -->
+    <path android:pathData="M 18.72,18 A 0.28,0.28 0 1,0 19.28,18 A 0.28,0.28 0 1,0 18.72,18 Z M 26.72,16 A 0.28,0.28 0 1,0 27.28,16 A 0.28,0.28 0 1,0 26.72,16 Z M 33.72,26 A 0.28,0.28 0 1,0 34.28,26 A 0.28,0.28 0 1,0 33.72,26 Z" android:fillColor="#633929" />
+
+    <!-- Fresh Curry / Cilantro Leaves -->
+    <path android:pathData="M 24,22 L 23.025,20.875 L 23.625,20.35 L 24.15,21.1 L 25.35,20.65 L 24.9,21.775 Z" android:fillColor="#43864A" android:strokeColor="#2E6323" android:strokeWidth="0.4" />
+
+    <!-- Juicy Lemon Slice Wedge on Side -->
+    <path android:pathData="M 8.5,12.5 Q 11.5,8.5 15.5,10.5 L 13.5,15.5 Q 10.5,16.5 8.5,12.5 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,12 Q 11,8 15,10 L 13,15 Q 10,16 8,12 Z" android:fillColor="#F8D84F" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <path android:pathData="M 10,12 L 13,10.7 M 10.7,14 L 13.5,12.8" android:fillColor="#00000000" android:strokeColor="#FFF3AA" android:strokeWidth="0.5" />
+    <path android:pathData="M 11,10.5 Q 13.5,9.8 14.5,11" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="0.6" />
+</vector>

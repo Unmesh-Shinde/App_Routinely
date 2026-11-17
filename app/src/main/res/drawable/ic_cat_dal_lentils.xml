@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Bowl of Yellow Dal Tadka Vessel & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,24 A 14.5,14.5 0 1,0 38.5,24 A 14.5,14.5 0 1,0 9.5,24 Z" android:fillColor="#FFD54F" />
+    <path android:pathData="M 12,20 C 18,14 30,14 36,18 C 30,22 22,23 12,20 Z" android:fillColor="#FFE082" />
+
+    <!-- Red Chili Tadka Drizzle & Whole Dried Red Chili -->
+    <path android:pathData="M 16,22 Q 22,20 28,24" android:fillColor="#00000000" android:strokeColor="#D32F2F" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 21,18 Q 25,16 27,20 Z" android:fillColor="#B71C1C" />
+
+    <!-- Mustard Seeds & Curry Leaves -->
+    <path android:pathData="M 18,20 A 0.8,0.8 0 1,0 19.6,20 A 0.8,0.8 0 1,0 18,20 Z M 28,21 A 0.8,0.8 0 1,0 29.6,21 A 0.8,0.8 0 1,0 28,21 Z" android:fillColor="#633929" />
+    <path android:pathData="M 21,23 Q 23,21 25,24 Z" android:fillColor="#4CAF50" />
+</vector>

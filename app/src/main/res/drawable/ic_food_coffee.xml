@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Saucer Plate Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Saucer Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Coffee Mug Ambient Drop Shadow -->
+    <path android:pathData="M 12.5,22 C 12.5,12 33.5,12 33.5,22 C 33.5,33 12.5,33 12.5,22 Z" android:fillColor="#22000000" />
+
+    <!-- Ceramic Coffee Cup Rim & Handle -->
+    <path android:pathData="M 32,20 C 37,20 37,28 32,28" android:fillColor="#00000000" android:strokeColor="#51382B" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 12,22 C 12,11.5 33,11.5 33,22 C 33,32 12,32 12,22 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+
+    <!-- Dark Espresso Coffee Liquid Base -->
+    <path android:pathData="M 13.5,22 C 13.5,13 31.5,13 31.5,22 C 31.5,30.5 13.5,30.5 13.5,22 Z" android:fillColor="#3E2723" />
+    <path android:pathData="M 14,22 C 14,14 31,14 31,22 C 31,29.5 14,29.5 14,22 Z" android:fillColor="#4E342E" />
+
+    <!-- Creamy Latte Art Heart Foam -->
+    <path android:pathData="M 22.5,20 C 21,17 17,18.5 19.5,22 L 22.5,25 L 25.5,22 C 28,18.5 24,17 22.5,20 Z" android:fillColor="#FFFDF0" android:strokeColor="#D7CCC8" android:strokeWidth="0.3" />
+
+    <!-- Swirling Hot Steam Vapors -->
+    <path android:pathData="M 18,10 Q 16,7 18,4 M 22,9 Q 24,6 22,3 M 26,10 Q 28,7 26,4" android:fillColor="#00000000" android:strokeColor="#60FFFFFF" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Roasted Coffee Beans on Saucer -->
+    <path android:pathData="M 10,33 A 1.8,2.8 30 1 0 13.5,35 A 1.8,2.8 30 1 0 10,33 Z" android:fillColor="#3E2723" android:strokeColor="#2C160B" android:strokeWidth="0.3" />
+    <path android:pathData="M 11,33 Q 12,34 13,35" android:fillColor="#00000000" android:strokeColor="#1A0C05" android:strokeWidth="0.3" />
+</vector>

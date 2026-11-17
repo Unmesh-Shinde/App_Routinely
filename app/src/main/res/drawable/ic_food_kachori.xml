@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Spherical Crispy Khasta Kachori Ambient Drop Shadow -->
+    <path android:pathData="M 12.5,24.8 A 12.5,12.5 0 1,0 37.5,24.8 A 12.5,12.5 0 1,0 12.5,24.8 Z" android:fillColor="#22000000" />
+
+    <!-- Golden Puffed Flaky Kachori Shell -->
+    <path android:pathData="M 12,24 A 12.5,12.5 0 1,0 37,24 A 12.5,12.5 0 1,0 12,24 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.85" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 13.5,22 A 11,11 0 1,0 35.5,22 A 11,11 0 1,0 13.5,22 Z" android:fillColor="#FFC107" />
+    <path android:pathData="M 15,18 C 18,14 28,14 31,18" android:fillColor="#00000000" android:strokeColor="#FFE082" android:strokeWidth="1" android:strokeLineCap="round" />
+
+    <!-- Cracked Crater Peak Peeking Spicy Lentil Filling -->
+    <path android:pathData="M 21,21 C 21,18 27,18 27,21 C 27,24 21,24 21,21 Z" android:fillColor="#7A3E1D" android:strokeColor="#51382B" android:strokeWidth="0.4" />
+
+    <!-- Tamarind Red Chutney & Mint Green Chutney Drizzles -->
+    <path android:pathData="M 17,21 Q 21,20 23,24" android:fillColor="#00000000" android:strokeColor="#B71C1C" android:strokeWidth="0.9" android:strokeLineCap="round" />
+    <path android:pathData="M 25,20 Q 27,22 29,21" android:fillColor="#00000000" android:strokeColor="#388E3C" android:strokeWidth="0.9" android:strokeLineCap="round" />
+</vector>

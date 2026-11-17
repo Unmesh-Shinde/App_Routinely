@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Creamy Kheer Pudding Vessel & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,24 A 14.5,14.5 0 1,0 38.5,24 A 14.5,14.5 0 1,0 9.5,24 Z" android:fillColor="#FFF8E1" />
+
+    <!-- Rice Grain / Vermicelli Strands in Milk -->
+    <path android:pathData="M 12.95,14 Q 13.65,13.28 14.9,13.8 Q 15.15,14 14.62,14.35 Q 13.65,14.72 12.95,14 Z M 19,10.95 Q 19.72,11.65 19.2,12.9 Q 19,13.15 18.65,12.62 Q 18.28,11.65 19,10.95 Z M 23.05,13.45 Q 23.95,13.05 24.95,14.35 Q 25.05,14.62 24.42,14.55 Q 23.5,14.3 23.05,13.45 Z" android:fillColor="#FFFDF0" android:strokeColor="#D7CCC8" android:strokeWidth="0.26" />
+
+    <!-- Saffron Threads, Almond Flakes & Pistachios -->
+    <path android:pathData="M 21,18 Q 23,16.5 24,18 M 26,18 Q 28,16.5 29,18" android:fillColor="#00000000" android:strokeColor="#D50000" android:strokeWidth="0.5" android:strokeLineCap="round" />
+    <path android:pathData="M 16,21 Q 19,19 22,22" android:fillColor="#00000000" android:strokeColor="#C88C4D" android:strokeWidth="0.8" android:strokeLineCap="round" />
+    <path android:pathData="M 26,22 A 1,1 0 1,0 28,22 A 1,1 0 1,0 26,22 Z M 20,27 A 1,1 0 1,0 22,27 A 1,1 0 1,0 20,27 Z" android:fillColor="#7CB342" />
+
+    <!-- Glossy Surface Reflection -->
+    <path android:pathData="M 12,18 C 18,12 28,12 34,16" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>

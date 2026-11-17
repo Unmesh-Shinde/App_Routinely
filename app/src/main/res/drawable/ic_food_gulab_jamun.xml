@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Bowl Base & Outer Outline -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Warm Sugar Syrup Bowl Base & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFB300" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 10,22 C 16,12 28,12 36,18 C 30,22 22,23 10,22 Z" android:fillColor="#FFE082" />
+    <path android:pathData="M 12,18 C 18,12 28,12 34,16" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+
+    <!-- 3D Spherical Deep-Fried Gulab Jamun Balls -->
+    <!-- Ball 1 (Top Left) -->
+    <path android:pathData="M 12.5,18.8 A 5.5,5.5 0 1,0 23.5,18.8 A 5.5,5.5 0 1,0 12.5,18.8 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 12,18 A 5.5,5.5 0 1,0 23,18 A 5.5,5.5 0 1,0 12,18 Z" android:fillColor="#4E342E" android:strokeColor="#2C160B" android:strokeWidth="0.5" />
+    <path android:pathData="M 13.5,17 C 15.5,14.5 19.5,14.5 21,17" android:fillColor="#00000000" android:strokeColor="#8D6E63" android:strokeWidth="1" android:strokeLineCap="round" />
+    <path android:pathData="M 15,16 A 1,1 0 1,0 17,16 A 1,1 0 1,0 15,16 Z" android:fillColor="#80FFFFFF" />
+
+    <!-- Ball 2 (Top Right) -->
+    <path android:pathData="M 23.5,19.8 A 5.5,5.5 0 1,0 34.5,19.8 A 5.5,5.5 0 1,0 23.5,19.8 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 23,19 A 5.5,5.5 0 1,0 34,19 A 5.5,5.5 0 1,0 23,19 Z" android:fillColor="#4E342E" android:strokeColor="#2C160B" android:strokeWidth="0.5" />
+    <path android:pathData="M 24.5,18 C 26.5,15.5 30.5,15.5 32,18" android:fillColor="#00000000" android:strokeColor="#8D6E63" android:strokeWidth="1" android:strokeLineCap="round" />
+    <path android:pathData="M 26,17 A 1,1 0 1,0 28,17 A 1,1 0 1,0 26,17 Z" android:fillColor="#80FFFFFF" />
+
+    <!-- Ball 3 (Bottom Center) -->
+    <path android:pathData="M 18.5,28.8 A 6,6 0 1,0 30.5,28.8 A 6,6 0 1,0 18.5,28.8 Z" android:fillColor="#20000000" />
+    <path android:pathData="M 18,28 A 6,6 0 1,0 30,28 A 6,6 0 1,0 18,28 Z" android:fillColor="#3E2723" android:strokeColor="#2C160B" android:strokeWidth="0.5" />
+    <path android:pathData="M 19.5,27 C 21.5,24.5 25.5,24.5 27.5,27" android:fillColor="#00000000" android:strokeColor="#8D6E63" android:strokeWidth="1" android:strokeLineCap="round" />
+    <path android:pathData="M 21,26 A 1,1 0 1,0 23,26 A 1,1 0 1,0 21,26 Z" android:fillColor="#80FFFFFF" />
+
+    <!-- Pistachio Flakes & Rose Petal Garnish -->
+    <path android:pathData="M 17,19 A 0.8,0.8 0 1,0 18.6,19 A 0.8,0.8 0 1,0 17,19 Z M 28,21 A 0.8,0.8 0 1,0 29.6,21 A 0.8,0.8 0 1,0 28,21 Z M 23,30 A 0.8,0.8 0 1,0 24.6,30 A 0.8,0.8 0 1,0 23,30 Z" android:fillColor="#7CB342" />
+    <path android:pathData="M 20,29 Q 22,27 24,28.5 Z" android:fillColor="#E91E63" />
+</vector>

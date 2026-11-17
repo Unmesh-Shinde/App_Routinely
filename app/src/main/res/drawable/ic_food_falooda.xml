@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Coaster Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Coaster Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Glass Cup Ambient Shadow -->
+    <path android:pathData="M 16.5,13.8 L 31.5,13.8 L 29.5,38.8 L 18.5,38.8 Z" android:fillColor="#22000000" />
+
+    <!-- Glass Body Filled with Rose Falooda Layers -->
+    <path android:pathData="M 16,13 L 32,13 L 29,38 L 19,38 Z" android:fillColor="#E91E63" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 17,15 L 31,15 L 29.5,28 L 18.5,28 Z" android:fillColor="#FFFDF0" />
+
+    <!-- Falooda Vermicelli Strands & Sabja Seeds -->
+    <path android:pathData="M 19,22 Q 22,20 25,24 M 21,26 Q 24,24 27,27" android:fillColor="#00000000" android:strokeColor="#FFE082" android:strokeWidth="0.8" android:strokeLineCap="round" />
+    <path android:pathData="M 20,29 A 0.8,0.8 0 1,0 21.6,29 A 0.8,0.8 0 1,0 20,29 Z M 26,31 A 0.8,0.8 0 1,0 27.6,31 A 0.8,0.8 0 1,0 26,31 Z" android:fillColor="#212121" />
+
+    <!-- Ice Cream Scoop on Top with Cherry & Straw -->
+    <path android:pathData="M 19,13 C 19,9 29,9 29,13 Z" android:fillColor="#FFF8E1" android:strokeColor="#51382B" android:strokeWidth="0.6" />
+    <path android:pathData="M 23,8 A 2,2 0 1,0 27,8 A 2,2 0 1,0 23,8 Z" android:fillColor="#D50000" />
+    <path android:pathData="M 28,6 L 22,38" android:fillColor="#00000000" android:strokeColor="#29B6F6" android:strokeWidth="1.5" android:strokeLineCap="round" />
+
+    <!-- Glass Specular Gloss Highlight -->
+    <path android:pathData="M 18,16 L 19,36" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>

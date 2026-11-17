@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Coaster Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Coaster Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Clay Matka Glass Ambient Shadow -->
+    <path android:pathData="M 15.5,15.8 C 12,24 12,32 18.5,38.8 L 29.5,38.8 C 36,32 36,24 32.5,15.8 Z" android:fillColor="#22000000" />
+
+    <!-- Terracotta Clay Matka Cup -->
+    <path android:pathData="M 15,15 C 11.5,23.5 11.5,31.5 18,38 L 30,38 C 36.5,31.5 36.5,23.5 33,15 Z" android:fillColor="#A1887F" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 16.5,17 C 13.5,24.5 13.5,30.5 19,36.5 L 29,36.5 C 34.5,30.5 34.5,24.5 31.5,17 Z" android:fillColor="#8D6E63" />
+
+    <!-- Rich Creamy Lassi Liquid & Thick Malai Top -->
+    <path android:pathData="M 15,15 C 18,13 30,13 33,15 C 31,17.5 17,17.5 15,15 Z" android:fillColor="#FFFDF0" />
+    <path android:pathData="M 17,15 C 20,13.5 28,13.5 31,15 C 29,16.5 19,16.5 17,15 Z" android:fillColor="#FFF59D" />
+
+    <!-- Saffron Threads (Kesar) & Chopped Pistachios -->
+    <path android:pathData="M 21,15 Q 23,13.5 24,15 M 26,15 Q 28,13.5 29,15" android:fillColor="#00000000" android:strokeColor="#D50000" android:strokeWidth="0.5" android:strokeLineCap="round" />
+    <path android:pathData="M 19,15 A 0.8,0.8 0 1,0 20.6,15 A 0.8,0.8 0 1,0 19,15 Z M 25,15 A 0.8,0.8 0 1,0 26.6,15 A 0.8,0.8 0 1,0 25,15 Z" android:fillColor="#7CB342" />
+
+    <!-- Matka Specular Highlight -->
+    <path android:pathData="M 17,18 C 15,24 15,30 19,35" android:fillColor="#00000000" android:strokeColor="#40FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>

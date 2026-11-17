@@ -24,6 +24,7 @@ object SyncLogManager {
 
     private fun getPrefs(context: Context) = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    @Synchronized
     fun addLog(context: Context, source: String, message: String, isSuccess: Boolean) {
         checkAndResetIfNeeded(context)
 
@@ -37,7 +38,9 @@ object SyncLogManager {
         getPrefs(context).edit().putString(KEY_LOGS, json).apply()
     }
 
-    fun getLogs(context: Context): List<SyncEntry> {
+    @Synchronized
+    fun getLogs(context: Context, now: Calendar = Calendar.getInstance()): List<SyncEntry> {
+        checkAndResetIfNeeded(context, now)
         val json = getPrefs(context).getString(KEY_LOGS, null) ?: return emptyList()
         val type = object : TypeToken<List<SyncEntry>>() {}.type
         return try {
@@ -47,9 +50,9 @@ object SyncLogManager {
         }
     }
 
-    private fun checkAndResetIfNeeded(context: Context) {
-        val now = Calendar.getInstance()
-        val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(now.time)
+    private fun checkAndResetIfNeeded(context: Context, now: Calendar = Calendar.getInstance()) {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US).apply { timeZone = now.timeZone }
+        val todayStr = dateFormat.format(now.time)
         val lastReset = getPrefs(context).getString(KEY_LAST_RESET_DATE, "")
         
         // Logic: If new day AND it's at or after 6:00 AM, clear old logs.

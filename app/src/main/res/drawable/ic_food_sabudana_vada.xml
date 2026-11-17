@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Sabudana Vada Patties Ambient Shadow -->
+    <path android:pathData="M 9.5,20.8 A 7.5,7.5 0 1,0 24.5,20.8 A 7.5,7.5 0 1,0 9.5,20.8 Z" android:fillColor="#22000000" />
+
+    <!-- Sabudana Vada Patty 1 (Left) -->
+    <path android:pathData="M 9,20 A 7.5,7.5 0 1,0 24,20 A 7.5,7.5 0 1,0 9,20 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 10.5,20 A 6,6 0 1,0 22.5,20 A 6,6 0 1,0 10.5,20 Z" android:fillColor="#FFC107" />
+    <!-- White Sabudana Pearls on Surface -->
+    <path android:pathData="M 12,18 A 1,1 0 1,0 14,18 A 1,1 0 1,0 12,18 Z M 18,17 A 1,1 0 1,0 20,17 A 1,1 0 1,0 18,17 Z M 14,22 A 1,1 0 1,0 16,22 A 1,1 0 1,0 14,22 Z M 19,21 A 1,1 0 1,0 21,21 A 1,1 0 1,0 19,21 Z" android:fillColor="#FFFFFF" />
+
+    <!-- Sabudana Vada Patty 2 (Right Overlapping) -->
+    <path android:pathData="M 19.5,28.8 A 7.5,7.5 0 1,0 34.5,28.8 A 7.5,7.5 0 1,0 19.5,28.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 19,28 A 7.5,7.5 0 1,0 34,28 A 7.5,7.5 0 1,0 19,28 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 20.5,28 A 6,6 0 1,0 32.5,28 A 6,6 0 1,0 20.5,28 Z" android:fillColor="#FFC107" />
+    <path android:pathData="M 22,26 A 1,1 0 1,0 24,26 A 1,1 0 1,0 22,26 Z M 28,25 A 1,1 0 1,0 30,25 A 1,1 0 1,0 28,25 Z M 24,30 A 1,1 0 1,0 26,30 A 1,1 0 1,0 24,30 Z M 29,29 A 1,1 0 1,0 31,29 A 1,1 0 1,0 29,29 Z" android:fillColor="#FFFFFF" />
+
+    <!-- Side Peanut Chutney Dip Bowl -->
+    <path android:pathData="M 28.5,16.8 A 4.5,4.5 0 1,0 37.5,16.8 A 4.5,4.5 0 1,0 28.5,16.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 28,16 A 4.5,4.5 0 1,0 37,16 A 4.5,4.5 0 1,0 28,16 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.6" />
+    <path android:pathData="M 29,16 A 3.5,3.5 0 1,0 36,16 A 3.5,3.5 0 1,0 29,16 Z" android:fillColor="#FFF8E1" />
+</vector>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Halved Boiled Egg 1 (Left) Ambient Shadow -->
+    <path android:pathData="M 8.5,20.8 C 8.5,12 24.5,12 24.5,20.8 C 24.5,30 8.5,30 8.5,20.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,20 C 8,11 24,11 24,20 C 24,29 8,29 8,20 Z" android:fillColor="#FFFAEF" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 9.5,20 C 9.5,12.5 22.5,12.5 22.5,20 C 22.5,27.5 9.5,27.5 9.5,20 Z" android:fillColor="#FFFFFF" />
+    <!-- Golden Yolk -->
+    <path android:pathData="M 12,20 A 4,4 0 1,0 20,20 A 4,4 0 1,0 12,20 Z" android:fillColor="#FFC107" android:strokeColor="#FFA000" android:strokeWidth="0.3" />
+    <path android:pathData="M 13.5,18.5 A 1,1 0 1,0 15.5,18.5 A 1,1 0 1,0 13.5,18.5 Z" android:fillColor="#80FFFFFF" />
+
+    <!-- Halved Boiled Egg 2 (Right Overlapping) -->
+    <path android:pathData="M 23.5,27.8 C 23.5,19 39.5,19 39.5,27.8 C 39.5,37 23.5,37 23.5,27.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 23,27 C 23,18 39,18 39,27 C 39,36 23,36 23,27 Z" android:fillColor="#FFFAEF" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 24.5,27 C 24.5,19.5 37.5,19.5 37.5,27 C 37.5,34.5 24.5,34.5 24.5,27 Z" android:fillColor="#FFFFFF" />
+    <!-- Golden Yolk -->
+    <path android:pathData="M 27,27 A 4,4 0 1,0 35,27 A 4,4 0 1,0 27,27 Z" android:fillColor="#FFC107" android:strokeColor="#FFA000" android:strokeWidth="0.3" />
+    <path android:pathData="M 28.5,25.5 A 1,1 0 1,0 30.5,25.5 A 1,1 0 1,0 28.5,25.5 Z" android:fillColor="#80FFFFFF" />
+
+    <!-- Black Pepper & Chili Powder Seasoning Specks -->
+    <path android:pathData="M 14,18 A 0.3,0.3 0 1,0 14.6,18 A 0.3,0.3 0 1,0 14,18 Z M 29,25 A 0.3,0.3 0 1,0 29.6,25 A 0.3,0.3 0 1,0 29,25 Z" android:fillColor="#212121" />
+    <path android:pathData="M 17,21 A 0.3,0.3 0 1,0 17.6,21 A 0.3,0.3 0 1,0 17,21 Z M 32,28 A 0.3,0.3 0 1,0 32.6,28 A 0.3,0.3 0 1,0 32,28 Z" android:fillColor="#E53935" />
+</vector>

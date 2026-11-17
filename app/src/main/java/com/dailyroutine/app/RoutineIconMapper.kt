@@ -25,7 +25,12 @@ object RoutineIconMapper {
         ReminderType.CUSTOM -> R.drawable.bg_circle_reminders
     }
 
+    fun iconForMeal(title: String, description: String = "", mealType: String = ""): Int {
+        return FoodIconResolver.getIconForMeal(title, description, mealType)
+    }
+
     fun iconForMealType(mealType: String): Int = when (mealType) {
+        "Hydration" -> R.drawable.ic_water
         "Breakfast" -> R.drawable.ic_breakfast
         "Lunch" -> R.drawable.ic_lunch
         "Dinner" -> R.drawable.ic_dinner
@@ -33,6 +38,7 @@ object RoutineIconMapper {
     }
 
     fun badgeForMealType(mealType: String): Int = when (mealType) {
+        "Hydration" -> R.drawable.bg_circle_water
         "Breakfast" -> R.drawable.bg_circle_breakfast
         "Lunch" -> R.drawable.bg_circle_diet
         "Dinner" -> R.drawable.bg_circle_dinner

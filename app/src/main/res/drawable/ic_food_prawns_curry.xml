@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Ceramic Bowl of Prawns Curry Vessel & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,24 A 14.5,14.5 0 1,0 38.5,24 A 14.5,14.5 0 1,0 9.5,24 Z" android:fillColor="#E65100" />
+    <path android:pathData="M 12,20 C 18,14 30,14 36,18 C 30,22 22,23 12,20 Z" android:fillColor="#FF7043" />
+
+    <!-- Whole Curled C-Shape Prawn 1 Peeking Out of Curry -->
+    <path android:pathData="M 14,22 C 12,18 14,13 18,12 C 22,11 24,15 21,19 C 18,23 14,22 14,22 Z" android:fillColor="#E53935" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <path android:pathData="M 15,20 C 14,17 15,14 18,13 C 21,12 22,15 20,18 Z" android:fillColor="#FF7043" />
+    <path android:pathData="M 16,18 Q 18,16 20,17" android:fillColor="#00000000" android:strokeColor="#FFC107" android:strokeWidth="0.4" />
+
+    <!-- Whole Curled C-Shape Prawn 2 -->
+    <path android:pathData="M 23,26 C 21,22 23,17 27,16 C 31,15 33,19 30,23 C 27,27 23,26 23,26 Z" android:fillColor="#E53935" android:strokeColor="#51382B" android:strokeWidth="0.5" />
+    <path android:pathData="M 24,24 C 23,21 24,18 27,17 C 30,16 31,19 29,22 Z" android:fillColor="#FF7043" />
+
+    <!-- Glossy Oil Sheen Arc & Cilantro -->
+    <path android:pathData="M 12,18 C 18,12 28,12 34,16" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 26,20 Q 28,18 30,21 Z" android:fillColor="#4CAF50" />
+</vector>

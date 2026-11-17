@@ -117,7 +117,8 @@ class WellnessEngineTest {
 
     @Test
     fun calculateActiveBurnForDate_includesHistoricalStepsAndHeartPoints() {
-        HealthDataManager(context).saveHistoricalHeartPoints("2026-07-09", 10.0)
+        context.getSharedPreferences("health_data_pref", Context.MODE_PRIVATE)
+            .edit().putFloat("hist_heart_pts_2026-07-09", 10.0f).apply()
 
         val burn = WellnessEngine.calculateActiveBurnForDate(context, "2026-07-09", steps = 1000, weight = 70.0)
 

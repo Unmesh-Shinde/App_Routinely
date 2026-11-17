@@ -36,7 +36,7 @@ class WeeklyGraphAdapter : RecyclerView.Adapter<WeeklyGraphAdapter.VH>() {
                 gravity = android.view.Gravity.BOTTOM
             })
         }
-        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_step_heart_bar, parent, false)
+        val v = LayoutInflater.from(parent.context).inflate(R.layout.item_dual_metric_bar, parent, false)
         return VH(v)
     }
 
@@ -47,8 +47,8 @@ class WeeklyGraphAdapter : RecyclerView.Adapter<WeeklyGraphAdapter.VH>() {
         holder.tvBarLabel?.text = item.dayLabel
         holder.tvBarDate?.text = item.dateLabel
         
-        val tvPrimary = holder.itemView.findViewById<TextView>(R.id.tvStepValue)
-        val tvSecondary = holder.itemView.findViewById<TextView>(R.id.tvHeartValue)
+        val tvPrimary = holder.itemView.findViewById<TextView>(R.id.tvPrimaryValue)
+        val tvSecondary = holder.itemView.findViewById<TextView>(R.id.tvSecondaryValue)
         val tvEmpty = holder.itemView.findViewById<TextView>(R.id.tvEmptyError)
         val barContainer = holder.itemView.findViewById<View>(R.id.llBarContainer)
 
@@ -74,8 +74,8 @@ class WeeklyGraphAdapter : RecyclerView.Adapter<WeeklyGraphAdapter.VH>() {
             barContainer.visibility = View.INVISIBLE
         }
 
-        val viewPrimaryBar = holder.itemView.findViewById<View>(R.id.viewStepBar)
-        val viewSecondaryBar = holder.itemView.findViewById<View>(R.id.viewHeartBar)
+        val viewPrimaryBar = holder.itemView.findViewById<View>(R.id.viewPrimaryBar)
+        val viewSecondaryBar = holder.itemView.findViewById<View>(R.id.viewSecondaryBar)
         
         // RecyclerView reuses these views. Reassign LayoutParams (rather than only
         // mutating the existing instance) so each item's measured height is applied.

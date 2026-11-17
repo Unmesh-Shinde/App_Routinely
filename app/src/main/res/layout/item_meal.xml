@@ -18,14 +18,12 @@
         android:padding="13dp"
         android:gravity="center_vertical">
 
-        <ImageView
+        <com.dailyroutine.app.MealIconView
             android:id="@+id/tvEmoji"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:background="@drawable/bg_emoji_badge"
-            android:contentDescription="Meal type"
-            android:padding="12dp"
-            app:srcCompat="@drawable/ic_meal"/>
+            android:contentDescription="Meal type"/>
 
         <!-- Text block -->
         <LinearLayout

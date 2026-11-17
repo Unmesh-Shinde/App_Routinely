@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Whole Fuzzy Brown Kiwi Ambient Shadow -->
+    <path android:pathData="M 9.5,21.8 A 8.5,8.5 0 1,0 26.5,21.8 A 8.5,8.5 0 1,0 9.5,21.8 Z" android:fillColor="#22000000" />
+
+    <!-- Whole Brown Kiwi Fruit Body -->
+    <path android:pathData="M 9,21 A 8.5,8.5 0 1,0 26,21 A 8.5,8.5 0 1,0 9,21 Z" android:fillColor="#8D6E63" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 12,17 C 15,14 20,14 23,17" android:fillColor="#00000000" android:strokeColor="#A1887F" android:strokeWidth="1" android:strokeLineCap="round" />
+
+    <!-- Sliced Kiwi Cross-Section Wheel (Right) -->
+    <path android:pathData="M 21.5,28.8 A 8.5,8.5 0 1,0 38.5,28.8 A 8.5,8.5 0 1,0 21.5,28.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 21,28 A 8.5,8.5 0 1,0 38,28 A 8.5,8.5 0 1,0 21,28 Z" android:fillColor="#8D6E63" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 22.5,28 A 7,7 0 1,0 36.5,28 A 7,7 0 1,0 22.5,28 Z" android:fillColor="#7CB342" />
+
+    <!-- Pale Core Center & Black Seeds Ring -->
+    <path android:pathData="M 27,28 A 2.5,2.5 0 1,0 32,28 A 2.5,2.5 0 1,0 27,28 Z" android:fillColor="#FFFDF0" />
+    <path android:pathData="M 25,25 A 0.5,0.5 0 1,0 26,25 A 0.5,0.5 0 1,0 25,25 Z M 33,25 A 0.5,0.5 0 1,0 34,25 A 0.5,0.5 0 1,0 33,25 Z M 25,31 A 0.5,0.5 0 1,0 26,31 A 0.5,0.5 0 1,0 25,31 Z M 33,31 A 0.5,0.5 0 1,0 34,31 A 0.5,0.5 0 1,0 33,31 Z M 29,23 A 0.5,0.5 0 1,0 30,23 A 0.5,0.5 0 1,0 29,23 Z M 29,33 A 0.5,0.5 0 1,0 30,33 A 0.5,0.5 0 1,0 29,33 Z" android:fillColor="#212121" />
+</vector>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Bowl Base & Outer Outline -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 5.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 7,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Creamy Oats Porridge Base & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFF8E1" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 10,22 C 16,12 28,12 36,18 C 30,22 22,23 10,22 Z" android:fillColor="#FFE082" />
+
+    <!-- Sliced Banana Rounds -->
+    <path android:pathData="M 12,20 A 3.5,3.5 0 1,0 19,20 A 3.5,3.5 0 1,0 12,20 Z" android:fillColor="#FFF9C4" android:strokeColor="#FBC02D" android:strokeWidth="0.4" />
+    <path android:pathData="M 14,20 A 1.5,1.5 0 1,0 17,20 A 1.5,1.5 0 1,0 14,20 Z" android:fillColor="#FFFDF0" />
+
+    <path android:pathData="M 18,26 A 3.5,3.5 0 1,0 25,26 A 3.5,3.5 0 1,0 18,26 Z" android:fillColor="#FFF9C4" android:strokeColor="#FBC02D" android:strokeWidth="0.4" />
+    <path android:pathData="M 20,26 A 1.5,1.5 0 1,0 23,26 A 1.5,1.5 0 1,0 20,26 Z" android:fillColor="#FFFDF0" />
+
+    <!-- Sliced Ripe Red Strawberry -->
+    <path android:pathData="M 25,16 Q 29,13 32,17 L 27,21 Z" android:fillColor="#E53935" android:strokeColor="#B71C1C" android:strokeWidth="0.4" />
+    <path android:pathData="M 27,15 L 29,14" android:fillColor="#00000000" android:strokeColor="#4CAF50" android:strokeWidth="0.5" />
+
+    <!-- Plump Blueberries with Gloss -->
+    <path android:pathData="M 28,24 A 2.2,2.2 0 1,0 32.4,24 A 2.2,2.2 0 1,0 28,24 Z" android:fillColor="#3F51B5" android:strokeColor="#1A237E" android:strokeWidth="0.3" />
+    <path android:pathData="M 29,23.2 A 0.6,0.6 0 1,0 30.2,23.2 A 0.6,0.6 0 1,0 29,23.2 Z" android:fillColor="#80FFFFFF" />
+
+    <path android:pathData="M 24,30 A 2.2,2.2 0 1,0 28.4,30 A 2.2,2.2 0 1,0 24,30 Z" android:fillColor="#3F51B5" android:strokeColor="#1A237E" android:strokeWidth="0.3" />
+
+    <!-- Golden Honey Drizzle Swirl -->
+    <path android:pathData="M 14,16 C 18,18 24,14 30,19 C 26,23 20,22 16,28" android:fillColor="#00000000" android:strokeColor="#FFB300" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 15,16.5 C 19,18.5 24,14.5 29,19" android:fillColor="#00000000" android:strokeColor="#50FFFFFF" android:strokeWidth="0.6" android:strokeLineCap="round" />
+</vector>

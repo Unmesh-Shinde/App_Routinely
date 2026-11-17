@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Bowl of Raisins Vessel & Shadow -->
+    <path android:pathData="M 8.5,24.8 A 15.5,15.5 0 1,0 39.5,24.8 A 15.5,15.5 0 1,0 8.5,24.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 8,24 A 16,16 0 1,0 40,24 A 16,16 0 1,0 8,24 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.85" />
+    <path android:pathData="M 9.5,24 A 14.5,14.5 0 1,0 38.5,24 A 14.5,14.5 0 1,0 9.5,24 Z" android:fillColor="#FFF8E1" />
+
+    <!-- Wrinkled Golden & Dark Kishmish Raisins -->
+    <path android:pathData="M 12,19 C 12,16 17,16 17,19 C 17,22 12,22 12,19 Z M 21,16 C 21,13 26,13 26,16 C 26,19 21,19 21,16 Z M 29,18 C 29,15 34,15 34,18 C 34,21 29,21 29,18 Z M 16,26 C 16,23 21,23 21,26 C 21,29 16,29 16,26 Z M 26,27 C 26,24 31,24 31,27 C 31,30 26,30 26,27 Z" android:fillColor="#FFC107" android:strokeColor="#E65100" android:strokeWidth="0.4" />
+    <path android:pathData="M 13,19 L 16,19 M 22,16 L 25,16 M 30,18 L 33,18 M 17,26 L 20,26 M 27,27 L 30,27" android:fillColor="#00000000" android:strokeColor="#E65100" android:strokeWidth="0.3" />
+
+    <!-- Dark Black Raisins -->
+    <path android:pathData="M 17,21 C 17,19 21,19 21,21 C 21,23 17,23 17,21 Z M 23,22 C 23,20 27,20 27,22 C 27,24 23,24 23,22 Z" android:fillColor="#3E2723" />
+</vector>

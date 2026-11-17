@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Coaster Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Coaster Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Champagne Flute Glass Ambient Shadow -->
+    <path android:pathData="M 19.5,10.8 C 17,20 20,28 23.5,29 L 23.5,37.8 L 18.5,38.8 L 29.5,38.8 L 24.5,37.8 L 24.5,29 C 28,28 31,20 28.5,10.8 Z" android:fillColor="#22000000" />
+
+    <!-- Glass Stem & Base Foot -->
+    <path android:pathData="M 24,27 L 24,38 M 18,38 L 30,38" android:fillColor="#00000000" android:strokeColor="#51382B" android:strokeWidth="1.2" android:strokeLineCap="round" />
+
+    <!-- Tall Slender Flute Glass Body -->
+    <path android:pathData="M 19,10 C 17,19 20,27 24,27 C 28,27 31,19 29,10 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+
+    <!-- Pale Golden Champagne / White Wine Liquid Base -->
+    <path android:pathData="M 19,14 C 18,20 20,26 24,26 C 28,26 30,20 29,14 Z" android:fillColor="#FFF59D" />
+    <path android:pathData="M 20,15 C 19,20 20,25 24,25 C 28,25 29,20 28,15 Z" android:fillColor="#FFE082" />
+
+    <!-- Effervescent Sparkling Bubbles -->
+    <path android:pathData="M 22,17 A 0.6,0.6 0 1,0 23.2,17 A 0.6,0.6 0 1,0 22,17 Z M 25,20 A 0.6,0.6 0 1,0 26.2,20 A 0.6,0.6 0 1,0 25,20 Z M 23,23 A 0.6,0.6 0 1,0 24.2,23 A 0.6,0.6 0 1,0 23,23 Z" android:fillColor="#80FFFFFF" />
+
+    <!-- Specular Gloss Highlight -->
+    <path android:pathData="M 20,12 C 18,17 19,23 21,25" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>

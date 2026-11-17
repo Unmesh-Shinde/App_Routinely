@@ -30,6 +30,11 @@ object UserSettingsStore {
 	private const val KEY_PIN_HASH = "pin_hash"
 	private const val KEY_PIN_HINT = "pin_hint"
 	private const val KEY_PIN_ALGORITHM = "pin_algorithm"
+	private const val KEY_PREVIOUS_PIN_SALT = "previous_pin_salt"
+	private const val KEY_PREVIOUS_PIN_HASH = "previous_pin_hash"
+	private const val KEY_PREVIOUS_PIN_ALGORITHM = "previous_pin_algorithm"
+	private const val KEY_NUTRITION_POLICY_ACKNOWLEDGED = "nutrition_policy_acknowledged"
+	private const val KEY_NUTRITION_POLICY_ACKNOWLEDGED_DATE = "nutrition_policy_acknowledged_date"
 	private const val PIN_ALGORITHM_PBKDF2 = "pbkdf2_sha256_v1"
 	private const val PBKDF2_ITERATIONS = 180_000
 	private const val PBKDF2_KEY_LENGTH_BITS = 256
@@ -73,11 +78,39 @@ object UserSettingsStore {
 
 	fun setManualPin(context: Context, pin: String, hint: String = ""): Boolean {
 		if (!pin.matches(Regex("\\d{6}"))) return false
+		val settings = prefs(context)
+		if (matchesSavedPin(pin, settings.getString(KEY_PIN_SALT, null), settings.getString(KEY_PIN_HASH, null), settings.getString(KEY_PIN_ALGORITHM, null)) ||
+			isManualPinPreviouslyUsed(context, pin)
+		) return false
 
+		val currentSalt = settings.getString(KEY_PIN_SALT, null)
+		val currentHash = settings.getString(KEY_PIN_HASH, null)
+		val currentAlgorithm = settings.getString(KEY_PIN_ALGORITHM, null)
+		val editor = settings.edit()
+		if (!currentSalt.isNullOrBlank() && !currentHash.isNullOrBlank()) {
+			editor.putString(KEY_PREVIOUS_PIN_SALT, currentSalt)
+				.putString(KEY_PREVIOUS_PIN_HASH, currentHash)
+				.putString(KEY_PREVIOUS_PIN_ALGORITHM, currentAlgorithm)
+		}
+		return storeManualPin(context, pin, hint, editor)
+	}
+
+	fun isManualPinPreviouslyUsed(context: Context, pin: String): Boolean {
+		if (!pin.matches(Regex("\\d{6}"))) return false
+		val settings = prefs(context)
+		return matchesSavedPin(
+			pin,
+			settings.getString(KEY_PREVIOUS_PIN_SALT, null),
+			settings.getString(KEY_PREVIOUS_PIN_HASH, null),
+			settings.getString(KEY_PREVIOUS_PIN_ALGORITHM, null)
+		)
+	}
+
+	private fun storeManualPin(context: Context, pin: String, hint: String, editor: android.content.SharedPreferences.Editor = prefs(context).edit()): Boolean {
 		val salt = ByteArray(32).also { SecureRandom().nextBytes(it) }
 		val saltText = Base64.encodeToString(salt, Base64.NO_WRAP)
 		val hash = hashPinPbkdf2(pin, saltText)
-		prefs(context).edit()
+		editor
 			.putString(KEY_PIN_SALT, saltText)
 			.putString(KEY_PIN_HASH, hash)
 			.putString(KEY_PIN_HINT, hint.trim())
@@ -101,9 +134,18 @@ object UserSettingsStore {
 			val verifiedLegacyPin = constantTimeBase64Equals(hashPinLegacySha256(pin, savedSalt), savedHash)
 			if (verifiedLegacyPin) {
 				// Migrate existing SHA-256 PINs after a successful unlock so users are not locked out.
-				setManualPin(context, pin, getManualPinHint(context))
+				storeManualPin(context, pin, getManualPinHint(context))
 			}
 			verifiedLegacyPin
+		}
+	}
+
+	private fun matchesSavedPin(pin: String, salt: String?, hash: String?, algorithm: String?): Boolean {
+		if (salt.isNullOrBlank() || hash.isNullOrBlank()) return false
+		return if (algorithm == PIN_ALGORITHM_PBKDF2) {
+			constantTimeBase64Equals(hashPinPbkdf2(pin, salt), hash)
+		} else {
+			constantTimeBase64Equals(hashPinLegacySha256(pin, salt), hash)
 		}
 	}
 
@@ -133,5 +175,20 @@ object UserSettingsStore {
 		} catch (_: IllegalArgumentException) {
 			false
 		}
+	}
+
+	fun hasAcknowledgedNutritionPolicy(context: Context): Boolean {
+		return prefs(context).getBoolean(KEY_NUTRITION_POLICY_ACKNOWLEDGED, false)
+	}
+
+	fun getNutritionPolicyAcknowledgedDate(context: Context): String? {
+		return prefs(context).getString(KEY_NUTRITION_POLICY_ACKNOWLEDGED_DATE, null)
+	}
+
+	fun setNutritionPolicyAcknowledged(context: Context, date: String) {
+		prefs(context).edit()
+			.putBoolean(KEY_NUTRITION_POLICY_ACKNOWLEDGED, true)
+			.putString(KEY_NUTRITION_POLICY_ACKNOWLEDGED_DATE, date)
+			.apply()
 	}
 }

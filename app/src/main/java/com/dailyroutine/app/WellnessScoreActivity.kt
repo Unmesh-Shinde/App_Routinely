@@ -98,10 +98,10 @@ class WellnessScoreActivity : AppCompatActivity() {
     }
 
     private fun loadSavedWeights() {
-        val wSleep = UserPreferencesStore.getSleepWeight(this) / 10
-        val wWorkout = UserPreferencesStore.getWorkoutWeight(this) / 10
-        val wNutrition = UserPreferencesStore.getNutritionWeight(this) / 10
-        val wSteps = UserPreferencesStore.getStepsWeight(this) / 10
+        val wSleep = UserPreferencesStore.getSleepWeight(this) / 10f
+        val wWorkout = UserPreferencesStore.getWorkoutWeight(this) / 10f
+        val wNutrition = UserPreferencesStore.getNutritionWeight(this) / 10f
+        val wSteps = UserPreferencesStore.getStepsWeight(this) / 10f
 
         sliderSleep.value = wSleep.toFloat().coerceIn(0f, 10f)
         sliderWorkout.value = wWorkout.toFloat().coerceIn(0f, 10f)
@@ -141,20 +141,20 @@ class WellnessScoreActivity : AppCompatActivity() {
     }
 
     private fun updateLabels() {
-        val s = sliderSleep.value.toInt()
-        val w = sliderWorkout.value.toInt()
-        val n = sliderNutrition.value.toInt()
-        val st = sliderSteps.value.toInt()
+        val s = sliderSleep.value
+        val w = sliderWorkout.value
+        val n = sliderNutrition.value
+        val st = sliderSteps.value
 
-        tvSleepWeight.text = s.toString()
-        tvWorkoutWeight.text = w.toString()
-        tvNutritionWeight.text = n.toString()
-        tvStepsWeight.text = st.toString()
+        tvSleepWeight.text = formatFactorWeight(s)
+        tvWorkoutWeight.text = formatFactorWeight(w)
+        tvNutritionWeight.text = formatFactorWeight(n)
+        tvStepsWeight.text = formatFactorWeight(st)
 
         val total = s + w + n + st
-        tvTotalWeight.text = "Total: $total"
+        tvTotalWeight.text = "Total: ${formatFactorWeight(total)}"
 
-        if (total != 10) {
+        if (total != 10f) {
             tvTotalWeight.setTextColor(android.graphics.Color.RED)
         } else {
             tvTotalWeight.setTextColor(getColor(R.color.textPrimary))
@@ -162,24 +162,27 @@ class WellnessScoreActivity : AppCompatActivity() {
     }
 
     private fun saveWeights() {
-        val s = sliderSleep.value.toInt()
-        val w = sliderWorkout.value.toInt()
-        val n = sliderNutrition.value.toInt()
-        val st = sliderSteps.value.toInt()
+        val s = sliderSleep.value
+        val w = sliderWorkout.value
+        val n = sliderNutrition.value
+        val st = sliderSteps.value
 
-        if (s + w + n + st != 10) {
+        if (s + w + n + st != 10f) {
             Toast.makeText(this, "Total weight must be exactly 10", Toast.LENGTH_SHORT).show()
             return
         }
 
-        UserPreferencesStore.setSleepWeight(this, (s * 10))
-        UserPreferencesStore.setWorkoutWeight(this, (w * 10))
-        UserPreferencesStore.setNutritionWeight(this, (n * 10))
-        UserPreferencesStore.setStepsWeight(this, (st * 10))
+        UserPreferencesStore.setSleepWeight(this, (s * 10).toInt())
+        UserPreferencesStore.setWorkoutWeight(this, (w * 10).toInt())
+        UserPreferencesStore.setNutritionWeight(this, (n * 10).toInt())
+        UserPreferencesStore.setStepsWeight(this, (st * 10).toInt())
 
         Toast.makeText(this, "Settings saved!", Toast.LENGTH_SHORT).show()
         finish()
     }
+
+    private fun formatFactorWeight(value: Float): String =
+        if (value % 1f == 0f) value.toInt().toString() else "%.1f".format(Locale.US, value)
 
     private fun getScoreForDate(dateStr: String): Int {
         return WellnessScoreManager.getSavedDailyScore(this, dateStr) ?: -1

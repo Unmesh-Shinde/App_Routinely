@@ -78,17 +78,17 @@
 
                         <FrameLayout
                             android:id="@+id/containerProfileAvatar"
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
+                            android:layout_width="88dp"
+                            android:layout_height="88dp"
                             android:clickable="true"
                             android:focusable="true"
                             android:background="?attr/selectableItemBackgroundBorderless">
 
                             <com.google.android.material.imageview.ShapeableImageView
                                 android:id="@+id/ivProfileAvatar"
-                                android:layout_width="64dp"
-                                android:layout_height="64dp"
-                                android:layout_gravity="center"
+                                android:layout_width="72dp"
+                                android:layout_height="72dp"
+                                android:layout_gravity="top|center_horizontal"
                                 android:scaleType="centerCrop"
                                 app:shapeAppearanceOverlay="@style/ShapeAppearance.DailyRoutine.Circle"
                                 app:strokeWidth="1dp"
@@ -97,8 +97,9 @@
                             <com.google.android.material.card.MaterialCardView
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
-                                android:layout_gravity="bottom|end"
+                                android:layout_gravity="top|end"
                                 android:layout_margin="4dp"
+                                android:layout_marginTop="48dp"
                                 app:cardCornerRadius="12dp"
                                 app:cardElevation="2dp"
                                 app:cardBackgroundColor="@color/primary"
@@ -112,6 +113,18 @@
                                     app:tint="@android:color/white"
                                     android:contentDescription="Edit Avatar"/>
                             </com.google.android.material.card.MaterialCardView>
+                            <TextView
+                                android:id="@+id/btnUploadProfilePhoto"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom|center_horizontal"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:paddingHorizontal="6dp"
+                                android:text="Upload photo"
+                                android:textColor="@color/primary"
+                                android:textSize="11sp" />
                         </FrameLayout>
 
                         <LinearLayout
@@ -385,31 +398,194 @@
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnExportReport"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="16dp"
-                android:text="Export 180-Day Wellness Report (PDF)"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                app:cornerRadius="16dp"
-                android:textColor="@color/healthProfile"
-                app:strokeColor="@color/healthProfile"
-                app:icon="@drawable/ic_save"
-                app:iconTint="@color/healthProfile"/>
-
-            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveProfile"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="20dp"
                 android:text="Save Changes"
                 android:textAllCaps="false"
                 android:textStyle="bold"
                 android:textColor="@color/textOnProfile"
                 app:backgroundTint="@color/healthProfile"
-                app:cornerRadius="16dp"/>
+                app:cornerRadius="16dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="@color/surfaceProfile"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/badgeProfile">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView style="@style/LabelText" android:text="Export Wellness Report" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Date range"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="13sp" />
+                    <Spinner
+                        android:id="@+id/spinnerReportRange"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_field"
+                        android:paddingHorizontal="12dp" />
+                    <TextView
+                        android:id="@+id/tvReportExportHint"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_report_export_hint"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="8dp"
+                        android:text="Choose a date range to enable report export."
+                        android:textColor="@color/reportExportHintText"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Report parameters"
+                        android:textColor="@color/textSecondary"
+                        android:textSize="13sp" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnReportParameters"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="4dp"
+                        android:gravity="start|center_vertical"
+                        android:text="Select report parameters"
+                        android:textAllCaps="false"
+                        android:textColor="@color/textPrimary"
+                        app:cornerRadius="12dp"
+                        app:strokeColor="@color/cardStroke"
+                        app:icon="@drawable/ic_expand_more"
+                        app:iconGravity="end"
+                        app:iconTint="@color/textSecondary" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnExportReport"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="12dp"
+                        android:text="Export Wellness Report (PDF)"
+                        android:textAllCaps="false"
+                        android:textStyle="bold"
+                        android:enabled="false"
+                        app:cornerRadius="16dp"
+                        android:textColor="@color/healthProfile"
+                        app:strokeColor="@color/healthProfile"
+                        app:icon="@drawable/ic_save"
+                        app:iconTint="@color/healthProfile" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardNutritionPolicy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="@color/surfaceProfile"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/badgeProfile">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            style="@style/LabelText"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:text="Nutrition Fair Use Policy" />
+
+                        <TextView
+                            android:id="@+id/tvPolicyAckChip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_chip"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="4dp"
+                            android:text="⚠️ Unacknowledged"
+                            android:textColor="@color/calorieStatusOrange"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Complete guide to daily meal limits, AI tokens, overnight retries, and 3-day streak rewards."
+                        android:textColor="@color/textSecondary"
+                        android:textSize="12sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="12dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnViewNutritionPolicy"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="8dp"
+                            android:text="View Guide"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:textColor="@color/textPrimary"
+                            app:cornerRadius="12dp"
+                            app:strokeColor="@color/cardStroke" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDownloadNutritionPdf"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:minHeight="48dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="4dp"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="8dp"
+                            android:text="Download PDF"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            android:textColor="@color/healthNutrition"
+                            app:cornerRadius="12dp"
+                            app:strokeColor="@color/healthNutrition"
+                            app:icon="@drawable/ic_save"
+                            app:iconPadding="4dp"
+                            app:iconTint="@color/healthNutrition" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

@@ -39,4 +39,12 @@
         <item name="cornerSize">50%</item>
     </style>
 
+    <style name="Theme.WidgetWaterAction" parent="Theme.DailyRoutine">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
 </resources>

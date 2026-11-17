@@ -12,6 +12,7 @@ class HealthDataManager(private val context: Context) {
 
     companion object {
         const val SYNC_HISTORY_DAYS = 180
+        const val HEALTH_CONNECT_ALL_ORIGINS_SOURCE = "__all_health_connect_origins__"
 
         private const val KEY_IS_CONNECTED = "is_fitness_connected"
         private const val KEY_STEPS = "steps_count"
@@ -24,13 +25,12 @@ class HealthDataManager(private val context: Context) {
         private const val KEY_WATER_PREFIX = "water_intake_"
         private const val KEY_WEIGHT_HISTORY = "weight_history_data"
         private const val KEY_SOURCE_APP = "connected_health_app_name"
-        private const val KEY_SOURCE_PKG = "connected_health_app_package"
         private const val KEY_MOVE_MINS = "move_minutes_count"
         private const val KEY_HEART_POINTS = "heart_points_count"
         private const val KEY_LAST_SYNC = "last_background_sync_time"
         private const val KEY_DISTANCE_VAL = "distance_val"
         private const val KEY_INITIAL_HISTORY_SYNC_DONE = "initial_history_sync_done"
-        private const val KEY_INITIAL_HEART_POINTS_HISTORY_SYNC_DONE = "initial_heart_points_server_history_sync_done_v2"
+        private const val KEY_SYNCED_HEALTH_CONNECT_SOURCE = "synced_health_connect_source_pkg"
         private const val KEY_HIST_STEPS_PREFIX = "hist_steps_"
         private const val KEY_HIST_STEPS_SYNCED_PREFIX = "hist_steps_synced_"
         private const val KEY_HIST_SLEEP_PREFIX = "hist_sleep_"
@@ -38,6 +38,7 @@ class HealthDataManager(private val context: Context) {
         private const val KEY_HIST_HEART_POINTS_PREFIX = "hist_heart_pts_"
         private const val KEY_HIST_HEART_POINTS_SYNCED_PREFIX = "hist_heart_pts_synced_"
         private const val KEY_HIST_DISTANCE_PREFIX = "hist_dist_"
+        private const val KEY_HIST_WALKING_DURATION_PREFIX = "hist_walk_minutes_"
         private const val KEY_HIST_ACTIVE_CALS_PREFIX = "hist_active_cals_"
         private const val KEY_WATER_HISTORY_PREFIX = "water_intake_"
 
@@ -67,35 +68,43 @@ class HealthDataManager(private val context: Context) {
     fun getMoveMinutes(): Int = prefs.getInt(KEY_MOVE_MINS, 0)
     fun setMoveMinutes(mins: Int) = prefs.edit().putInt(KEY_MOVE_MINS, mins).apply()
 
+    // Legacy cached input retained for WellnessEngine's existing calorie formula. The
+    // sync pipeline no longer reads, requests, or writes Heart Points.
     fun getHeartPoints(): Int = prefs.getInt(KEY_HEART_POINTS, 0)
-    fun setHeartPoints(points: Int) = prefs.edit().putInt(KEY_HEART_POINTS, points).apply()
 
-    fun getConnectedAppName(): String = prefs.getString(KEY_SOURCE_APP, "None") ?: "None"
-    fun setConnectedAppName(name: String) = prefs.edit().putString(KEY_SOURCE_APP, name).apply()
-
-    fun getConnectedAppPackage(): String? = prefs.getString(KEY_SOURCE_PKG, null)
-    fun setConnectedAppPackage(pkg: String) {
-        val previousPkg = getConnectedAppPackage()
-        prefs.edit()
-            .putString(KEY_SOURCE_PKG, pkg)
-            .putBoolean(KEY_INITIAL_HISTORY_SYNC_DONE, previousPkg == pkg && isInitialHistorySyncDone())
-            .apply()
-    }
+    fun getConnectedAppName(): String = if (isConnected()) "Health Connect" else "None"
 
     fun isInitialHistorySyncDone(): Boolean = prefs.getBoolean(KEY_INITIAL_HISTORY_SYNC_DONE, false)
     fun setInitialHistorySyncDone(done: Boolean) = prefs.edit().putBoolean(KEY_INITIAL_HISTORY_SYNC_DONE, done).apply()
 
-    fun isInitialHeartPointsHistorySyncDone(): Boolean = prefs.getBoolean(KEY_INITIAL_HEART_POINTS_HISTORY_SYNC_DONE, false)
-    fun setInitialHeartPointsHistorySyncDone(done: Boolean) =
-        prefs.edit().putBoolean(KEY_INITIAL_HEART_POINTS_HISTORY_SYNC_DONE, done).apply()
-
     fun isConnected(): Boolean = prefs.getBoolean(KEY_IS_CONNECTED, false)
 
+    fun hasSyncedHealthConnectSource(sourceIdentity: String): Boolean =
+        prefs.getString(KEY_SYNCED_HEALTH_CONNECT_SOURCE, null) == sourceIdentity
+
+    fun markHealthConnectSourceSynced(sourceIdentity: String) {
+        prefs.edit().putString(KEY_SYNCED_HEALTH_CONNECT_SOURCE, sourceIdentity).apply()
+    }
+
     fun setConnected(connected: Boolean) {
-        prefs.edit().putBoolean(KEY_IS_CONNECTED, connected).apply()
+        prefs.edit()
+            .putBoolean(KEY_IS_CONNECTED, connected)
+            .putString(KEY_SOURCE_APP, if (connected) "Health Connect" else "None")
+            // Drop the provider filter saved by older versions; all reads now use Health Connect origins.
+            .remove("connected_health_app_package")
+            .apply()
         if (!connected) {
-            // Clear data if disconnected
-            prefs.edit().clear().apply()
+            // Clear health-provider state without deleting unrelated water intake and goals.
+            val healthKeys = setOf(
+                KEY_IS_CONNECTED, KEY_STEPS, KEY_SLEEP, KEY_CALORIES, KEY_WEIGHT,
+                KEY_WEIGHT_HISTORY, KEY_SOURCE_APP, KEY_MOVE_MINS,
+                KEY_HEART_POINTS, KEY_LAST_SYNC, KEY_DISTANCE_VAL,
+                KEY_INITIAL_HISTORY_SYNC_DONE, KEY_SYNCED_HEALTH_CONNECT_SOURCE, "last_finalized_day"
+            )
+            val editor = prefs.edit()
+            prefs.all.keys.filter { key -> key in healthKeys || key.startsWith("hist_") }
+                .forEach(editor::remove)
+            editor.apply()
         }
     }
 
@@ -261,30 +270,14 @@ class HealthDataManager(private val context: Context) {
         return repository.getMetric(date)?.distanceKm ?: getHistoricalDistance(date)
     }
 
-    fun saveHistoricalHeartPoints(date: String, pts: Double) {
-        prefs.edit()
-            .putFloat(KEY_HIST_HEART_POINTS_PREFIX + date, pts.toFloat())
-            .putBoolean(KEY_HIST_HEART_POINTS_SYNCED_PREFIX + date, true)
-            .apply()
+    fun saveHistoricalWalkingDuration(date: String, minutes: Long) {
+        prefs.edit().putLong(KEY_HIST_WALKING_DURATION_PREFIX + date, minutes.coerceAtLeast(0L)).apply()
     }
+
+    fun getHistoricalWalkingDuration(date: String): Long =
+        prefs.getLong(KEY_HIST_WALKING_DURATION_PREFIX + date, 0L)
+
     fun getHistoricalHeartPoints(date: String): Double = prefs.getFloat("hist_heart_pts_$date", 0.0f).toDouble()
-
-    suspend fun getHistoricalHeartPointsRoom(date: String): Double {
-        return repository.getMetric(date)?.heartPoints ?: getHistoricalHeartPoints(date)
-    }
-
-    fun isHistoricalHeartPointsSynced(date: String): Boolean = prefs.getBoolean(KEY_HIST_HEART_POINTS_SYNCED_PREFIX + date, false)
-
-    fun countHistoricalHeartPointsSyncedDays(days: Int = SYNC_HISTORY_DAYS): Int {
-        val today = LocalDate.now()
-        return (0 until days).count { offset ->
-            isHistoricalHeartPointsSynced(today.minusDays(offset.toLong()).toString())
-        }
-    }
-
-    fun isHeartPointsHistoryComplete(days: Int = SYNC_HISTORY_DAYS): Boolean {
-        return countHistoricalHeartPointsSyncedDays(days) >= days
-    }
 
     fun pruneHistoricalData(retentionDays: Int = SYNC_HISTORY_DAYS) {
         val cutoff = LocalDate.now().minusDays((retentionDays - 1).toLong())
@@ -294,9 +287,10 @@ class HealthDataManager(private val context: Context) {
             KEY_HIST_SLEEP_PREFIX,
             KEY_HIST_CALS_PREFIX,
             KEY_HIST_ACTIVE_CALS_PREFIX,
-            KEY_HIST_HEART_POINTS_SYNCED_PREFIX,
             KEY_HIST_HEART_POINTS_PREFIX,
+            KEY_HIST_HEART_POINTS_SYNCED_PREFIX,
             KEY_HIST_DISTANCE_PREFIX,
+            KEY_HIST_WALKING_DURATION_PREFIX,
             KEY_WATER_HISTORY_PREFIX
         )
 

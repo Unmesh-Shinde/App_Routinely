@@ -18,28 +18,8 @@
     <uses-permission android:name="android.permission.health.READ_BASAL_METABOLIC_RATE"/>
     <uses-permission android:name="android.permission.health.READ_DISTANCE"/>
     <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
-    <uses-permission android:name="android.permission.health.READ_WEIGHT"/>
     <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_HISTORY"/>
     <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_IN_BACKGROUND"/>
-
-    <queries>
-        <package android:name="com.google.android.apps.fitness" />
-        <package android:name="com.sec.android.app.shealth" />
-        <package android:name="com.fitbit.FitbitMobile" />
-        <package android:name="com.garmin.android.apps.connectmobile" />
-        <package android:name="com.xiaomi.wearable" />
-        <package android:name="com.xiaomi.hm.health" />
-        <package android:name="com.huami.watch.hmwatchmanager" />
-        <package android:name="com.noisefit" />
-        <package android:name="com.coveiot.boat" />
-        <package android:name="com.huawei.health" />
-        <package android:name="com.realme.link" />
-        <package android:name="com.google.android.apps.healthdata" />
-        <package android:name="com.fossil.wearables.fossil" />
-        <package android:name="com.withings.wiscale2" />
-        <package android:name="fi.polar.beat" />
-        <package android:name="com.stt.android.suunto" />
-    </queries>
 
     <application
         android:name=".RoutinelyApplication"
@@ -136,6 +116,11 @@
             android:label="My Profile"/>
 
         <activity
+            android:name=".NutritionPolicyActivity"
+            android:exported="false"
+            android:label="Nutrition Fair Use Policy"/>
+
+        <activity
             android:name=".AvatarSelectionActivity"
             android:exported="false"
             android:label="Choose Avatar"/>
@@ -169,10 +154,17 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+                <action android:name="android.intent.action.DATE_CHANGED"/>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
                 <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".NutritionRetryAlarmReceiver"
+            android:exported="false" />
 
         <!-- Wellness Widget -->
         <receiver
@@ -181,12 +173,20 @@
             android:label="@string/widget_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.dailyroutine.app.ACTION_ADD_WATER" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/wellness_widget_info" />
         </receiver>
+
+        <activity
+            android:name=".WidgetWaterActionActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.WidgetWaterAction" />
 
         <!-- File Provider for PDF Sharing -->
         <provider

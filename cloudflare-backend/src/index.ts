@@ -1,3 +1,5 @@
+import { DurableObject } from "cloudflare:workers";
+
 /**
  * Welcome to Cloudflare Workers! This is your first worker.
  *
@@ -42,10 +44,7 @@ export default {
 			return handleWorkoutMet(request, env, security.uid);
 		}
 
-		return Response.json(
-			{ error: "not_found" },
-			{ status: 404 },
-		);
+		return apiErrorResponse("not_found", 404, { scope: "request" });
 	},
 } satisfies ExportedHandler<Env>;
 
@@ -67,27 +66,179 @@ const AUTH_JWKS_URL =
 const APP_CHECK_JWKS_URL = "https://firebaseappcheck.googleapis.com/v1/jwks";
 const MAX_CLOCK_SKEW_SECONDS = 60;
 const MAX_JWKS_CACHE_SECONDS = 6 * 60 * 60;
-// Keep the primary and fallback on currently supported stable Flash models.
-const GEMINI_MODEL = "gemini-3.6-flash";
-const GEMINI_FALLBACK_MODEL = "gemini-3.5-flash";
+// User-selected Gemini cascade order.
+const GEMINI_MODEL = "gemini-3.5-flash-lite";
+const GEMINI_FALLBACK_MODEL = "gemini-3.1-flash-lite";
+const GEMINI_SECONDARY_FALLBACK_MODEL = "gemini-3.6-flash";
+const GEMINI_MODELS = [GEMINI_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_SECONDARY_FALLBACK_MODEL];
 const GEMINI_ATTEMPTS_PER_MODEL = 3;
 const GEMINI_REQUEST_TIMEOUT_MS = 20_000;
 const GEMINI_RETRY_DELAYS_MS = [250, 750];
+const DEFAULT_GEMINI_UPSTREAM_ATTEMPT_LIMIT = 300;
 const jwksCache = new Map<string, CachedJwkSet>();
+
+type ApiErrorScope = "firebase" | "project" | "key" | "key_model" | "model" | "meal_input" | "request" | "provider" | "location" | "user_budget";
+
+type BudgetRequest =
+	| { action: "reserve_retry"; uid: string; category: string; day: string; limit: number }
+	| { action: "reserve_provider_attempt"; day: string; limit: number }
+	| { action: "is_pair_exhausted"; day: string; pairId: string }
+	| { action: "mark_pair_exhausted"; day: string; pairId: string };
+
+type BudgetResponse = { allowed: boolean; used?: number };
+
+/** SQLite-backed, single-writer quotas shared across Worker isolates. */
+export class NutritionBudgetDurableObject extends DurableObject<Env> {
+	constructor(ctx: DurableObjectState, env: Env) {
+		super(ctx, env);
+		this.ctx.storage.sql.exec(`
+			CREATE TABLE IF NOT EXISTS retry_budget (
+				uid TEXT NOT NULL, category TEXT NOT NULL, day TEXT NOT NULL, used INTEGER NOT NULL DEFAULT 0,
+				PRIMARY KEY (uid, category, day)
+			);
+			CREATE TABLE IF NOT EXISTS provider_budget (
+				day TEXT PRIMARY KEY, used INTEGER NOT NULL DEFAULT 0
+			);
+			CREATE TABLE IF NOT EXISTS exhausted_pairs (
+				day TEXT NOT NULL, pair_id TEXT NOT NULL, PRIMARY KEY (day, pair_id)
+			);
+		`);
+		this.ctx.storage.sql.exec("DELETE FROM retry_budget WHERE day < date('now', '-45 days')");
+		this.ctx.storage.sql.exec("DELETE FROM provider_budget WHERE day < date('now', '-45 days')");
+		this.ctx.storage.sql.exec("DELETE FROM exhausted_pairs WHERE day < date('now', '-45 days')");
+	}
+
+	async fetch(request: Request): Promise<Response> {
+		if (request.method !== "POST") return Response.json({ error: "method_not_allowed" }, { status: 405 });
+		let input: BudgetRequest;
+		try {
+			input = await request.json() as BudgetRequest;
+		} catch {
+			return Response.json({ error: "invalid_json" }, { status: 400 });
+		}
+		const result = this.ctx.storage.transactionSync((): BudgetResponse => {
+			if (input.action === "reserve_retry") {
+				const row = this.ctx.storage.sql.exec<{ used: number }>(
+					"SELECT used FROM retry_budget WHERE uid = ? AND category = ? AND day = ?",
+					input.uid, input.category, input.day,
+				).toArray()[0];
+				const used = row?.used ?? 0;
+				if (used >= input.limit) return { allowed: false, used };
+				this.ctx.storage.sql.exec(
+					"INSERT INTO retry_budget (uid, category, day, used) VALUES (?, ?, ?, 1) ON CONFLICT(uid, category, day) DO UPDATE SET used = used + 1",
+					input.uid, input.category, input.day,
+				);
+				return { allowed: true, used: used + 1 };
+			}
+			if (input.action === "reserve_provider_attempt") {
+				const row = this.ctx.storage.sql.exec<{ used: number }>(
+					"SELECT used FROM provider_budget WHERE day = ?", input.day,
+				).toArray()[0];
+				const used = row?.used ?? 0;
+				if (used >= input.limit) return { allowed: false, used };
+				this.ctx.storage.sql.exec(
+					"INSERT INTO provider_budget (day, used) VALUES (?, 1) ON CONFLICT(day) DO UPDATE SET used = used + 1",
+					input.day,
+				);
+				return { allowed: true, used: used + 1 };
+			}
+			if (input.action === "is_pair_exhausted") {
+				const row = this.ctx.storage.sql.exec<{ found: number }>(
+					"SELECT 1 AS found FROM exhausted_pairs WHERE day = ? AND pair_id = ?", input.day, input.pairId,
+				).toArray()[0];
+				return { allowed: !row };
+			}
+			this.ctx.storage.sql.exec(
+				"INSERT OR IGNORE INTO exhausted_pairs (day, pair_id) VALUES (?, ?)", input.day, input.pairId,
+			);
+			return { allowed: true };
+		});
+		return Response.json(result);
+	}
+}
+
+async function budgetRequest(env: Env, input: BudgetRequest): Promise<BudgetResponse> {
+	const id = env.NUTRITION_BUDGET.idFromName("routinely-nutrition-global-v1");
+	const stub = env.NUTRITION_BUDGET.get(id);
+	const response = await stub.fetch("https://nutrition-budget.internal/", {
+		method: "POST",
+		headers: { "content-type": "application/json" },
+		body: JSON.stringify(input),
+	});
+	if (!response.ok) throw new Error(`Nutrition budget Durable Object returned ${response.status}`);
+	return response.json<BudgetResponse>();
+}
+
+async function sha256Hex(value: string): Promise<string> {
+	const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+	return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function getProviderQuotaDate(): string {
+	return _getPacificDate();
+}
+
+export function _getUtcDate(date = new Date()): string {
+	return date.toISOString().slice(0, 10);
+}
+
+export function _getNextUtcMidnight(now = Date.now()): number {
+	const date = new Date(now);
+	return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1);
+}
+
+export function _getNextPacificMidnight(now = Date.now()): number {
+	const formatter = new Intl.DateTimeFormat("en-US", {
+		timeZone: "America/Los_Angeles",
+		year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit",
+		hourCycle: "h23",
+	});
+	const parts = Object.fromEntries(formatter.formatToParts(new Date(now)).map((part) => [part.type, part.value]));
+	const target = Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day) + 1);
+	let candidate = target;
+	// Correct for the Pacific offset at the target instant, including DST changes.
+	for (let attempt = 0; attempt < 3; attempt += 1) {
+		const local = Object.fromEntries(formatter.formatToParts(new Date(candidate)).map((part) => [part.type, part.value]));
+		const representedAsUtc = Date.UTC(
+			Number(local.year), Number(local.month) - 1, Number(local.day),
+			Number(local.hour), Number(local.minute), Number(local.second),
+		);
+		const difference = target - representedAsUtc;
+		candidate += difference;
+		if (difference === 0) break;
+	}
+	return candidate;
+}
+
+function apiErrorResponse(
+	code: string,
+	httpStatus: number,
+	options: { scope: ApiErrorScope; upstreamStatus?: number; retryable?: boolean; message?: string; retryAt?: number },
+): Response {
+	return Response.json({
+		error: code,
+		errorCode: code,
+		scope: options.scope,
+		upstreamStatus: options.upstreamStatus ?? null,
+		retryable: options.retryable ?? false,
+		message: options.message ?? code.replaceAll("_", " "),
+		...(options.retryAt !== undefined ? { retryAt: options.retryAt } : {}),
+	}, { status: httpStatus });
+}
 
 async function authenticateRequest(
 	request: Request,
 	env: Env,
 ): Promise<{ uid: string } | Response> {
 	if (!env.FIREBASE_PROJECT_ID || !env.FIREBASE_PROJECT_NUMBER || !env.FIREBASE_APP_ID) {
-		return Response.json({ error: "firebase_not_configured" }, { status: 503 });
+		return apiErrorResponse("firebase_not_configured", 503, { scope: "project" });
 	}
 
 	const authorization = request.headers.get("authorization") ?? "";
 	const authMatch = /^Bearer\s+(.+)$/i.exec(authorization);
 	const appCheckToken = request.headers.get("x-firebase-appcheck")?.trim();
 	if (!authMatch || !appCheckToken) {
-		return Response.json({ error: "unauthorized" }, { status: 401 });
+		return apiErrorResponse("unauthorized", 401, { scope: "firebase" });
 	}
 
 	try {
@@ -103,12 +254,12 @@ async function authenticateRequest(
 		});
 
 		if (appCheckTokenPayload.sub !== env.FIREBASE_APP_ID) {
-			return Response.json({ error: "unauthorized" }, { status: 401 });
+			return apiErrorResponse("unauthorized", 401, { scope: "firebase" });
 		}
 
 		return { uid: authToken.sub as string };
 	} catch {
-		return Response.json({ error: "unauthorized" }, { status: 401 });
+		return apiErrorResponse("unauthorized", 401, { scope: "firebase" });
 	}
 }
 
@@ -244,65 +395,104 @@ function extractNumber(val: unknown): number {
 	return 0;
 }
 
-type GeminiApiKeySlot = { key: string; label: string };
+function extractOptionalNumber(val: unknown): number | null {
+	if (typeof val === "number") return Number.isFinite(val) ? val : null;
+	if (typeof val === "string") {
+		const text = val.trim();
+		if (!text) return null;
+		const parsed = Number(text);
+		return Number.isFinite(parsed) ? parsed : null;
+	}
+	return null;
+}
 
-function getGeminiApiKeys(env: Record<string, string | undefined>): GeminiApiKeySlot[] {
-	const proKeys: GeminiApiKeySlot[] = [];
-	const freeKeys: GeminiApiKeySlot[] = [];
+export function _getPacificDate(dateValue = new Date()): string {
+	const parts = new Intl.DateTimeFormat("en-US", {
+		timeZone: "America/Los_Angeles",
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+	}).formatToParts(dateValue);
+	const date = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+	return `${date.year}-${date.month}-${date.day}`;
+}
+
+const keyModelId = (key: string, model: string) => `${key}\u0000${model}`;
+
+export type GeminiApiKeySlot = { key: string; label: string };
+
+export function _getGeminiApiKeys(env: Record<string, string | undefined>): GeminiApiKeySlot[] {
+	const availableKeys: GeminiApiKeySlot[] = [];
 	const seenKeys = new Set<string>();
 
-	// 1. Check GEMINI_PRO_API_KEYS (comma-separated or single string)
-	for (const [index, key] of parseCommaKeys(env.GEMINI_PRO_API_KEYS).entries()) {
-		if (!seenKeys.has(key)) {
-			proKeys.push({ key, label: `pro-${index + 1}` });
-			seenKeys.add(key);
-		}
-	}
+	for (let setNum = 1; setNum <= 5; setNum++) {
+		const envVarName = `GEMINI_API_KEYS_SET${setNum}`;
+		const rawKeys = parseCommaKeys(env[envVarName]);
 
-	// 2. Check GEMINI_FREE_API_KEYS (comma-separated or single string)
-	for (const [index, key] of parseCommaKeys(env.GEMINI_FREE_API_KEYS).entries()) {
-		if (!seenKeys.has(key)) {
-			freeKeys.push({ key, label: `free-${index + 1}` });
-			seenKeys.add(key);
-		}
-	}
-
-	// 3. Fallback: check legacy GEMINI_API_KEY_1..3 and GEMINI_API_KEY for backward compatibility
-	for (const keyVar of ["GEMINI_API_KEY_1", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3", "GEMINI_API_KEY"]) {
-		const raw = env[keyVar];
-		if (raw) {
-			const cleaned = raw.trim().replace(/^["']|["']$/g, "");
-			if (cleaned && !seenKeys.has(cleaned)) {
-				freeKeys.push({ key: cleaned, label: `legacy-${keyVar}` });
-				seenKeys.add(cleaned);
+		for (const [index, key] of rawKeys.entries()) {
+			if (!seenKeys.has(key)) {
+				seenKeys.add(key);
+				availableKeys.push({ key, label: `Api${index + 1}Set${setNum}` });
 			}
 		}
 	}
 
-	return [...proKeys, ...freeKeys];
+	return availableKeys;
 }
 
 async function handleMealCalories(request: Request, env: Env, uid: string): Promise<Response> {
 	if (request.method !== "POST") {
-		return Response.json({ error: "method_not_allowed" }, { status: 405 });
+		return apiErrorResponse("method_not_allowed", 405, { scope: "request" });
 	}
 
-	const apiKeys = getGeminiApiKeys(env as unknown as Record<string, string | undefined>);
+	const apiKeys = _getGeminiApiKeys(env as unknown as Record<string, string | undefined>);
 	if (apiKeys.length === 0) {
-		return Response.json({ error: "ai_provider_not_configured" }, { status: 503 });
+		return apiErrorResponse("ai_provider_not_configured", 503, { scope: "project" });
 	}
 
-	let payload: { title?: unknown; description?: unknown };
+	let payload: {
+		title?: unknown;
+		description?: unknown;
+		request_kind?: unknown;
+		meal_category?: unknown;
+	};
 	try {
 		payload = await request.json();
 	} catch {
-		return Response.json({ error: "invalid_json" }, { status: 400 });
+		return apiErrorResponse("invalid_json", 400, { scope: "request" });
 	}
 
 	const title = typeof payload.title === "string" ? payload.title.trim() : "";
 	const description = typeof payload.description === "string" ? payload.description.trim() : "";
 	if (!title || title.length > 500 || description.length > 2_000) {
-		return Response.json({ error: "invalid_request" }, { status: 400 });
+		return apiErrorResponse("invalid_request", 400, { scope: "meal_input" });
+	}
+
+	if (payload.request_kind === "automatic_retry") {
+		const category = typeof payload.meal_category === "string" ? payload.meal_category.trim().toLowerCase() : "";
+		if (!/^[a-z][a-z0-9 _-]{0,31}$/.test(category)) {
+			return apiErrorResponse("invalid_retry_category", 400, { scope: "request" });
+		}
+		try {
+			const reservation = await budgetRequest(env, {
+				action: "reserve_retry",
+				uid: await sha256Hex(uid),
+				category,
+				day: _getUtcDate(),
+				limit: 8,
+			});
+			if (!reservation.allowed) {
+				return apiErrorResponse("ai_retry_budget_exhausted", 429, {
+					scope: "user_budget",
+					retryable: true,
+					message: `The automatic estimate retry allowance for ${category} has been reached for today. The meal remains queued.`,
+					retryAt: _getNextUtcMidnight(),
+				});
+			}
+		} catch (error) {
+			console.error("Could not reserve the automatic retry budget", error);
+			return apiErrorResponse("ai_budget_unavailable", 503, { scope: "project", retryable: true, retryAt: Date.now() + 30 * 60_000 });
+		}
 	}
 
 	const prompt = createMealNutritionPrompt(title, description);
@@ -404,12 +594,27 @@ async function handleMealCalories(request: Request, env: Env, uid: string): Prom
 		],
 	};
 
-	const upstreamResult = await callGemini(prompt, env, mealSchema);
+	const upstreamResult = await _callGemini(prompt, env, mealSchema);
 
 	if (!upstreamResult.ok) {
-		return Response.json(
-			{ error: providerErrorCode(upstreamResult.status, upstreamResult.rawText) },
-			{ status: upstreamResult.status === 429 ? 429 : 502 },
+		if (upstreamResult.rawText === "ai_budget_unavailable") {
+			return apiErrorResponse("ai_budget_unavailable", 503, {
+				scope: "project", retryable: true, retryAt: upstreamResult.retryAt ?? Date.now() + 30 * 60_000,
+			});
+		}
+		if (upstreamResult.budgetLimited) {
+			return apiErrorResponse("ai_provider_daily_budget_reached", 429, {
+				scope: "project",
+				retryable: true,
+				message: "The nutrition service has reached its daily provider request limit. The meal remains queued.",
+				retryAt: upstreamResult.retryAt,
+			});
+		}
+		const error = providerErrorDetails(upstreamResult.status, upstreamResult.rawText);
+		return apiErrorResponse(
+			error.code,
+			upstreamResult.status === 429 ? 429 : 502,
+			{ ...error, upstreamStatus: upstreamResult.status },
 		);
 	}
 
@@ -417,42 +622,44 @@ async function handleMealCalories(request: Request, env: Env, uid: string): Prom
 	try {
 		providerResponse = JSON.parse(upstreamResult.rawText) as GeminiResponse;
 	} catch {
-		return Response.json({ error: "ai_invalid_response" }, { status: 502 });
+		return apiErrorResponse("ai_invalid_response", 502, { scope: "provider", upstreamStatus: 200, retryable: true });
+	}
+
+	if (isContentBlocked(providerResponse)) {
+		return apiErrorResponse("ai_content_blocked", 422, { scope: "meal_input", upstreamStatus: 200 });
 	}
 
 	const text = extractGeminiText(providerResponse);
 	if (!text) {
-		return Response.json({ error: "ai_empty_response" }, { status: 502 });
+		return apiErrorResponse("ai_empty_response", 502, { scope: "provider", upstreamStatus: 200, retryable: true });
 	}
 
 	try {
 		const jsonMatch = text.match(/\{[\s\S]*\}/);
 		if (!jsonMatch) {
-			return Response.json({ error: "ai_invalid_response" }, { status: 502 });
+			return apiErrorResponse("ai_invalid_response", 502, { scope: "provider", upstreamStatus: 200, retryable: true });
 		}
 		const result = JSON.parse(jsonMatch[0]);
-		const rawCalories = extractNumber(result.total_calories ?? result.calories ?? result.totalCalories);
-		const calories = Math.round(rawCalories);
-		if (!Number.isInteger(calories) || calories <= 0 || calories > 20_000) {
-			return Response.json({ error: "ai_invalid_response" }, { status: 502 });
-		}
+		const rawCalories = extractOptionalNumber(result.total_calories ?? result.calories ?? result.totalCalories);
+		const calories = rawCalories !== null && rawCalories >= 0 && rawCalories <= 20_000
+			? Math.round(rawCalories)
+			: null;
 
-		const rawCarbs = extractNumber(result.carbs_g ?? result.carbs ?? result.carbohydrates ?? result.carbsG);
-		const rawProtein = extractNumber(result.protein_g ?? result.protein ?? result.proteinG);
-		const rawFat = extractNumber(result.fat_g ?? result.fat ?? result.fatG);
-		const rawFiber = extractNumber(result.fiber_g ?? result.fiber ?? result.fiberG);
-
-		if (!hasCompleteMealMacros(rawCarbs, rawProtein, rawFat)) {
-			console.warn(`Gemini returned incomplete macros for calories=${calories} (carbs=${rawCarbs}, protein=${rawProtein}, fat=${rawFat}), rejecting with ai_empty_response.`);
-			return Response.json({ error: "ai_empty_response" }, { status: 502 });
-		}
+		const normalizeMacro = (value: unknown): number | null => {
+			const parsed = extractOptionalNumber(value);
+			return parsed !== null && parsed >= 0 ? Math.round(parsed * 10.0) / 10.0 : null;
+		};
+		const carbs = normalizeMacro(result.carbs_g ?? result.carbs ?? result.carbohydrates ?? result.carbsG);
+		const protein = normalizeMacro(result.protein_g ?? result.protein ?? result.proteinG);
+		const fat = normalizeMacro(result.fat_g ?? result.fat ?? result.fatG);
+		const fiber = normalizeMacro(result.fiber_g ?? result.fiber ?? result.fiberG);
 
 		return Response.json({
 			total_calories: calories,
-			carbs_g: Math.max(0, Math.round(rawCarbs * 10.0) / 10.0),
-			protein_g: Math.max(0, Math.round(rawProtein * 10.0) / 10.0),
-			fat_g: Math.max(0, Math.round(rawFat * 10.0) / 10.0),
-			fiber_g: Math.max(0, Math.round(rawFiber * 10.0) / 10.0),
+			carbs_g: carbs,
+			protein_g: protein,
+			fat_g: fat,
+			fiber_g: fiber,
 			fat_breakdown: typeof result.fat_breakdown === "object" && result.fat_breakdown !== null ? result.fat_breakdown : {},
 			carb_breakdown: typeof result.carb_breakdown === "object" && result.carb_breakdown !== null ? result.carb_breakdown : {},
 			vitamins: typeof result.vitamins === "object" && result.vitamins !== null ? result.vitamins : {},
@@ -462,7 +669,7 @@ async function handleMealCalories(request: Request, env: Env, uid: string): Prom
 			other_nutrients: typeof result.other_nutrients === "object" && result.other_nutrients !== null ? result.other_nutrients : {},
 		});
 	} catch {
-		return Response.json({ error: "ai_invalid_response" }, { status: 502 });
+		return apiErrorResponse("ai_invalid_response", 502, { scope: "provider", upstreamStatus: 200, retryable: true });
 	}
 }
 
@@ -476,33 +683,32 @@ export function createMealNutritionPrompt(title: string, description: string): s
 		"- Treat meal_title and portion_details as the same meal, not two separate meals.",
 		"- Treat every supplied gram value as final edible weight; use the stated serving size and ingredients to scale every nutrient.",
 		"- Estimate each meal independently from its ingredients and portion. Never reuse fixed nutrient values from another meal or from the output example.",
-		"- Do not use generic default values for Omega-3, Vitamin D, Vitamin B6, Vitamin B12, Magnesium, or Zinc. Estimate them from this meal's foods; use zero when ingredients provide negligible amounts.",
+		"- A zero value is valid when a nutrient is absent or negligible. Do not invent a positive macro value just to make all macros nonzero or to match calories.",
+		"- Return numeric values for calories, carbs_g, protein_g, fat_g, and fiber_g, including zero when appropriate. Estimate from the stated ingredients and portion; do not treat an absent ingredient as present.",
+		"- Do not force calories to equal a formula based only on carbs, protein, and fat when another energy source or rounding could explain a difference; estimate calories and each nutrient independently.",
+		"- Populate vitamin, mineral, amino-acid, antioxidant, and nutrient-breakdown maps only with values reasonably supported by the ingredients and portion. If no values can be estimated reliably for a map, return an empty object; do not invent values to fill it.",
 		"- Estimate total calories (kcal), macros in grams (carbs_g, protein_g, fat_g, fiber_g), key vitamins (Vitamin A, Vitamin C, Vitamin D, Vitamin B12, Vitamin B6, Folate, Choline), key minerals (Calcium, Iron, Potassium, Sodium, Zinc, Magnesium, Selenium, Phosphorus), essential amino acids (Leucine, Lysine, Valine, Tryptophan), antioxidants (Polyphenols, Lycopene, Lutein), and other nutrients (Saturated Fat, Total Sugars, Cholesterol, Omega-3, Food Water Content).",
 		"- Output total_calories, carbs_g, protein_g, fat_g, and fiber_g strictly as raw numeric numbers (e.g. 450, 45.0, 25.0), NOT string values with units.",
-		"- Populate nutrient maps with specific nutrient names as keys and values with appropriate units (for example, \"Vitamin C\": \"value mg\"). Do NOT use literal key names like \"name\".",
+		"- Populate any returned nutrient maps with specific nutrient names as keys and values with appropriate units (for example, \"Vitamin C\": \"value mg\"). Do NOT use literal key names like \"name\".",
 		"- Keep response concise and output strictly valid JSON matching the requested schema. Any example values are format hints only; calculate all values for this meal.",
 	].join("\n");
 }
 
-export function hasCompleteMealMacros(carbs: number, protein: number, fat: number): boolean {
-	return Number.isFinite(carbs) && carbs > 0 && Number.isFinite(protein) && protein > 0 && Number.isFinite(fat) && fat > 0;
-}
-
 async function handleWorkoutMet(request: Request, env: Env, uid: string): Promise<Response> {
 	if (request.method !== "POST") {
-		return Response.json({ error: "method_not_allowed" }, { status: 405 });
+		return apiErrorResponse("method_not_allowed", 405, { scope: "request" });
 	}
 
-	const apiKeys = getGeminiApiKeys(env as unknown as Record<string, string | undefined>);
+	const apiKeys = _getGeminiApiKeys(env as unknown as Record<string, string | undefined>);
 	if (apiKeys.length === 0) {
-		return Response.json({ error: "ai_provider_not_configured" }, { status: 503 });
+		return apiErrorResponse("ai_provider_not_configured", 503, { scope: "project" });
 	}
 
 	let payload: Record<string, unknown>;
 	try {
 		payload = await request.json() as Record<string, unknown>;
 	} catch {
-		return Response.json({ error: "invalid_json" }, { status: 400 });
+		return apiErrorResponse("invalid_json", 400, { scope: "request" });
 	}
 
 	const stringField = (name: string, maxLength: number): string => {
@@ -516,7 +722,7 @@ async function handleWorkoutMet(request: Request, env: Env, uid: string): Promis
 
 	const name = stringField("exercise_name", 500);
 	if (!name) {
-		return Response.json({ error: "invalid_request" }, { status: 400 });
+		return apiErrorResponse("invalid_request", 400, { scope: "request" });
 	}
 
 	const prompt = [
@@ -542,14 +748,24 @@ async function handleWorkoutMet(request: Request, env: Env, uid: string): Promis
 		"- Keep MET between 1.0 and 15.0.",
 		"Return only JSON in this exact shape: {\"exercise_family\": string, \"base_met\": number}.",
 	].join("\n");
-	void uid;
-
-	const upstreamResult = await callGemini(prompt, env);
+	const upstreamResult = await _callGemini(prompt, env);
 
 	if (!upstreamResult.ok) {
-		return Response.json(
-			{ error: providerErrorCode(upstreamResult.status, upstreamResult.rawText) },
-			{ status: upstreamResult.status === 429 ? 429 : 502 },
+		if (upstreamResult.rawText === "ai_budget_unavailable") {
+			return apiErrorResponse("ai_budget_unavailable", 503, {
+				scope: "project", retryable: true, retryAt: upstreamResult.retryAt ?? Date.now() + 30 * 60_000,
+			});
+		}
+		if (upstreamResult.budgetLimited) {
+			return apiErrorResponse("ai_provider_daily_budget_reached", 429, {
+				scope: "project", retryable: true, retryAt: upstreamResult.retryAt,
+			});
+		}
+		const error = providerErrorDetails(upstreamResult.status, upstreamResult.rawText);
+		return apiErrorResponse(
+			error.code,
+			upstreamResult.status === 429 ? 429 : 502,
+			{ ...error, upstreamStatus: upstreamResult.status },
 		);
 	}
 
@@ -557,33 +773,65 @@ async function handleWorkoutMet(request: Request, env: Env, uid: string): Promis
 	try {
 		providerResponse = JSON.parse(upstreamResult.rawText) as GeminiResponse;
 	} catch {
-		return Response.json({ error: "ai_invalid_response" }, { status: 502 });
+		return apiErrorResponse("ai_invalid_response", 502, { scope: "provider", upstreamStatus: 200, retryable: true });
 	}
 
 	const text = extractGeminiText(providerResponse);
 	if (!text) {
-		return Response.json({ error: "ai_empty_response" }, { status: 502 });
+		return apiErrorResponse("ai_empty_response", 502, { scope: "provider", upstreamStatus: 200, retryable: true });
 	}
 
 	try {
 		const result = JSON.parse(text.replace(/^```json\s*/i, "").replace(/\s*```$/, ""));
 		const met = Number(result.base_met);
 		if (!Number.isFinite(met) || met < 1 || met > 15) {
-			return Response.json({ error: "ai_invalid_response" }, { status: 502 });
+			return apiErrorResponse("ai_invalid_response", 502, { scope: "provider", upstreamStatus: 200, retryable: true });
 		}
 		return Response.json({ base_met: met });
 	} catch {
-		return Response.json({ error: "ai_invalid_response" }, { status: 502 });
+		return apiErrorResponse("ai_invalid_response", 502, { scope: "provider", upstreamStatus: 200, retryable: true });
 	}
 }
 
-function providerErrorCode(status: number, rawText = ""): string {
-	if (isLocationRejected({ status, rawText })) return "ai_provider_location";
-	if (isQuotaExhausted({ status, rawText })) return "ai_provider_quota";
-	if (status === 401 || status === 403) return "ai_provider_auth_error";
-	if (status === 429 || status === 500 || status === 503) return "ai_provider_busy";
-	if (status === 400) return "ai_provider_bad_request";
-	return "ai_provider_error";
+function providerErrorDetails(
+	status: number,
+	rawText = "",
+): { code: string; scope: ApiErrorScope; retryable: boolean } {
+	if (isLocationRejected({ status, rawText })) {
+		return { code: "ai_provider_location", scope: "location", retryable: false };
+	}
+	if (isQuotaExhausted({ status, rawText })) {
+		return { code: "ai_provider_quota", scope: "key_model", retryable: true };
+	}
+	if (status === 413) {
+		return { code: "ai_payload_too_large", scope: "meal_input", retryable: false };
+	}
+	if (status === 401 || status === 403) {
+		const projectWide = /billing|verification|project|free tier|organization|payment|suspended|restricted/i.test(rawText);
+		return { code: "ai_provider_auth_error", scope: projectWide ? "project" : "key", retryable: false };
+	}
+	if (status === 404 || (status === 400 && /model/i.test(rawText))) {
+		return { code: "ai_model_unavailable", scope: "model", retryable: false };
+	}
+	if (status === 400) {
+		return { code: "ai_provider_bad_request", scope: "meal_input", retryable: false };
+	}
+	if (status === 429) {
+		// The Worker already walks configured keys/models in this request. The app
+		// may make a later scheduled retry after the provider cooldown has elapsed.
+		return { code: "ai_provider_rate_limited", scope: "key_model", retryable: true };
+	}
+	if (status === 0 || status === 408 || (status >= 500 && status !== 501)) {
+		return {
+			code: "ai_provider_busy",
+			scope: "provider",
+			retryable: true,
+		};
+	}
+	if (status === 501) {
+		return { code: "ai_model_unavailable", scope: "model", retryable: false };
+	}
+	return { code: "ai_provider_error", scope: "provider", retryable: false };
 }
 
 type GeminiAttempt = {
@@ -600,10 +848,12 @@ type GeminiCallResult = {
 	status: number;
 	rawText: string;
 	attempts: GeminiAttempt[];
+	budgetLimited?: boolean;
+	retryAt?: number;
 };
 
-async function callGemini(prompt: string, env: Env, responseSchema?: Record<string, unknown>): Promise<GeminiCallResult> {
-	const apiKeys = getGeminiApiKeys(env as unknown as Record<string, string | undefined>);
+export async function _callGemini(prompt: string, env: Env, responseSchema?: Record<string, unknown>): Promise<GeminiCallResult> {
+	const apiKeys = _getGeminiApiKeys(env as unknown as Record<string, string | undefined>);
 	if (apiKeys.length === 0) {
 		return { ok: false, status: 503, rawText: "ai_provider_not_configured", attempts: [] };
 	}
@@ -614,7 +864,6 @@ async function callGemini(prompt: string, env: Env, responseSchema?: Record<stri
 	};
 
 	const genConfig: Record<string, unknown> = {
-		temperature: 0.1,
 		responseMimeType: "application/json",
 	};
 	if (responseSchema) {
@@ -630,11 +879,26 @@ async function callGemini(prompt: string, env: Env, responseSchema?: Record<stri
 	});
 
 	const attempts: GeminiAttempt[] = [];
-	// Model-first approach: try best model across all keys (Pro keys first, then Free keys)
-	// before moving to fallback model.
+	// A throttled key is skipped for this model, but remains eligible for the next model.
+	const skippedKeyModelsForRequest = new Set<string>();
+	const quotaDate = getProviderQuotaDate();
+	// Model-first approach: try each model across all keys before moving to its fallback.
 	const kind = responseSchema ? "meal" : "workout";
-	for (const model of [GEMINI_MODEL, GEMINI_FALLBACK_MODEL]) {
+	for (const model of GEMINI_MODELS) {
 		for (const keySlot of apiKeys) {
+			const requestPairId = keyModelId(keySlot.key, model);
+			let persistentlyExhausted = false;
+			try {
+				const pairId = await sha256Hex(requestPairId);
+				persistentlyExhausted = !(await budgetRequest(env, { action: "is_pair_exhausted", day: quotaDate, pairId })).allowed;
+			} catch (error) {
+				console.error("Could not check persisted Gemini key/model quota state", error);
+				return { ok: false, status: 503, rawText: "ai_budget_unavailable", attempts };
+			}
+			if (skippedKeyModelsForRequest.has(requestPairId) || persistentlyExhausted) {
+				console.info(`Skipping exhausted key/model pair: ${keySlot.label} on ${model}`);
+				continue;
+			}
 			let shouldTryCompatibility = false;
 			let skipRemainingAttemptsForKey = false;
 
@@ -643,6 +907,23 @@ async function callGemini(prompt: string, env: Env, responseSchema?: Record<stri
 				if (skipRemainingAttemptsForKey) break;
 
 				for (let attemptNumber = 0; attemptNumber < GEMINI_ATTEMPTS_PER_MODEL; attemptNumber += 1) {
+					try {
+						const providerLimit = Number.parseInt(env.GEMINI_MAX_UPSTREAM_ATTEMPTS_PER_DAY ?? "", 10);
+						const reservation = await budgetRequest(env, {
+							action: "reserve_provider_attempt",
+							day: quotaDate,
+							limit: Number.isInteger(providerLimit) && providerLimit > 0 ? providerLimit : DEFAULT_GEMINI_UPSTREAM_ATTEMPT_LIMIT,
+						});
+						if (!reservation.allowed) {
+							return {
+								ok: false, status: 429, rawText: "ai_provider_daily_budget_reached", attempts,
+								budgetLimited: true, retryAt: _getNextPacificMidnight(),
+							};
+						}
+					} catch (error) {
+						console.error("Could not reserve Gemini upstream attempt budget", error);
+						return { ok: false, status: 503, rawText: "ai_budget_unavailable", attempts, retryAt: Date.now() + 30 * 60_000 };
+					}
 					const attempt = await requestGeminiModel(model, keySlot, headers, payload);
 					attempts.push(attempt);
 
@@ -657,15 +938,31 @@ async function callGemini(prompt: string, env: Env, responseSchema?: Record<stri
 					logAttemptFailure(kind, attempt);
 
 					if (isLocationRejected(attempt)) {
-						// The precondition may be specific to this key's project. Try the next configured key.
-						// If the restriction is request-wide, later keys will return the same error and be logged.
-						skipRemainingAttemptsForKey = true;
-						break;
+						// This is based on request egress location/IP classification, so changing
+						// keys/models from the same Worker cannot fix it and only spends quota.
+						return { ok: false, status: attempt.status, rawText: attempt.rawText, attempts };
 					}
 
-					// If 429 Daily Quota / Resource Exhausted, skip remaining retries & payloads for this key
-					// and move immediately (0ms delay) to the next key!
-					if (isQuotaExhausted(attempt)) {
+					if (attempt.status === 413) {
+						// Retrying the same oversized meal prompt with other keys/models cannot help.
+						return { ok: false, status: attempt.status, rawText: attempt.rawText, attempts };
+					}
+
+					// The configured policy skips a throttled key/model pair for the
+					// provider day. Other models and keys remain eligible.
+					if (attempt.status === 429) {
+						skippedKeyModelsForRequest.add(requestPairId);
+						try {
+							await budgetRequest(env, {
+								action: "mark_pair_exhausted",
+								day: quotaDate,
+								pairId: await sha256Hex(requestPairId),
+							});
+						} catch (error) {
+							console.error("Could not persist Gemini key/model throttling", error);
+							return { ok: false, status: 503, rawText: "ai_budget_unavailable", attempts };
+						}
+						console.warn(`Key/model pair throttled for today: ${keySlot.label} on ${model}`);
 						skipRemainingAttemptsForKey = true;
 						break;
 					}
@@ -738,7 +1035,7 @@ async function requestGeminiModel(
 }
 
 function isRetryableProviderStatus(status: number): boolean {
-	return status === 0 || status === 408 || status === 429 || status >= 500;
+	return status === 0 || status === 408 || status === 429 || (status >= 500 && status !== 501);
 }
 
 function isPermanentProviderFailure(attempt: Pick<GeminiAttempt, "status" | "rawText">): boolean {
@@ -762,8 +1059,15 @@ function wait(milliseconds: number): Promise<void> {
 }
 
 type GeminiResponse = {
-	candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+	promptFeedback?: { blockReason?: string };
+	candidates?: Array<{ content?: { parts?: Array<{ text?: string }> }; finishReason?: string }>;
 };
+
+function isContentBlocked(response: GeminiResponse): boolean {
+	const blockedReasons = new Set(["SAFETY", "BLOCKLIST", "PROHIBITED_CONTENT", "SPII", "RECITATION"]);
+	return blockedReasons.has(response.promptFeedback?.blockReason ?? "") ||
+		(response.candidates ?? []).some((candidate) => blockedReasons.has(candidate.finishReason ?? ""));
+}
 
 function extractGeminiText(response: GeminiResponse): string {
 	return response.candidates?.[0]?.content?.parts

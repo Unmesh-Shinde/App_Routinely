@@ -136,22 +136,17 @@ class DistanceActivity : AppCompatActivity() {
 
     private fun refreshTodayView() {
         lifecycleScope.launch {
-            val stepsStr = healthDataManager.getSteps().replace(",", "")
-            val steps = stepsStr.toIntOrNull() ?: 0
+            val steps = healthDataManager.getSteps().replace(",", "").toIntOrNull() ?: 0
             val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
             val distance = healthDataManager.getHistoricalDistanceRoom(todayStr)
-                .let { if (it > 0) it else healthDataManager.calculateDistanceKm(steps) }
 
             withContext(Dispatchers.Main) {
                 findViewById<TextView>(R.id.tvCurrentDistance).text = "%.1f".format(distance)
                 findViewById<TextView>(R.id.tvStepsCount).text = "%,d".format(steps)
 
-                val duration = healthDataManager.calculateDurationMin(steps)
+                val duration = healthDataManager.getHistoricalWalkingDuration(todayStr)
                 findViewById<TextView>(R.id.tvDuration).text = "%d min".format(duration)
-
-                val heartPoints = healthDataManager.getHeartPoints()
-                findViewById<TextView>(R.id.tvHeartPoints).text = heartPoints.toString()
             }
         }
     }
@@ -192,14 +187,11 @@ class DistanceActivity : AppCompatActivity() {
                     }
                     
                     val dailyDist = if (dateStr == todayStr) {
-                        val stepsStr = healthDataManager.getSteps().replace(",", "")
-                        val steps = stepsStr.toIntOrNull() ?: 0
                         healthDataManager.getHistoricalDistanceRoom(todayStr)
-                            .let { if (it > 0) it else healthDataManager.calculateDistanceKm(steps) }
                     } else {
                         val rawDist = m?.distanceKm ?: healthDataManager.getHistoricalDistance(dateStr)
                         val normalizedDist = HealthDataManager.normalizeDistanceKm(rawDist)
-                        if (normalizedDist > 0) normalizedDist else healthDataManager.calculateDistanceKm(dailySteps)
+                        normalizedDist
                     }
 
                     dailyDistances += DailyDistance(calendar, dailyDist, dailySteps >= 200 || dailyDist > 0.1)
@@ -284,7 +276,7 @@ class DistanceActivity : AppCompatActivity() {
                                     var sDist = m?.distanceKm ?: healthDataManager.getHistoricalDistance(dateKey)
                                     if (sDist > 100.0) sDist /= 1000.0
                                     
-                                    weekDist += if (sDist > 0.0) sDist else healthDataManager.calculateDistanceKm((m?.steps?.toInt() ?: healthDataManager.getHistoricalSteps(dateKey).toInt()))
+                                    weekDist += sDist
                                 }
                             }
                         }
@@ -327,7 +319,7 @@ class DistanceActivity : AppCompatActivity() {
                             var sDist = m?.distanceKm ?: healthDataManager.getHistoricalDistance(dateKey)
                             if (sDist > 100.0) sDist /= 1000.0
 
-                            weekDist += if (sDist > 0.0) sDist else healthDataManager.calculateDistanceKm((m?.steps?.toInt() ?: healthDataManager.getHistoricalSteps(dateKey).toInt()))
+                            weekDist += sDist
                         }
 
                         val isSunday = (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY)

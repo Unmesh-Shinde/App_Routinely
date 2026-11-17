@@ -22,15 +22,38 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         Log.d("DailyRoutineWorker", "doWork: Starting adaptive background sync...")
         val syncMode = inputData.getString(KEY_SYNC_MODE) ?: SYNC_MODE_ALL
+        val historyStartOffset = inputData.getInt(KEY_HISTORY_START_OFFSET, 0)
 
         val result = HealthSyncManager(applicationContext).performSync(
             hcm = HealthConnectManager(applicationContext),
-            gfit = GoogleFitHeartPointsManager(applicationContext),
-            syncMode = syncMode
+            syncMode = syncMode,
+            historyStartOffset = historyStartOffset
         )
 
-        if (shouldScheduleStepFollowUp(syncMode)) {
-            schedule2HourStepSync(applicationContext)
+        if (result is Result.Success) {
+            when (syncMode) {
+                SYNC_MODE_STEPS -> schedule2HourStepSync(applicationContext)
+                SYNC_MODE_SLEEP -> scheduleSleepFollowUp(applicationContext)
+                SYNC_MODE_CORRECTION -> scheduleHistoryFollowUp(applicationContext)
+                SYNC_MODE_HISTORY -> {
+                    val nextOffset = historyStartOffset + HISTORY_CHUNK_SIZE
+                    if (nextOffset < HealthDataManager.SYNC_HISTORY_DAYS) {
+                        enqueueHistoryChunk(applicationContext, nextOffset)
+                    } else {
+                        scheduleHistoryFollowUp(applicationContext)
+                    }
+                }
+                SYNC_MODE_ALL -> {
+                    val nextOffset = historyStartOffset + HISTORY_CHUNK_SIZE
+                    if (nextOffset < HealthDataManager.SYNC_HISTORY_DAYS) {
+                        enqueueHistoryChunk(applicationContext, nextOffset, SYNC_MODE_ALL)
+                    } else {
+                        schedule2HourStepSync(applicationContext)
+                        scheduleSleepFollowUp(applicationContext)
+                        scheduleHistoryFollowUp(applicationContext)
+                    }
+                }
+            }
         }
 
         result
@@ -41,14 +64,23 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
         const val TAG_SLEEP_SYNC = "sleep_sync_scheduled"
         const val TAG_HISTORY_SYNC = "history_sync_daily"
         const val KEY_SYNC_MODE = "sync_mode"
+        const val KEY_HISTORY_START_OFFSET = "history_start_offset"
+        const val HISTORY_CHUNK_SIZE = 30
         const val SYNC_MODE_ALL = "all"
         const val SYNC_MODE_STEPS = "steps"
         const val SYNC_MODE_SLEEP = "sleep"
         const val SYNC_MODE_HISTORY = "history"
+        const val SYNC_MODE_CORRECTION = "correction"
 
         private const val WORK_NAME_PERIODIC_SYNC = "HealthPeriodicSync"
 
-        fun scheduleAutoSync(context: Context) {
+        fun scheduleAutoSync(context: Context, rescheduleForClockChange: Boolean = false) {
+            if (rescheduleForClockChange) {
+                val workManager = WorkManager.getInstance(context)
+                workManager.cancelAllWorkByTag(TAG_STEP_SYNC)
+                workManager.cancelAllWorkByTag(TAG_SLEEP_SYNC)
+                workManager.cancelAllWorkByTag(TAG_HISTORY_SYNC)
+            }
             scheduleInitialHistorySyncIfNeeded(context)
             schedule2HourStepSync(context)
             scheduleSleepSync(context, 7, 0, "SleepSyncMorning")
@@ -91,14 +123,22 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
             return syncMode == SYNC_MODE_STEPS || syncMode == SYNC_MODE_ALL
         }
 
+        private fun scheduleSleepFollowUp(context: Context) {
+            scheduleSleepSync(context, 7, 0, "SleepSyncMorning")
+            scheduleSleepSync(context, 19, 0, "SleepSyncEvening")
+        }
+
+        private fun scheduleHistoryFollowUp(context: Context) {
+            scheduleHistorySync(context)
+        }
+
         private fun scheduleInitialHistorySyncIfNeeded(context: Context) {
             val hdm = HealthDataManager(context)
-            if (!hdm.isConnected()) return
-            val needsStepHistory = !hdm.isInitialHistorySyncDone()
-            val needsHeartPointsHistory = GoogleFitHeartPointsManager(context).hasReadPermission() &&
-                !hdm.isInitialHeartPointsHistorySyncDone()
-            if (!needsStepHistory && !needsHeartPointsHistory) return
-            enqueueUniqueSync(context, "InitialHistorySync", TAG_HISTORY_SYNC, 0L, SYNC_MODE_HISTORY)
+            val connectedSource = HealthDataManager.HEALTH_CONNECT_ALL_ORIGINS_SOURCE
+            val needsStepHistory = hdm.isConnected() &&
+                (!hdm.isInitialHistorySyncDone() || !hdm.hasSyncedHealthConnectSource(connectedSource))
+            if (!needsStepHistory) return
+            enqueueUniqueSync(context, "HealthHistoryFullSync_v3", TAG_HISTORY_SYNC, 0L, SYNC_MODE_HISTORY)
         }
 
         private fun scheduleSleepSync(context: Context, hour: Int, min: Int, uniqueName: String) {
@@ -108,7 +148,26 @@ class HealthSyncWorker(context: Context, workerParams: WorkerParameters) :
 
         private fun scheduleHistorySync(context: Context) {
             val target = nextTargetAt(3, 0)
-            enqueueUniqueSync(context, uniqueWorkName("HistorySync", target), TAG_HISTORY_SYNC, delayUntil(target), SYNC_MODE_HISTORY)
+            enqueueUniqueSync(context, uniqueWorkName("HistorySync", target), TAG_HISTORY_SYNC, delayUntil(target), SYNC_MODE_CORRECTION)
+        }
+
+        private fun enqueueHistoryChunk(
+            context: Context,
+            startOffset: Int,
+            syncMode: String = SYNC_MODE_HISTORY
+        ) {
+            val request = OneTimeWorkRequestBuilder<HealthSyncWorker>()
+                .setInputData(workDataOf(
+                    KEY_SYNC_MODE to syncMode,
+                    KEY_HISTORY_START_OFFSET to startOffset
+                ))
+                .addTag(TAG_HISTORY_SYNC)
+                .build()
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                "HealthHistoryRepair_v3_$startOffset",
+                ExistingWorkPolicy.KEEP,
+                request
+            )
         }
 
         private fun nextTargetAt(hour: Int, min: Int): Calendar {

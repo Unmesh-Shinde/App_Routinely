@@ -66,13 +66,20 @@ class WeightActivity : AppCompatActivity() {
         }
         
         MaterialAlertDialogBuilder(this)
-            .setTitle("Log Today's Weight")
+            .setTitle("Today's Weight")
             .setView(input)
             .setPositiveButton("Save") { _, _ ->
                 val weight = input.text.toString().toDoubleOrNull() ?: 0.0
                 if (weight > 0) {
                     val todayStr = dateFormatter.format(Date())
                     healthDataManager.saveWeight(todayStr, weight)
+                    lifecycleScope.launch {
+                        HealthMetricsRoomWriter(this@WeightActivity).upsertMetric(
+                            date = todayStr,
+                            weightKg = weight,
+                            source = "manual_entry"
+                        )
+                    }
                     UserPreferencesStore.setUserWeight(this, weight)
                     refreshTodayView()
                     Toast.makeText(this, "Weight Logged! ⚖️", Toast.LENGTH_SHORT).show()
@@ -110,7 +117,7 @@ class WeightActivity : AppCompatActivity() {
             val todayStr = dateFormatter.format(Date())
             val weight = healthDataManager.getWeightRoom(todayStr)
             withContext(Dispatchers.Main) {
-                findViewById<TextView>(R.id.tvCurrentWeight).text = if (weight > 0) "%.1f kg".format(weight) else "No weight data added"
+                findViewById<TextView>(R.id.tvCurrentWeight).text = if (weight > 0) "%.1f kg".format(weight) else "No weight data logged for today"
                 updateIdealWeightMessage()
             }
         }
@@ -120,10 +127,10 @@ class WeightActivity : AppCompatActivity() {
         val tv = findViewById<TextView>(R.id.tvIdealWeightMessage)
         val metrics = ProfileHealthMetricsCalculator.calculate(this)
         if (metrics == null) {
-            tv.text = "Complete age, height, weight, and gender in Profile to calculate your ideal weight."
+            tv.text = "Ideal Weight: --- kg. According to the vital details added to your profile"
             return
         }
-        tv.text = "Ideal Weight: %.1f kg according to your profile.".format(metrics.idealWeightKg)
+        tv.text = "Ideal Weight: %.1f kg. According to the vital details added to your profile".format(metrics.idealWeightKg)
     }
 
     private fun refreshWeeklyView() {

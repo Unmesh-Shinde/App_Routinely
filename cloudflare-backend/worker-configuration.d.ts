@@ -5,7 +5,9 @@ interface __BaseEnv_Env {
 	FIREBASE_PROJECT_ID: "app-routinely";
 	FIREBASE_PROJECT_NUMBER: "420538867344";
 	FIREBASE_APP_ID: "1:420538867344:android:496ce1c11559d95475c215";
-	GEMINI_API_KEY: string;
+	GEMINI_API_KEYS_SET1: string;
+	GEMINI_MAX_UPSTREAM_ATTEMPTS_PER_DAY: string;
+	NUTRITION_BUDGET: DurableObjectNamespace;
 }
 declare namespace Cloudflare {
 	interface Env extends __BaseEnv_Env {}
@@ -15,7 +17,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "FIREBASE_PROJECT_ID" | "FIREBASE_PROJECT_NUMBER" | "FIREBASE_APP_ID" | "GEMINI_API_KEY">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "FIREBASE_PROJECT_ID" | "FIREBASE_PROJECT_NUMBER" | "FIREBASE_APP_ID" | "GEMINI_API_KEYS_SET1" | "GEMINI_MAX_UPSTREAM_ATTEMPTS_PER_DAY">> {}
 }
 
 // Begin runtime types

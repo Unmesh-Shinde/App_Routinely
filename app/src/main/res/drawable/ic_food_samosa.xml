@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Samosa Triangular Pastry Cone & Drop Shadow -->
+    <path android:pathData="M 23.5,9.8 L 36.5,31.8 C 36.5,35 10.5,35 10.5,31.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 23,9 L 36,31 C 36,34 10,34 10,31 Z" android:fillColor="#E59235" android:strokeColor="#51382B" android:strokeWidth="0.85" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Samosa Fold Seam & 3D Lighting -->
+    <path android:pathData="M 23,9 L 23,33" android:fillColor="#00000000" android:strokeColor="#B86D1B" android:strokeWidth="0.8" />
+    <path android:pathData="M 23,9 L 10,31 C 12,33 21,33 23,33 Z" android:fillColor="#FFC107" />
+    <path android:pathData="M 18,17 C 16,21 14,25 13,29" android:fillColor="#00000000" android:strokeColor="#FFE082" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Broken Peak Peeking Potato/Pea Stuffing -->
+    <path android:pathData="M 21,11 A 1.5,1.5 0 1,0 24,11 A 1.5,1.5 0 1,0 21,11 Z" android:fillColor="#8D6E63" />
+    <path android:pathData="M 22,11 A 0.5,0.5 0 1,0 23,11 A 0.5,0.5 0 1,0 22,11 Z" android:fillColor="#4CAF50" />
+
+    <!-- Green Mint Chutney & Red Tamarind Chutney Dip Bowls -->
+    <path android:pathData="M 10.5,31.8 A 4.5,4.5 0 1,0 19.5,31.8 A 4.5,4.5 0 1,0 10.5,31.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 10,31 A 4.5,4.5 0 1,0 19,31 A 4.5,4.5 0 1,0 10,31 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.6" />
+    <path android:pathData="M 11,31 A 3.5,3.5 0 1,0 18,31 A 3.5,3.5 0 1,0 11,31 Z" android:fillColor="#388E3C" />
+
+    <path android:pathData="M 27.5,31.8 A 4.5,4.5 0 1,0 36.5,31.8 A 4.5,4.5 0 1,0 27.5,31.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 27,31 A 4.5,4.5 0 1,0 36,31 A 4.5,4.5 0 1,0 27,31 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.6" />
+    <path android:pathData="M 28,31 A 3.5,3.5 0 1,0 35,31 A 3.5,3.5 0 1,0 28,31 Z" android:fillColor="#B71C1C" />
+</vector>

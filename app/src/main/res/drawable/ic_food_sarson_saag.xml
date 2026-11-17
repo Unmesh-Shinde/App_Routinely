@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Bowl of Dark Green Mustard Saag Vessel & Shadow -->
+    <path android:pathData="M 5.5,20.8 C 5.5,13.8 22.5,13.8 22.5,20.8 C 22.5,29 5.5,29 5.5,20.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 5,20 C 5,13 22,13 22,20 C 22,28 5,28 5,20 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 6,20 C 6,14 21,14 21,20 C 21,27 6,27 6,20 Z" android:fillColor="#2E7D32" />
+
+    <!-- White Butter Dollop in Saag -->
+    <path android:pathData="M 11,18 C 12,16 16,16 17,18 C 18,20 12,21 11,18 Z" android:fillColor="#FFFFFF" />
+
+    <!-- Yellow Cornmeal Makki di Roti Flatbread (Right Side) -->
+    <path android:pathData="M 23.5,22.8 A 8.5,8.5 0 1,0 40.5,22.8 A 8.5,8.5 0 1,0 23.5,22.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 23,22 A 8.5,8.5 0 1,0 40,22 A 8.5,8.5 0 1,0 23,22 Z" android:fillColor="#FBC02D" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 25,22 A 6.5,6.5 0 1,0 38,22 A 6.5,6.5 0 1,0 25,22 Z" android:fillColor="#FFEB3B" />
+</vector>

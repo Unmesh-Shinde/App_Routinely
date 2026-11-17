@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Ceramic Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 44,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Plate Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Whole Guava Ambient Shadow -->
+    <path android:pathData="M 9.5,22.8 A 9,9 0 1,0 27.5,22.8 A 9,9 0 1,0 9.5,22.8 Z" android:fillColor="#22000000" />
+
+    <!-- Whole Green Guava Body -->
+    <path android:pathData="M 9,22 A 9,9 0 1,0 27,22 A 9,9 0 1,0 9,22 Z" android:fillColor="#7CB342" android:strokeColor="#51382B" android:strokeWidth="0.8" />
+    <path android:pathData="M 12,18 C 15,15 21,15 24,18" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1" android:strokeLineCap="round" />
+    <path android:pathData="M 17,13 Q 19,10 20,12 Z" android:fillColor="#388E3C" />
+
+    <!-- Sliced Guava Half (Pink Core) -->
+    <path android:pathData="M 21.5,27.8 A 8,8 0 1,0 37.5,27.8 A 8,8 0 1,0 21.5,27.8 Z" android:fillColor="#22000000" />
+    <path android:pathData="M 21,27 A 8,8 0 1,0 37,27 A 8,8 0 1,0 21,27 Z" android:fillColor="#7CB342" android:strokeColor="#51382B" android:strokeWidth="0.75" />
+    <path android:pathData="M 23,27 A 6,6 0 1,0 35,27 A 6,6 0 1,0 23,27 Z" android:fillColor="#F8BBD0" />
+    <path android:pathData="M 26,27 A 3,3 0 1,0 32,27 A 3,3 0 1,0 26,27 Z" android:fillColor="#F48FB1" />
+    <path android:pathData="M 28,26 A 0.4,0.4 0 1,0 28.8,26 A 0.4,0.4 0 1,0 28,26 Z M 30,28 A 0.4,0.4 0 1,0 30.8,28 A 0.4,0.4 0 1,0 30,28 Z" android:fillColor="#FFF8E1" />
+</vector>

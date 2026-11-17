@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Saucer Plate Base Rim & Contour -->
+    <path android:pathData="M 4,24 A 20,20 0 1,0 44,24 A 20,20 0 1,0 4,24 Z" android:fillColor="#FFFDF7" android:strokeColor="#51382B" android:strokeWidth="1.15" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 5.5,24 A 18.5,18.5 0 1,0 42.5,24 A 18.5,18.5 0 1,0 42.5,24 Z" android:fillColor="#F4E8D3" android:strokeColor="#E8D5B4" android:strokeWidth="0.5" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <path android:pathData="M 7,24 A 17,17 0 1,0 41,24 A 17,17 0 1,0 41,24 Z" android:fillColor="#FFFAF0" android:strokeColor="#E8D5B4" android:strokeWidth="0.45" android:strokeLineCap="round" android:strokeLineJoin="round" />
+    <!-- Saucer Bevel Specular Highlight & Inner Shadow -->
+    <path android:pathData="M 8,20 Q 14,8 28,8" android:fillColor="#00000000" android:strokeColor="#80FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 8.5,24 A 15.5,15.5 0 1,0 39.5,24 A 15.5,15.5 0 1,0 8.5,24 Z" android:fillColor="#15000000" />
+
+    <!-- Glass Cup Ambient Shadow -->
+    <path android:pathData="M 12.5,22 C 12.5,12 33.5,12 33.5,22 C 33.5,33 12.5,33 12.5,22 Z" android:fillColor="#22000000" />
+
+    <!-- Mug Handle & Glass Rim -->
+    <path android:pathData="M 32,20 C 37,20 37,28 32,28" android:fillColor="#00000000" android:strokeColor="#51382B" android:strokeWidth="1.2" android:strokeLineCap="round" />
+    <path android:pathData="M 12,22 C 12,11.5 33,11.5 33,22 C 33,32 12,32 12,22 Z" android:fillColor="#FFFDF5" android:strokeColor="#51382B" android:strokeWidth="0.8" android:strokeLineCap="round" android:strokeLineJoin="round" />
+
+    <!-- Soothing Green Tea Liquid Base -->
+    <path android:pathData="M 13.5,22 C 13.5,13 31.5,13 31.5,22 C 31.5,30.5 13.5,30.5 13.5,22 Z" android:fillColor="#7CB342" />
+    <path android:pathData="M 14,22 C 14,14 31,14 31,22 C 31,29.5 14,29.5 14,22 Z" android:fillColor="#558B2F" />
+
+    <!-- Floating Green Tea Leaf & Lemon Slice -->
+    <path android:pathData="M 17,21 Q 20,18 23,21 Q 20,23 17,21 Z" android:fillColor="#33691E" android:strokeColor="#1B5E20" android:strokeWidth="0.3" />
+    <path android:pathData="M 24,19 A 2.5,2.5 0 1,0 29,19 A 2.5,2.5 0 1,0 24,19 Z" android:fillColor="#F8D84F" />
+
+    <!-- Swirling Hot Steam Vapors Rising -->
+    <path android:pathData="M 18,10 Q 16,7 18,4 M 22,9 Q 24,6 22,3 M 26,10 Q 28,7 26,4" android:fillColor="#00000000" android:strokeColor="#60FFFFFF" android:strokeWidth="0.8" android:strokeLineCap="round" />
+
+    <!-- Specular Gloss Highlight -->
+    <path android:pathData="M 15,16 C 18,14.5 27,14.5 30,16" android:fillColor="#00000000" android:strokeColor="#A0FFFFFF" android:strokeWidth="1.2" android:strokeLineCap="round" />
+</vector>
